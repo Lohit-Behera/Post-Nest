@@ -1,0 +1,12 @@
+{
+  "name": "postnest",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev" : "nodemon src/index.js"
+  },
+  "author": "Lohit Sekhar Behera",
+  "license": "ISC",
+  "description": ""
+}

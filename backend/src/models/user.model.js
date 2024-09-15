@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 const userSchema = new Schema(
     {
@@ -32,6 +33,10 @@ const userSchema = new Schema(
         },
         coverImage: {
             type: String,
+        },
+        isAdmin: {
+            type: Boolean,
+            default: false
         },
         bio: {
             type: String
@@ -81,4 +86,4 @@ userSchema.methods.generateRefreshToken = function () {
     });
 };
 
-export default mongoose.model("User", userSchema)
+export const User = mongoose.model("User", userSchema)

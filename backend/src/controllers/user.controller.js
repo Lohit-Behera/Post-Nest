@@ -1,20 +1,23 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 import { uploadFile } from "../utils/cloudinary.js";
 
 const options = {
     httpOnly: true,
-    secure: true,
-}
+    secure: false,
+    sameSite: 'None'
+};
+
 
 // generate access token and refresh token
-const generateTokens = async (userId) => {
+const generateTokens = async (userId, res) => {
     try {
         const user = await User.findById(userId);
         if (!user) {
-            throw new ApiError(404, "User not found");
+            return res.status(404).json(
+                new ApiResponse(404, {}, "username or email not found")
+            )
         }
 
         const accessToken = user.generateAccessToken();
@@ -26,8 +29,7 @@ const generateTokens = async (userId) => {
         return { accessToken, refreshToken };
 
     } catch (error) {
-        console.log("Error details:", error);
-        throw new ApiError(500, "Something went wrong while generating tokens");
+        res.status(500).json(new ApiResponse(500, {}, "Something went wrong while generating tokens"));
     }
 };
 
@@ -39,24 +41,24 @@ const registerUser = asyncHandler(async (req, res) => {
 
     // validate data
     if (!username || !email || !fullName || !password) {
-        throw new ApiError(400, "Please provide all fields")
+        res.status(400).json(new ApiResponse(400, {}, "Please provide all fields"))
     }
 
     // check if user already exists
     if (await User.findOne({ $or: [{ username }, { email }] })) {
-        throw new ApiError(409, "User with this email already exists")
+        res.status(409).json(new ApiResponse(409, {}, "User with this username or email already exists"))
     }
     
     // check for images
     const avatarLocalPath = req.files?.avatar[0]?.path
     if (!avatarLocalPath) {
-        throw new ApiError(400, "Please provide an avatar")
+        res.status(400).json(new ApiResponse(400, {}, "Please provide an avatar"))
     }
     
     // upload images
     const avatarURL = await uploadFile(avatarLocalPath)
     if (!avatarURL) {
-        throw new ApiError(500, "Something went wrong while uploading avatar")
+        res.status(500).json(new ApiResponse(500, {}, "Something went wrong while uploading avatar"))
     }
 
     // create user
@@ -72,7 +74,7 @@ const registerUser = asyncHandler(async (req, res) => {
     const userDetails = await User.findById(user._id).select("-password -refreshToken -coverImage -bio -website -plan ")
 
     if (!userDetails) {
-        throw new ApiError(500, "Something went wrong while creating user")
+        res.status(500).json(new ApiResponse(500, {}, "Something went wrong while creating user"))
     }
 
     // send response
@@ -88,19 +90,25 @@ const loginUser = asyncHandler(async (req, res) => {
 
     // validate data
     if (!(username || email) || !password) {
-        throw new ApiError(400, "Please provide all fields")
+        return res.status(400).json(
+            new ApiResponse(400, {}, "Please provide username or email and password")
+        )
     }
 
     // check if user exists
     const user = await User.findOne({ $or: [{ username }, { email }] })
 
     if (!user) {
-        throw new ApiError(404, "User not found")
+        return res.status(401).json(
+            new ApiResponse(401, {}, "username or email not found")
+        )
     }
-
+    
     // check if password is correct
     if (!await user.comparePassword(password)) {
-        throw new ApiError(401, "Invalid credentials")
+        return res.status(401).json(
+            new ApiResponse(401, {}, "Incorrect password")
+        )
     }
 
     // generate access token and refresh token
@@ -140,7 +148,7 @@ const userDetails = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id).select("-password -refreshToken")
 
     if (!user) {
-        throw new ApiError(404, "User not found")
+        res.status(404).json(new ApiResponse(404, {}, "username or email not found"))
     }
 
     // send response

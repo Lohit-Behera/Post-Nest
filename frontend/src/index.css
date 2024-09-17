@@ -73,3 +73,25 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+:-webkit-autofill,
+:-webkit-autofill:hover,
+:-webkit-autofill:focus {
+  border: 1px solid var(--primary);
+  -webkit-text-fill-color:black; 
+  -webkit-box-shadow: 0 0 0px 1000px white inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+.dark :-webkit-autofill,
+.dark :-webkit-autofill:hover,
+.dark :-webkit-autofill:focus {
+  border: 1px solid var(--primary);
+  -webkit-text-fill-color: white;
+  -webkit-box-shadow: 0 0 0px 1000px #0c0a09 inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+::selection {
+  background: #facc15;
+}

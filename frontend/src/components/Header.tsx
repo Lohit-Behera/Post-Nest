@@ -1,4 +1,5 @@
 import { ModeToggle } from "./mode-toggle";
+import { useDispatch, useSelector } from "react-redux";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Sheet,
@@ -18,18 +19,25 @@ import {
   PanelLeft,
   Rss,
 } from "lucide-react";
+import { fetchLogout, fetchUserDetails } from "@/features/UserSlice";
 
 function Header() {
+  const dispatch = useDispatch<any>();
+
+  const userInfo = useSelector((state: any) => state.user.userInfo);
+  const details = () => {
+    dispatch(fetchUserDetails());
+  };
   return (
     <>
-      <header className="bg-background backdrop:blur-lg py-1 px-2 hidden md:flex justify-between space-x-2">
+      <header className="bg-background backdrop:blur-lg p-2 hidden md:flex justify-between space-x-2">
         <nav className="w-full flex justify-between">
           <Avatar>
             <AvatarImage src={Logo} />
             <AvatarFallback>L</AvatarFallback>
           </Avatar>
           <div className="flex my-auto">
-            <Button variant="ghost" className="font-semibold">
+            <Button variant="ghost" className="font-semibold" onClick={details}>
               <Home className="mr-2 h-4 w-4" />
               Home
             </Button>
@@ -41,14 +49,22 @@ function Header() {
               <ContactRound className="mr-2 h-4 w-4" />
               Support
             </Button>
-            <Button variant="ghost" className="font-semibold">
-              <LogOut className="mr-2 h-4 w-4" />
-              Logout
-            </Button>
-            <Button variant="ghost" className="font-semibold">
-              <LogIn className="mr-2 h-4 w-4" />
-              Login
-            </Button>
+            {userInfo && (
+              <Button
+                variant="ghost"
+                className="font-semibold"
+                onClick={() => dispatch(fetchLogout())}
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+              </Button>
+            )}
+            {!userInfo && (
+              <Button variant="ghost" className="font-semibold">
+                <LogIn className="mr-2 h-4 w-4" />
+                Login
+              </Button>
+            )}
           </div>
         </nav>
         <ModeToggle />

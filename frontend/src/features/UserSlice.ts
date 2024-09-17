@@ -5,7 +5,6 @@ import { baseUrl } from "./Proxy";
 export const fetchLogin = createAsyncThunk(
   "user/login",
   async (user: { email: string; password: string }, { rejectWithValue }) => {
-    console.log(user);
     try {
       const config = {
         headers: {
@@ -81,6 +80,32 @@ export const fetchUserDetails = createAsyncThunk(
   }
 );
 
+export const fetchSendVerifyEmail = createAsyncThunk(
+  "user/sendVerifyEmail",
+  async (_, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      };
+      const { data } = await axios.post(
+        `${baseUrl}/api/v1/users/send-verify-email`,
+        {},
+        config
+      );
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 function getCookie(name: string) {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
@@ -97,7 +122,7 @@ const userInfoCookie = getCookie("userInfoPostNest");
 const userSlice = createSlice({
   name: "user",
   initialState: {
-    userInfo: userInfoCookie ? JSON.parse(userInfoCookie) : {},
+    userInfo: userInfoCookie ? JSON.parse(userInfoCookie) : null,
     userInfoStatus: "idle",
     userInfoError: {},
 
@@ -108,6 +133,10 @@ const userSlice = createSlice({
     userDetails: {},
     userDetailsStatus: "idle",
     userDetailsError: {},
+
+    sendVerifyEmail: {},
+    sendVerifyEmailStatus: "idle",
+    sendVerifyEmailError: {},
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -132,7 +161,7 @@ const userSlice = createSlice({
       .addCase(fetchLogout.fulfilled, (state, action) => {
         state.logoutStatus = "succeeded";
         state.logout = action.payload;
-        state.userInfo = {};
+        state.userInfo = null;
       })
       .addCase(fetchLogout.rejected, (state, action) => {
         state.logoutStatus = "failed";
@@ -150,6 +179,20 @@ const userSlice = createSlice({
       .addCase(fetchUserDetails.rejected, (state, action) => {
         state.userDetailsStatus = "failed";
         state.userDetailsError = action.payload || "Login failed";
+      })
+
+      // Send Verify Email
+      .addCase(fetchSendVerifyEmail.pending, (state) => {
+        state.sendVerifyEmailStatus = "loading";
+      })
+      .addCase(fetchSendVerifyEmail.fulfilled, (state, action) => {
+        state.sendVerifyEmailStatus = "succeeded";
+        state.sendVerifyEmail = action.payload;
+      })
+      .addCase(fetchSendVerifyEmail.rejected, (state, action) => {
+        state.sendVerifyEmailStatus = "failed";
+        state.sendVerifyEmailError =
+          action.payload || "Send Verify Email failed";
       });
   },
 });

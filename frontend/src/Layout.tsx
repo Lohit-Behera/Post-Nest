@@ -6,18 +6,29 @@ import { fetchUserDetails } from "./features/UserSlice";
 
 function Layout() {
   const dispatch = useDispatch<any>();
-  const id = useSelector((state: any) => state.user.userInfo?.id);
+  const userInfo = useSelector((state: any) => state.user.userInfo);
+  const userDetailsStatus = useSelector(
+    (state: any) => state.user.userDetailsStatus
+  );
   useEffect(() => {
-    if (id) {
+    if (userInfo) {
       dispatch(fetchUserDetails());
     }
-  }, [id, dispatch]);
+  }, [userInfo, dispatch]);
   return (
     <>
       <Header />
-      <main className="w-[99%] mx-auto">
-        <Outlet />
-      </main>
+      {userDetailsStatus === "loading" ? (
+        <p>Loading</p>
+      ) : userDetailsStatus === "failed" ? (
+        <p>Error</p>
+      ) : (
+        <>
+          <main className="w-[99%] mx-auto">
+            <Outlet />
+          </main>
+        </>
+      )}
     </>
   );
 }

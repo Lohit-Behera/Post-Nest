@@ -1,4 +1,5 @@
 import { ModeToggle } from "./mode-toggle";
+import { useNavigate, NavLink } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -19,14 +20,18 @@ import {
   PanelLeft,
   Rss,
 } from "lucide-react";
-import { fetchLogout, fetchUserDetails } from "@/features/UserSlice";
+import { fetchLogout, fetchSendVerifyEmail } from "@/features/UserSlice";
 
 function Header() {
   const dispatch = useDispatch<any>();
+  const navigate = useNavigate();
 
   const userInfo = useSelector((state: any) => state.user.userInfo);
-  const details = () => {
-    dispatch(fetchUserDetails());
+  const userDetails = useSelector((state: any) => state.user.userDetails);
+
+  const handleLogout = () => {
+    dispatch(fetchLogout());
+    navigate("/sign-in");
   };
   return (
     <>
@@ -36,12 +41,23 @@ function Header() {
             <AvatarImage src={Logo} />
             <AvatarFallback>L</AvatarFallback>
           </Avatar>
-          <div className="flex my-auto">
-            <Button variant="ghost" className="font-semibold" onClick={details}>
-              <Home className="mr-2 h-4 w-4" />
-              Home
-            </Button>
-            <Button variant="ghost" className="font-semibold">
+          <div className="flex my-auto space-x-2">
+            <NavLink to="/">
+              {({ isActive }) => (
+                <Button
+                  variant={isActive ? "default" : "ghost"}
+                  className="font-semibold"
+                >
+                  <Home className="mr-2 h-4 w-4" />
+                  Home
+                </Button>
+              )}
+            </NavLink>
+            <Button
+              variant="ghost"
+              className="font-semibold"
+              onClick={() => dispatch(fetchSendVerifyEmail())}
+            >
               <Rss className="mr-2 h-4 w-4" />
               Feed
             </Button>
@@ -50,20 +66,36 @@ function Header() {
               Support
             </Button>
             {userInfo && (
-              <Button
-                variant="ghost"
-                className="font-semibold"
-                onClick={() => dispatch(fetchLogout())}
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                Logout
-              </Button>
+              <>
+                <Button
+                  variant="ghost"
+                  className="font-semibold"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Logout
+                </Button>
+                <Avatar>
+                  <AvatarImage
+                    src={userDetails.data?.avatar}
+                    className="object-cover"
+                  />
+                  <AvatarFallback>L</AvatarFallback>
+                </Avatar>
+              </>
             )}
             {!userInfo && (
-              <Button variant="ghost" className="font-semibold">
-                <LogIn className="mr-2 h-4 w-4" />
-                Login
-              </Button>
+              <NavLink to="/sign-in">
+                {({ isActive }) => (
+                  <Button
+                    variant={isActive ? "default" : "ghost"}
+                    className="font-semibold"
+                  >
+                    <LogIn className="mr-2 h-4 w-4" />
+                    Login
+                  </Button>
+                )}
+              </NavLink>
             )}
           </div>
         </nav>

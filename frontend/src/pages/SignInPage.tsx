@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -27,7 +27,9 @@ const FormSchema = z.object({
 
 function SignInPage() {
   const dispatch = useDispatch<any>();
+  const navigate = useNavigate();
 
+  const userInfo = useSelector((state: any) => state.user.userInfo);
   const loginStatus = useSelector((state: any) => state.user.loginStatus);
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -37,6 +39,12 @@ function SignInPage() {
       password: "",
     },
   });
+
+  useEffect(() => {
+    if (userInfo) {
+      navigate("/");
+    }
+  }, [userInfo, navigate]);
 
   useEffect(() => {
     if (loginStatus === "succeeded") {

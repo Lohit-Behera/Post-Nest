@@ -1,9 +1,9 @@
 function HomePage() {
   return (
     <div>
-        <h1>PostNest</h1>
+      <h1 className="text-3xl font-bold">PostNest</h1>
     </div>
-  )
+  );
 }
 
-export default HomePage
+export default HomePage;

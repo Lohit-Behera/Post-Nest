@@ -1,7 +1,9 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
+import { Token } from "../models/token.model.js";
 import { uploadFile } from "../utils/cloudinary.js";
+import { sendEmail } from "../utils/sendMail.js";
 
 const options = {
     httpOnly: true,
@@ -16,7 +18,7 @@ const generateTokens = async (userId, res) => {
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json(
-                new ApiResponse(404, {}, "username or email not found")
+                new ApiResponse(404, {}, "user not found")
             )
         }
 
@@ -32,7 +34,6 @@ const generateTokens = async (userId, res) => {
         res.status(500).json(new ApiResponse(500, {}, "Something went wrong while generating tokens"));
     }
 };
-
 
 // Register user
 const registerUser = asyncHandler(async (req, res) => {
@@ -76,7 +77,7 @@ const registerUser = asyncHandler(async (req, res) => {
     if (!userDetails) {
         res.status(500).json(new ApiResponse(500, {}, "Something went wrong while creating user"))
     }
-
+    
     // send response
     return res.status(201).json(
         new ApiResponse(201, userDetails, "User created successfully")
@@ -150,12 +151,80 @@ const userDetails = asyncHandler(async (req, res) => {
     if (!user) {
         res.status(404).json(new ApiResponse(404, {}, "username or email not found"))
     }
-
+    
     // send response
     return res.status(200).json(
         new ApiResponse(200, user, "User details fetched successfully")
     )
 })
 
+// send verify email
+const sendVerifyEmail = async (req, res) => {
+    const userId = req.user._id
 
-export { registerUser, loginUser, logoutUser, userDetails }
+    if (req.user.isVerified) {
+        return res.status(400).json(new ApiResponse(400, {}, "Email already verified"))
+    }
+
+    const token = await Token.findOne({ user: userId })
+
+    if (!token) {
+        await Token.create({ user: userId })
+    }
+
+    const verificationToken = await Token.findOne({ user: userId })
+
+    if (!verificationToken) {
+        return res.status(500).json(new ApiResponse(500, {}, "Something went wrong while generating verification token"))
+    }
+
+    const emailVerifyToken = verificationToken.generateVerifyEmailToken()
+
+    if (!emailVerifyToken) {
+        return res.status(500).json(new ApiResponse(500, {}, "Something went wrong while generating email verification token"))
+    }
+
+    verificationToken.token = emailVerifyToken
+    await verificationToken.save({ validateBeforeSave: false })
+
+    const verifyEmailLink = `${req.protocol + '://' + req.get('host')}/api/v1/users/verify-email/${userId}/${emailVerifyToken}`
+
+    await sendEmail(req.user.email, "Verify Email", `Click on the link below to verify your email\n\n${verifyEmailLink}`);
+
+    return res.status(200).json(new ApiResponse(200, {}, "Email verification link sent"))
+}
+
+
+// verify email
+const verifyEmail = async (req, res) => {
+    const { userId, token } = req.params
+    const user = await User.findById(userId)
+
+    if (!user) {
+        return res.status(404).json(new ApiResponse(404, {}, "User not found"))
+    }
+
+    const verifyEmailToken = await Token.findOne({ user: userId })
+
+    if (!verifyEmailToken) {
+        return res.status(404).json(new ApiResponse(404, {}, "Verification token not found"))
+    }
+
+    if (verifyEmailToken.token !== token) {
+        return res.status(401).json(new ApiResponse(401, {}, "Invalid verification token"))
+    }
+
+    if (verifyEmailToken.token.toString() !== token.toString()) {
+        return res.status(401).json(new ApiResponse(401, {}, "Invalid user"))
+    }
+
+    user.isVerified = true
+    await user.save({ validateBeforeSave: false })
+
+    await verifyEmailToken.deleteOne({ user: userId })
+
+    return res.redirect(`http://localhost:5173?verified=true`)
+}
+
+
+export { registerUser, loginUser, logoutUser, userDetails, sendVerifyEmail, verifyEmail }

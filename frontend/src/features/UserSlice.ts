@@ -106,6 +106,58 @@ export const fetchSendVerifyEmail = createAsyncThunk(
   }
 );
 
+// Get user info for everyone
+export const fetchGetUserInfo = createAsyncThunk(
+  "user/getUserInfo",
+  async (id: { id: string }, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      };
+      const { data } = await axios.get(
+        `${baseUrl}/api/v1/users/user-details/${id.id}`,
+        config
+      );
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const fetchUpdateUserDetails = createAsyncThunk(
+  "user/updateUserDetails",
+  async (user: any, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      };
+      const { data } = await axios.patch(
+        `${baseUrl}/api/v1/users/update`,
+        user,
+        config
+      );
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 function getCookie(name: string) {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
@@ -137,8 +189,22 @@ const userSlice = createSlice({
     sendVerifyEmail: {},
     sendVerifyEmailStatus: "idle",
     sendVerifyEmailError: {},
+
+    getUserInfo: {},
+    getUserInfoStatus: "idle",
+    getUserInfoError: {},
+
+    updateUserDetails: {},
+    updateUserDetailsStatus: "idle",
+    updateUserDetailsError: {},
   },
-  reducers: {},
+  reducers: {
+    resetUserUpdate: (state) => {
+      state.updateUserDetails = {};
+      state.updateUserDetailsStatus = "idle";
+      state.updateUserDetailsError = {};
+    },
+  },
   extraReducers: (builder) => {
     builder
       // Login
@@ -178,7 +244,7 @@ const userSlice = createSlice({
       })
       .addCase(fetchUserDetails.rejected, (state, action) => {
         state.userDetailsStatus = "failed";
-        state.userDetailsError = action.payload || "Login failed";
+        state.userDetailsError = action.payload || "User Details failed";
       })
 
       // Send Verify Email
@@ -193,8 +259,36 @@ const userSlice = createSlice({
         state.sendVerifyEmailStatus = "failed";
         state.sendVerifyEmailError =
           action.payload || "Send Verify Email failed";
+      })
+
+      // Get User Info
+      .addCase(fetchGetUserInfo.pending, (state) => {
+        state.getUserInfoStatus = "loading";
+      })
+      .addCase(fetchGetUserInfo.fulfilled, (state, action) => {
+        state.getUserInfoStatus = "succeeded";
+        state.getUserInfo = action.payload;
+      })
+      .addCase(fetchGetUserInfo.rejected, (state, action) => {
+        state.getUserInfoStatus = "failed";
+        state.getUserInfoError = action.payload || "Get User Info failed";
+      })
+
+      // Edit User Details
+      .addCase(fetchUpdateUserDetails.pending, (state) => {
+        state.updateUserDetailsStatus = "loading";
+      })
+      .addCase(fetchUpdateUserDetails.fulfilled, (state, action) => {
+        state.updateUserDetailsStatus = "succeeded";
+        state.updateUserDetails = action.payload;
+      })
+      .addCase(fetchUpdateUserDetails.rejected, (state, action) => {
+        state.updateUserDetailsStatus = "failed";
+        state.updateUserDetailsError =
+          action.payload || "failed to update user details";
       });
   },
 });
 
+export const { resetUserUpdate } = userSlice.actions;
 export default userSlice.reducer;

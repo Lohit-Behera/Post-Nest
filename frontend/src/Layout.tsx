@@ -24,7 +24,7 @@ function Layout() {
         <p>Error</p>
       ) : (
         <>
-          <main className="w-[99%] mx-auto">
+          <main>
             <Outlet />
           </main>
         </>

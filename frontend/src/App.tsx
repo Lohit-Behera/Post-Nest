@@ -9,6 +9,8 @@ import Layout from "./Layout";
 import HomePage from "./pages/HomePage";
 import SignUpPage from "./pages/SignUpPage";
 import SignInPage from "./pages/SignInPage";
+import ProfilePage from "./pages/ProfilePage";
+import UpdateProfilePage from "./pages/UpdateProfilePage";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -16,6 +18,8 @@ const router = createBrowserRouter(
       <Route index element={<HomePage />} />
       <Route path="/sign-up" element={<SignUpPage />} />
       <Route path="/sign-in" element={<SignInPage />} />
+      <Route path="/profile/:userId" element={<ProfilePage />} />
+      <Route path="/update-profile/:userId" element={<UpdateProfilePage />} />
     </Route>
   )
 );

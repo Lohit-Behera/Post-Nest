@@ -1,5 +1,5 @@
 import { ModeToggle } from "./mode-toggle";
-import { useNavigate, NavLink } from "react-router-dom";
+import { useNavigate, NavLink, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -75,13 +75,15 @@ function Header() {
                   <LogOut className="mr-2 h-4 w-4" />
                   Logout
                 </Button>
-                <Avatar>
-                  <AvatarImage
-                    src={userDetails.data?.avatar}
-                    className="object-cover"
-                  />
-                  <AvatarFallback>L</AvatarFallback>
-                </Avatar>
+                <Link to={`/profile/${userInfo._id}`}>
+                  <Avatar>
+                    <AvatarImage
+                      src={userDetails.data?.avatar}
+                      className="object-cover"
+                    />
+                    <AvatarFallback>L</AvatarFallback>
+                  </Avatar>
+                </Link>
               </>
             )}
             {!userInfo && (
@@ -143,7 +145,20 @@ function Header() {
             </SheetHeader>
           </SheetContent>
         </Sheet>
-        <ModeToggle />
+        <div className="flex my-auto space-x-2">
+          {userInfo && (
+            <>
+              <Avatar>
+                <AvatarImage
+                  src={userDetails.data?.avatar}
+                  className="object-cover"
+                />
+                <AvatarFallback>L</AvatarFallback>
+              </Avatar>
+            </>
+          )}
+          <ModeToggle />
+        </div>
       </header>
     </>
   );

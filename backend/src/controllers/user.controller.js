@@ -2,7 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 import { Token } from "../models/token.model.js";
-import { uploadFile } from "../utils/cloudinary.js";
+import { deleteFile, uploadFile } from "../utils/cloudinary.js";
 import { sendEmail } from "../utils/sendMail.js";
 
 const options = {
@@ -226,5 +226,108 @@ const verifyEmail = async (req, res) => {
     return res.redirect(`http://localhost:5173?verified=true`)
 }
 
+const getUserDetails = async (req, res) => {
+    const { id } = req.params
 
-export { registerUser, loginUser, logoutUser, userDetails, sendVerifyEmail, verifyEmail }
+    const user = await User.findById(id).select("-password -refreshToken")
+
+    if (!user) {
+        return res.status(404).json(new ApiResponse(404, {}, "User not found"))
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, user, "User details fetched successfully")
+    )
+}
+
+// update user details
+const updateUserDetails = async (req, res) => {
+    const user = await User.findById(req.user._id)
+    const { fullName, bio, website} = req.body
+    const avatarLocalPath = req.files.avatar ? req.files.avatar[0].path : null
+    const coverImageLocalPath = req.files.coverImage ? req.files.coverImage[0].path : null
+
+    if (!user) {
+        return res.status(404).json(new ApiResponse(404, {}, "User not found"))
+    }
+
+    if (fullName === "" && bio === "" && website === "" && avatarLocalPath === null && coverImageLocalPath === null) {
+        return res.status(400).json(new ApiResponse(400, {}, "Nothing to update"))
+    }
+
+    if (fullName !== "") {
+        if (fullName === user.fullName) {
+            return res.status(400).json(new ApiResponse(400, {}, "Full name is same as before"))
+        } else if (fullName.length < 2) {
+            return res.status(400).json(new ApiResponse(400, {}, "Full name should be atleast 2 characters long"))
+        } else {
+            user.fullName = fullName
+        }
+    }
+
+    if (bio !== "") {
+        if (bio === user.bio) {
+            return res.status(400).json(new ApiResponse(400, {}, "Bio is same as before"))
+        } else if (bio.length < 2) {
+            return res.status(400).json(new ApiResponse(400, {}, "Bio should be atleast 2 characters long"))
+        } else {
+            user.bio = bio
+        }
+    }
+
+    if (website !== "") {
+        if (website === user.website) {
+            return res.status(400).json(new ApiResponse(400, {}, "Website is same as before"))
+        } else if (website.length < 2) {
+            return res.status(400).json(new ApiResponse(400, {}, "Website should be atleast 2 characters long"))
+        } else {
+            user.website = website
+        }
+    }
+
+    if (avatarLocalPath) {
+        const avatarUrl = await uploadFile(avatarLocalPath)
+
+        if (!avatarUrl) {
+            return res.status(500).json(new ApiResponse(500, {}, "Something went wrong while uploading avatar"))
+        }
+
+        const publicId = user.avatar.split('/').pop().split('.')[0];
+
+        await deleteFile(publicId, res)
+
+        user.avatar = avatarUrl
+    }
+
+    if (coverImageLocalPath) {
+        if (user.coverImage) {
+            const publicId = user.coverImage.split('/').pop().split('.')[0];
+            await deleteFile(publicId, res)
+        }
+        
+        const coverImageUrl = await uploadFile(coverImageLocalPath)
+        
+        if (!coverImageUrl) {
+            return res.status(500).json(new ApiResponse(500, {}, "Something went wrong while uploading cover image"))
+        }
+        user.coverImage = coverImageUrl
+    }
+
+    await user.save({ validateBeforeSave: false })
+
+    return res.status(200).json(
+        new ApiResponse(200, {}, "User details updated successfully")
+    )
+}
+
+
+export {
+    registerUser,
+    loginUser,
+    logoutUser,
+    userDetails,
+    sendVerifyEmail,
+    verifyEmail,
+    getUserDetails,
+    updateUserDetails
+}

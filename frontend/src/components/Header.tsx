@@ -12,14 +12,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "./ui/button";
 import Logo from "../assets/Logo.svg";
-import {
-  ContactRound,
-  Home,
-  LogIn,
-  LogOut,
-  PanelLeft,
-  Rss,
-} from "lucide-react";
+import { Home, LogIn, LogOut, PanelLeft, Rss, SquarePlus } from "lucide-react";
 import { fetchLogout, fetchSendVerifyEmail } from "@/features/UserSlice";
 
 function Header() {
@@ -61,10 +54,17 @@ function Header() {
               <Rss className="mr-2 h-4 w-4" />
               Feed
             </Button>
-            <Button variant="ghost" className="font-semibold">
-              <ContactRound className="mr-2 h-4 w-4" />
-              Support
-            </Button>
+            <NavLink to="/create-post">
+              {({ isActive }) => (
+                <Button
+                  variant={isActive ? "default" : "ghost"}
+                  className="font-semibold"
+                >
+                  <SquarePlus className="mr-2 h-4 w-4" />
+                  Create Post
+                </Button>
+              )}
+            </NavLink>
             {userInfo && (
               <>
                 <Button
@@ -129,8 +129,8 @@ function Header() {
                     Feed
                   </Button>
                   <Button variant="ghost" className="font-semibold">
-                    <ContactRound className="mr-2 h-4 w-4" />
-                    Support
+                    <SquarePlus className="mr-2 h-4 w-4" />
+                    Create Post
                   </Button>
                   <Button variant="ghost" className="font-semibold">
                     <LogOut className="mr-2 h-4 w-4" />

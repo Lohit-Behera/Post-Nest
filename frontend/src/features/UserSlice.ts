@@ -109,7 +109,7 @@ export const fetchSendVerifyEmail = createAsyncThunk(
 // Get user info for everyone
 export const fetchGetUserInfo = createAsyncThunk(
   "user/getUserInfo",
-  async (id: { id: string }, { rejectWithValue }) => {
+  async (id: string, { rejectWithValue }) => {
     try {
       const config = {
         headers: {
@@ -118,7 +118,7 @@ export const fetchGetUserInfo = createAsyncThunk(
         withCredentials: true,
       };
       const { data } = await axios.get(
-        `${baseUrl}/api/v1/users/user-details/${id.id}`,
+        `${baseUrl}/api/v1/users/user-details/${id}`,
         config
       );
       return data;

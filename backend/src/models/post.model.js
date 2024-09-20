@@ -19,9 +19,9 @@ const postSchema = new Schema(
         thumbnail: {
             type: String
         },
-        isPublished: {
+        isPublic: {
             type: Boolean,
-            default: false
+            default: true
         },
     },
     {
@@ -31,4 +31,6 @@ const postSchema = new Schema(
 
 postSchema.plugin(mongooseAggregatePaginate);
 
-export default mongoose.model("Post", postSchema)
+const Post = mongoose.model("Post", postSchema);
+
+export { Post }

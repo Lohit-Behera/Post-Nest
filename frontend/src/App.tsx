@@ -11,6 +11,8 @@ import SignUpPage from "./pages/SignUpPage";
 import SignInPage from "./pages/SignInPage";
 import ProfilePage from "./pages/ProfilePage";
 import UpdateProfilePage from "./pages/UpdateProfilePage";
+import CreatePostPage from "./pages/CreatePostPage";
+import PostDetailsPage from "./pages/PostDetailsPage";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -20,6 +22,8 @@ const router = createBrowserRouter(
       <Route path="/sign-in" element={<SignInPage />} />
       <Route path="/profile/:userId" element={<ProfilePage />} />
       <Route path="/update-profile/:userId" element={<UpdateProfilePage />} />
+      <Route path="/create-post" element={<CreatePostPage />} />
+      <Route path="/post/:id" element={<PostDetailsPage />} />
     </Route>
   )
 );

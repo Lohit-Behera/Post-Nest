@@ -31,7 +31,7 @@ function ProfilePage() {
     if (!userInfo) {
       navigate(`/sign-in`);
     } else {
-      dispatch(fetchGetUserInfo({ id: userId }));
+      dispatch(fetchGetUserInfo(userId as string));
     }
   }, [userId, dispatch]);
   return (

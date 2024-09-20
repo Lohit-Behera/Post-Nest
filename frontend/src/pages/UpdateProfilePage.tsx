@@ -51,7 +51,7 @@ function UpdateProfilePage() {
     if (!userInfo) {
       navigate(`/sign-in`);
     } else if (userId) {
-      dispatch(fetchGetUserInfo({ id: userId }));
+      dispatch(fetchGetUserInfo(userId as string));
     }
   }, [userId, dispatch]);
 

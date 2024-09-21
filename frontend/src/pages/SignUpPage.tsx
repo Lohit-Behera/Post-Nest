@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -15,6 +15,9 @@ import {
 } from "@/components/ui/form";
 import waterFall from "@/assets/waterfalls.jpg";
 import CustomPassword from "@/components/CustomPassword";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchRegister } from "@/features/UserSlice";
+import { useEffect } from "react";
 
 const FormSchema = z.object({
   username: z.string().min(2, {
@@ -45,6 +48,21 @@ const FormSchema = z.object({
 });
 
 function SignUpPage() {
+  const dispatch = useDispatch<any>();
+  const navigate = useNavigate();
+
+  const register = useSelector((state: any) => state.user.register);
+  const registerStatus = useSelector((state: any) => state.user.registerStatus);
+  const registerError = useSelector((state: any) => state.user.registerError);
+
+  useEffect(() => {
+    if (registerStatus === "succeeded") {
+      alert(register.data.message);
+      navigate("/sign-in");
+    } else if (registerStatus === "failed") {
+      alert(registerError);
+    }
+  }, [register, registerStatus, registerError, navigate]);
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -68,7 +86,7 @@ function SignUpPage() {
     if (data.password !== data.confirmPassword) {
       alert("Passwords do not match.");
     } else {
-      console.log(userData);
+      dispatch(fetchRegister(userData));
     }
   }
 

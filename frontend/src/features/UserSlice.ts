@@ -2,6 +2,31 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { baseUrl } from "./Proxy";
 
+export const fetchRegister = createAsyncThunk(
+  "user/register",
+  async (user: any, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      };
+      const { data } = await axios.post(
+        `${baseUrl}/api/v1/users/register`,
+        user,
+        config
+      );
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 export const fetchLogin = createAsyncThunk(
   "user/login",
   async (user: { email: string; password: string }, { rejectWithValue }) => {
@@ -174,6 +199,10 @@ const userInfoCookie = getCookie("userInfoPostNest");
 const userSlice = createSlice({
   name: "user",
   initialState: {
+    register: {},
+    registerStatus: "idle",
+    registerError: {},
+
     userInfo: userInfoCookie ? JSON.parse(userInfoCookie) : null,
     userInfoStatus: "idle",
     userInfoError: {},
@@ -204,9 +233,28 @@ const userSlice = createSlice({
       state.updateUserDetailsStatus = "idle";
       state.updateUserDetailsError = {};
     },
+    resetRegister: (state) => {
+      state.register = {};
+      state.registerStatus = "idle";
+      state.registerError = {};
+    },
   },
   extraReducers: (builder) => {
     builder
+
+      // Register
+      .addCase(fetchRegister.pending, (state) => {
+        state.registerStatus = "loading";
+      })
+      .addCase(fetchRegister.fulfilled, (state, action) => {
+        state.registerStatus = "succeeded";
+        state.register = action.payload;
+      })
+      .addCase(fetchRegister.rejected, (state, action) => {
+        state.registerStatus = "failed";
+        state.registerError = action.payload || "Register failed";
+      })
+
       // Login
       .addCase(fetchLogin.pending, (state) => {
         state.userInfoStatus = "loading";
@@ -290,5 +338,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { resetUserUpdate } = userSlice.actions;
+export const { resetUserUpdate, resetRegister } = userSlice.actions;
 export default userSlice.reducer;

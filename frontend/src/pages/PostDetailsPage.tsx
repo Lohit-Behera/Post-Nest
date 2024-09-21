@@ -36,6 +36,11 @@ function PostDetailsPage() {
   const deletePostStatus = useSelector(
     (state: any) => state.post.deletePostStatus
   );
+  const deletePostError = useSelector(
+    (state: any) => state.post.deletePostError
+  );
+
+  console.log(userInfo._id === user._id);
 
   useEffect(() => {
     dispatch(fetchPostDetails(id as string));
@@ -46,6 +51,9 @@ function PostDetailsPage() {
       alert(deletePost.message);
       dispatch(resetDeletePost());
       navigate("/");
+    } else if (deletePostStatus === "failed") {
+      alert(deletePostError);
+      dispatch(resetDeletePost());
     }
   });
 
@@ -72,7 +80,7 @@ function PostDetailsPage() {
                     </p>
                   </div>
                 </div>
-                {userInfo.id === user.id && (
+                {userInfo._id === user._id && (
                   <div className="flex space-x-3">
                     <Button
                       variant="secondary"

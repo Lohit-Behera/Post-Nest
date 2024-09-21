@@ -1,9 +1,13 @@
 import { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchPostDetails } from "@/features/PostSlice";
+import {
+  fetchDeletePost,
+  fetchPostDetails,
+  resetDeletePost,
+} from "@/features/PostSlice";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -11,12 +15,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Pencil, Trash } from "lucide-react";
 
 function PostDetailsPage() {
   const { id } = useParams();
-
   const dispatch = useDispatch<any>();
+  const navigate = useNavigate();
 
+  const userInfo = useSelector((state: any) => state.user.userInfo);
   const postDetails = useSelector((state: any) => state.post.postDetails);
   const post = postDetails.data ? postDetails.data.post : {};
   const user = postDetails.data ? postDetails.data.user : {};
@@ -26,10 +32,22 @@ function PostDetailsPage() {
   const updatedContent = post.content
     ? post.content.replace("<h1>", '<h1 class="text-3xl font-bold">')
     : "";
+  const deletePost = useSelector((state: any) => state.post.deletePost);
+  const deletePostStatus = useSelector(
+    (state: any) => state.post.deletePostStatus
+  );
 
   useEffect(() => {
     dispatch(fetchPostDetails(id as string));
   }, [dispatch, id]);
+
+  useEffect(() => {
+    if (deletePostStatus === "succeeded") {
+      alert(deletePost.message);
+      dispatch(resetDeletePost());
+      navigate("/");
+    }
+  });
 
   return (
     <>
@@ -41,17 +59,39 @@ function PostDetailsPage() {
         <div className="w-full md:w-[90%] mx-auto">
           <Card>
             <CardHeader>
-              <CardTitle className="flex space-x-2">
-                <Avatar>
-                  <AvatarImage src={user.avatar} />
-                  <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col space-y-1">
-                  <p>{user.username}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {user.fullName}
-                  </p>
+              <CardTitle className="flex justify-between ">
+                <div className="flex space-x-2">
+                  <Avatar className="w-14 h-14">
+                    <AvatarImage src={user.avatar} />
+                    <AvatarFallback>CN</AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col space-y-1">
+                    <p>{user.username}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {user.fullName}
+                    </p>
+                  </div>
                 </div>
+                {userInfo.id === user.id && (
+                  <div className="flex space-x-3">
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      onClick={() => {
+                        navigate(`/post/update/${id}`);
+                      }}
+                    >
+                      <Pencil />
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      onClick={() => dispatch(fetchDeletePost(id as string))}
+                    >
+                      <Trash />
+                    </Button>
+                  </div>
+                )}
               </CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col space-y-4">

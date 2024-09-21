@@ -82,4 +82,86 @@ const postDetails = asyncHandler(async (req, res) => {
     )
 })
 
-export { createPost, postDetails }
+const UpdatePost = asyncHandler(async (req, res) => {
+    const { id } = req.params
+    const userId = req.user._id
+    const { title, content, isPublic } = req.body
+
+    const post = await Post.findById(id)
+
+    if (!post) {
+        return res.status(404).json(new ApiResponse(404, {}, "Post not found"))
+    }
+
+    if (post.author.toString() !== userId.toString()) {
+        return res.status(403).json(new ApiResponse(403, {}, "You are not authorized to update this post"))
+    }
+
+    if (!title && !content && !isPublic) {
+        return res.status(400).json(new ApiResponse(400, {}, "Please provide at least one field to update"))
+    }
+
+    if (post.title === title && post.content === content && post.isPublic === isPublic && !req.file) {
+            return res.status(400).json(new ApiResponse(400, {}, "No changes detected"))
+        }
+
+    if (title) {
+        post.title = title
+    }
+    if (content) {
+        post.content = content
+    }
+    if (isPublic) {
+        post.isPublic = isPublic
+    }
+
+    if (req.file) {
+        const thumbnailLocalPath = req.file?.path
+        const thumbnailUrl = await uploadFile(thumbnailLocalPath)
+        if (!thumbnailUrl) {
+            return res.status(500).json(new ApiResponse(500, {}, "Something went wrong while uploading thumbnail"))
+        }
+        const publicId = post.thumbnail.split('/').pop().split('.')[0]
+        await deleteFile(publicId, res)
+        await Post.findByIdAndUpdate(id, {
+            thumbnail: thumbnailUrl
+        })
+    }
+
+    await post.save({ validateBeforeSave: false })
+
+    const updatedPost = await Post.findById(id)
+
+    if (!updatedPost) {
+        return res.status(500).json(new ApiResponse(500, {}, "Something went wrong while updating post"))
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, {}, "Post updated successfully")
+    )
+})
+
+const deletePost = asyncHandler(async (req, res) => {
+    const { id } = req.params
+    const userId = req.user._id
+
+    const post = await Post.findById(id)
+
+    if (!post) {
+        return res.status(404).json(new ApiResponse(404, {}, "Post not found"))
+    }
+
+    if (post.author.toString() !== userId.toString()) {
+        return res.status(403).json(new ApiResponse(403, {}, "You are not authorized to delete this post"))
+    }
+
+    const publicId = post.thumbnail.split('/').pop().split('.')[0];
+
+    await deleteFile(publicId, res)
+    await Post.findByIdAndDelete(id)
+    return res.status(200).json(
+        new ApiResponse(200, {}, "Post deleted successfully")
+    )
+})
+
+export { createPost, postDetails, UpdatePost, deletePost }

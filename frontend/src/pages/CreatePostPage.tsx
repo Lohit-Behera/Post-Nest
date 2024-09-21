@@ -15,7 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import RichTextEditor from "@/components/TextEditor";
-import { fetchCreatePost } from "@/features/PostSlice";
+import { fetchCreatePost, resetCreatePost } from "@/features/PostSlice";
 import { useEffect } from "react";
 
 const formSchema = z.object({
@@ -48,7 +48,6 @@ function CreatePostPage() {
 
   const userInfo = useSelector((state: any) => state.user.userInfo);
   const createPost = useSelector((state: any) => state.post.createPost);
-  const data = createPost.postDetails || {};
   const createPostStatus = useSelector(
     (state: any) => state.post.createPostStatus
   );
@@ -64,9 +63,12 @@ function CreatePostPage() {
 
   useEffect(() => {
     if (createPostStatus === "succeeded") {
-      navigate(`/post/${data._id}`);
+      const id = createPost.data._id;
+      navigate(`/post/${id}`);
+      dispatch(resetCreatePost());
     } else if (createPostStatus === "failed") {
       alert(createPostError);
+      dispatch(resetCreatePost());
     }
   }, [createPostStatus]);
 

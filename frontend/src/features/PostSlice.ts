@@ -53,6 +53,57 @@ export const fetchPostDetails = createAsyncThunk(
   }
 );
 
+export const fetchUpdatePost = createAsyncThunk(
+  "update/post",
+  async (post: any, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      };
+      const { data } = await axios.patch(
+        `${baseUrl}/api/v1/posts/update/${post.id}`,
+        post,
+        config
+      );
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const fetchDeletePost = createAsyncThunk(
+  "delete/post",
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      };
+      const { data } = await axios.delete(
+        `${baseUrl}/api/v1/posts/delete/${id}`,
+        config
+      );
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 const postSlice = createSlice({
   name: "post",
   initialState: {
@@ -63,12 +114,30 @@ const postSlice = createSlice({
     postDetails: {},
     postDetailsStatus: "idle",
     postDetailsError: {},
+
+    updatePost: {},
+    updatePostStatus: "idle",
+    updatePostError: {},
+
+    deletePost: {},
+    deletePostStatus: "idle",
+    deletePostError: {},
   },
   reducers: {
     resetCreatePost: (state) => {
       state.createPost = {};
       state.createPostStatus = "idle";
       state.createPostError = {};
+    },
+    resetUpdatePost: (state) => {
+      state.updatePost = {};
+      state.updatePostStatus = "idle";
+      state.updatePostError = {};
+    },
+    resetDeletePost: (state) => {
+      state.deletePost = {};
+      state.deletePostStatus = "idle";
+      state.deletePostError = {};
     },
   },
   extraReducers: (builder) => {
@@ -95,8 +164,35 @@ const postSlice = createSlice({
       .addCase(fetchPostDetails.rejected, (state, action) => {
         state.postDetailsStatus = "failed";
         state.postDetailsError = action.payload || "Post details failed";
+      })
+
+      .addCase(fetchUpdatePost.pending, (state) => {
+        state.updatePostStatus = "loading";
+      })
+      .addCase(fetchUpdatePost.fulfilled, (state, action) => {
+        state.updatePostStatus = "succeeded";
+        state.updatePost = action.payload;
+      })
+      .addCase(fetchUpdatePost.rejected, (state, action) => {
+        state.updatePostStatus = "failed";
+        state.updatePostError = action.payload || "Update post failed";
+      })
+
+      .addCase(fetchDeletePost.pending, (state) => {
+        state.deletePostStatus = "loading";
+      })
+      .addCase(fetchDeletePost.fulfilled, (state, action) => {
+        state.deletePostStatus = "succeeded";
+        state.deletePost = action.payload;
+      })
+      .addCase(fetchDeletePost.rejected, (state, action) => {
+        state.deletePostStatus = "failed";
+        state.deletePostError = action.payload || "Delete post failed";
       });
   },
 });
+
+export const { resetCreatePost, resetUpdatePost, resetDeletePost } =
+  postSlice.actions;
 
 export default postSlice.reducer;

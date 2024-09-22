@@ -168,7 +168,7 @@ export const fetchUpdateUserDetails = createAsyncThunk(
         withCredentials: true,
       };
       const { data } = await axios.patch(
-        `${baseUrl}/api/v1/users/update`,
+        `${baseUrl}/api/v1/users/update/${user.id}`,
         user,
         config
       );

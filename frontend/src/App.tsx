@@ -14,6 +14,7 @@ import UpdateProfilePage from "./pages/UpdateProfilePage";
 import CreatePostPage from "./pages/CreatePostPage";
 import PostDetailsPage from "./pages/PostDetailsPage";
 import UpdatePostPage from "./pages/UpdatePostPage";
+import FeedPage from "./pages/FeedPage";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -26,6 +27,7 @@ const router = createBrowserRouter(
       <Route path="/create-post" element={<CreatePostPage />} />
       <Route path="/post/:id" element={<PostDetailsPage />} />
       <Route path="/post/update/:id" element={<UpdatePostPage />} />
+      <Route path="/feed" element={<FeedPage />} />
     </Route>
   )
 );

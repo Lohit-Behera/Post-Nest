@@ -118,11 +118,13 @@ const UpdatePost = asyncHandler(async (req, res) => {
     if (req.file) {
         const thumbnailLocalPath = req.file?.path
         const thumbnailUrl = await uploadFile(thumbnailLocalPath)
+        
         if (!thumbnailUrl) {
             return res.status(500).json(new ApiResponse(500, {}, "Something went wrong while uploading thumbnail"))
         }
         const publicId = post.thumbnail.split('/').pop().split('.')[0]
         await deleteFile(publicId, res)
+        console.log(publicId);
         await Post.findByIdAndUpdate(id, {
             thumbnail: thumbnailUrl
         })
@@ -164,4 +166,111 @@ const deletePost = asyncHandler(async (req, res) => {
     )
 })
 
-export { createPost, postDetails, UpdatePost, deletePost }
+const allPosts = asyncHandler(async (req, res) => {
+    const options = {
+        page: parseInt(req.query.page) || 1,
+        limit: parseInt(req.query.limit) || 10,
+    };
+
+    const aggregate = Post.aggregate([
+        {
+            $lookup: {
+                from: "users",
+                localField: "author",
+                foreignField: "_id",
+                as: "authorDetails",
+            },
+        },
+        {
+            $unwind: "$authorDetails",
+        },
+        {
+            $project: {
+                title: 1,
+                content: 1,
+                thumbnail: 1,
+                isPublic: 1,
+                createdAt: 1,
+                updatedAt: 1,
+                "authorDetails.username": 1,
+                "authorDetails.fullName": 1,
+                "authorDetails._id": 1,
+                "authorDetails.avatar": 1,
+            },
+        },
+        {
+            $sort: {
+                createdAt: -1,
+            },
+        },
+    ]);
+
+    const posts = await Post.aggregatePaginate(aggregate, options);
+
+    if (!posts) {
+        return res.status(404).json(new ApiResponse(404, {}, "No posts found"));
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, posts, "Posts fetched successfully")
+    );
+});
+
+const userAllPosts = asyncHandler(async  (req, res) => {
+    const { userId } = req.params
+
+    const options = {
+        page: parseInt(req.query.page) || 1,
+        limit: parseInt(req.query.limit) || 10,
+    };
+
+    const aggregate = await Post.aggregate([
+        {
+            $match: {
+                author: userId
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "author",
+                foreignField: "_id",
+                as: "authorDetails",
+            },
+        },
+        {
+            $unwind: "$authorDetails",
+        },
+        {
+            $project: {
+                title: 1,
+                content: 1,
+                thumbnail: 1,
+                isPublic: 1,
+                createdAt: 1,
+                updatedAt: 1,
+                "authorDetails.username": 1,
+                "authorDetails.fullName": 1,
+                "authorDetails._id": 1,
+                "authorDetails.avatar": 1,
+            },
+        },
+        {
+            $sort: {
+                createdAt: -1,
+            },
+        },
+    ])
+
+    const posts = await Post.aggregatePaginate(aggregate, options);
+
+    if (!posts) {
+        return res.status(404).json(new ApiResponse(404, {}, "No posts found"));
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, posts, "User posts fetched successfully")
+    )
+})
+
+export { createPost, postDetails, UpdatePost, deletePost, allPosts, userAllPosts }

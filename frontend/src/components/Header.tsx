@@ -27,9 +27,9 @@ function Header() {
     navigate("/sign-in");
   };
   return (
-    <>
-      <header className="bg-background backdrop:blur-lg p-2 hidden md:flex justify-between space-x-2">
-        <nav className="w-full flex justify-between">
+    <header className="z-20 w-full sticky top-0 p-2 backdrop-blur bg-background/50 shadow  ">
+      <nav className="hidden md:flex justify-between space-x-2">
+        <div className="w-full flex justify-between">
           <Avatar>
             <AvatarImage src={Logo} />
             <AvatarFallback>L</AvatarFallback>
@@ -46,14 +46,18 @@ function Header() {
                 </Button>
               )}
             </NavLink>
-            <Button
-              variant="ghost"
-              className="font-semibold"
-              onClick={() => dispatch(fetchSendVerifyEmail())}
-            >
-              <Rss className="mr-2 h-4 w-4" />
-              Feed
-            </Button>
+            <NavLink to="/feed">
+              {({ isActive }) => (
+                <Button
+                  variant={isActive ? "default" : "ghost"}
+                  className="font-semibold"
+                  onClick={() => dispatch(fetchSendVerifyEmail())}
+                >
+                  <Rss className="mr-2 h-4 w-4" />
+                  Feed
+                </Button>
+              )}
+            </NavLink>
             <NavLink to="/create-post">
               {({ isActive }) => (
                 <Button
@@ -100,10 +104,10 @@ function Header() {
               </NavLink>
             )}
           </div>
-        </nav>
+        </div>
         <ModeToggle />
-      </header>
-      <header className="bg-background backdrop:blur-lg py-1 px-2 flex md:hidden justify-between">
+      </nav>
+      <nav className=" flex md:hidden justify-between">
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="my-auto">
@@ -159,8 +163,8 @@ function Header() {
           )}
           <ModeToggle />
         </div>
-      </header>
-    </>
+      </nav>
+    </header>
   );
 }
 

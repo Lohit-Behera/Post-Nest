@@ -242,6 +242,11 @@ const getUserDetails = async (req, res) => {
 
 // update user details
 const updateUserDetails = async (req, res) => {
+    const { userId } = req.params
+
+    if (userId !== req.user._id.toString()) {
+        return res.status(403).json(new ApiResponse(403, {}, "You are not authorized to update this user"))
+    }
     const user = await User.findById(req.user._id)
     const { fullName, bio, website} = req.body
     const avatarLocalPath = req.files.avatar ? req.files.avatar[0].path : null

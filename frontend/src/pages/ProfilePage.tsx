@@ -52,14 +52,16 @@ function ProfilePage() {
               <AvatarImage src={userData.avatar} className="object-cover" />
               <AvatarFallback>L</AvatarFallback>
             </Avatar>
-            <Button
-              variant="secondary"
-              size="icon"
-              className="absolute right-2 bottom-2"
-              onClick={() => navigate(`/update-profile/${userData._id}`)}
-            >
-              <Pencil />
-            </Button>
+            {userData._id === userInfo._id && (
+              <Button
+                variant="secondary"
+                size="icon"
+                className="absolute right-2 bottom-2"
+                onClick={() => navigate(`/update-profile/${userData._id}`)}
+              >
+                <Pencil />
+              </Button>
+            )}
           </div>
           <div className="flex flex-col md:flex-row mt-14 w-full h-full space-x-0 md:space-x-4 space-y-4 md:space-y-0">
             <div className="w-full md:w-[30%]">

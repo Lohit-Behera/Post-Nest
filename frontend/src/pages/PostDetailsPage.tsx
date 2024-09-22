@@ -40,8 +40,6 @@ function PostDetailsPage() {
     (state: any) => state.post.deletePostError
   );
 
-  console.log(userInfo._id === user._id);
-
   useEffect(() => {
     dispatch(fetchPostDetails(id as string));
   }, [dispatch, id]);

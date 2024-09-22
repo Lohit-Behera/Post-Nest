@@ -81,7 +81,7 @@ function UpdatePostPage() {
                   <Input
                     className="bg-background"
                     placeholder="Title"
-                    value={post.title || ""}
+                    value={title}
                     onChange={(e) => setTitle(e.target.value)}
                   />
                   <Button
@@ -177,7 +177,8 @@ function UpdatePostPage() {
             <div className="flex space-x-2">
               <Checkbox
                 className="my-auto"
-                onCheckedChange={(e) => setIsPublic(e)}
+                checked={isPublic === true ? true : false}
+                onCheckedChange={(e) => setIsPublic(e === true ? true : false)}
               />
               <Label>Public</Label>
             </div>

@@ -35,7 +35,7 @@ router.route("/details").get(authMiddleware, userDetails)
 
 router.route("/send-verify-email").post(authMiddleware, sendVerifyEmail)
 
-router.route("/update").patch(
+router.route("/update/:userId").patch(
     authMiddleware,
     upload.fields([
         { name: "avatar", maxCount: 1 },

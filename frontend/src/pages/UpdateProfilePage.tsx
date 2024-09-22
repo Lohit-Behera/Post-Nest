@@ -71,6 +71,7 @@ function UpdateProfilePage() {
   const handleEditProfile = () => {
     dispatch(
       fetchUpdateUserDetails({
+        id: userId,
         fullName: fullName,
         bio: bio,
         website: website,

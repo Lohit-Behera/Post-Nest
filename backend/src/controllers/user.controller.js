@@ -2,6 +2,8 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 import { Token } from "../models/token.model.js";
+import { Post } from "../models/post.model.js";
+import { Follow } from "../models/follow.model.js";
 import { deleteFile, uploadFile } from "../utils/cloudinary.js";
 import { sendEmail } from "../utils/sendMail.js";
 

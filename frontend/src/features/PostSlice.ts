@@ -126,6 +126,31 @@ export const fetchAllPosts = createAsyncThunk(
   }
 );
 
+export const fetchUserAllPosts = createAsyncThunk(
+  "posts/userAllPosts",
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      };
+      const { data } = await axios.get(
+        `${baseUrl}/api/v1/posts/user/all/${id}`,
+        config
+      );
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 const postSlice = createSlice({
   name: "post",
   initialState: {
@@ -148,6 +173,10 @@ const postSlice = createSlice({
     allPosts: [],
     allPostsStatus: "idle",
     allPostsError: {},
+
+    userAllPosts: [],
+    userAllPostsStatus: "idle",
+    userAllPostsError: {},
   },
   reducers: {
     resetCreatePost: (state) => {
@@ -226,6 +255,18 @@ const postSlice = createSlice({
       .addCase(fetchAllPosts.rejected, (state, action) => {
         state.allPostsStatus = "failed";
         state.allPostsError = action.payload || "All posts failed";
+      })
+
+      .addCase(fetchUserAllPosts.pending, (state) => {
+        state.userAllPostsStatus = "loading";
+      })
+      .addCase(fetchUserAllPosts.fulfilled, (state, action) => {
+        state.userAllPostsStatus = "succeeded";
+        state.userAllPosts = action.payload;
+      })
+      .addCase(fetchUserAllPosts.rejected, (state, action) => {
+        state.userAllPostsStatus = "failed";
+        state.userAllPostsError = action.payload || "All posts failed";
       });
   },
 });

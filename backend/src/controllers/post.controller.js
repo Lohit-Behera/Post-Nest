@@ -218,53 +218,21 @@ const allPosts = asyncHandler(async (req, res) => {
 
 const userAllPosts = asyncHandler(async  (req, res) => {
     const { userId } = req.params
+    const user = await User.findById(userId)
 
     const options = {
         page: parseInt(req.query.page) || 1,
         limit: parseInt(req.query.limit) || 10,
     };
 
-    const aggregate = await Post.aggregate([
-        {
-            $match: {
-                author: userId
-            }
-        },
-        {
-            $lookup: {
-                from: "users",
-                localField: "author",
-                foreignField: "_id",
-                as: "authorDetails",
-            },
-        },
-        {
-            $unwind: "$authorDetails",
-        },
-        {
-            $project: {
-                title: 1,
-                content: 1,
-                thumbnail: 1,
-                isPublic: 1,
-                createdAt: 1,
-                updatedAt: 1,
-                "authorDetails.username": 1,
-                "authorDetails.fullName": 1,
-                "authorDetails._id": 1,
-                "authorDetails.avatar": 1,
-            },
-        },
-        {
-            $sort: {
-                createdAt: -1,
-            },
-        },
-    ])
+    const aggregateQuery = Post.aggregate([
+        { $match: { author: user._id } },
+        { $sort: { createdAt: -1 } }, 
+    ]);
 
-    const posts = await Post.aggregatePaginate(aggregate, options);
+    const posts = await Post.aggregatePaginate(aggregateQuery, options);
 
-    if (!posts) {
+    if (!posts.docs.length) {
         return res.status(404).json(new ApiResponse(404, {}, "No posts found"));
     }
 

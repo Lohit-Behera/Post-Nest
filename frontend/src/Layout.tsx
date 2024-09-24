@@ -24,7 +24,7 @@ function Layout() {
         <p>Error</p>
       ) : (
         <>
-          <main>
+          <main className="my-10">
             <Outlet />
           </main>
         </>

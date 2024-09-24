@@ -16,6 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Pencil, Trash } from "lucide-react";
+import Comments from "@/components/Comments";
 
 function PostDetailsPage() {
   const { id } = useParams();
@@ -106,7 +107,7 @@ function PostDetailsPage() {
               <div dangerouslySetInnerHTML={{ __html: updatedContent }} />
             </CardContent>
             <CardFooter>
-              <p>Card Footer</p>
+              <Comments id={id} />
             </CardFooter>
           </Card>
         </div>

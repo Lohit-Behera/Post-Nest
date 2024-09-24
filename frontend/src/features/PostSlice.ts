@@ -151,6 +151,31 @@ export const fetchUserAllPosts = createAsyncThunk(
   }
 );
 
+export const fetchFollowingPosts = createAsyncThunk(
+  "posts/followingPosts",
+  async (_, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      };
+      const { data } = await axios.get(
+        `${baseUrl}/api/v1/posts//following/all`,
+        config
+      );
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 const postSlice = createSlice({
   name: "post",
   initialState: {
@@ -177,6 +202,10 @@ const postSlice = createSlice({
     userAllPosts: [],
     userAllPostsStatus: "idle",
     userAllPostsError: {},
+
+    followingPosts: [],
+    followingPostsStatus: "idle",
+    followingPostsError: {},
   },
   reducers: {
     resetCreatePost: (state) => {
@@ -267,6 +296,18 @@ const postSlice = createSlice({
       .addCase(fetchUserAllPosts.rejected, (state, action) => {
         state.userAllPostsStatus = "failed";
         state.userAllPostsError = action.payload || "All posts failed";
+      })
+
+      .addCase(fetchFollowingPosts.pending, (state) => {
+        state.followingPostsStatus = "loading";
+      })
+      .addCase(fetchFollowingPosts.fulfilled, (state, action) => {
+        state.followingPostsStatus = "succeeded";
+        state.followingPosts = action.payload;
+      })
+      .addCase(fetchFollowingPosts.rejected, (state, action) => {
+        state.followingPostsStatus = "failed";
+        state.followingPostsError = action.payload || "Following posts failed";
       });
   },
 });

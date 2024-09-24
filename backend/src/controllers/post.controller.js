@@ -1,7 +1,9 @@
+import mongoose from "mongoose";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 import { Post } from "../models/post.model.js"
+import { Follow } from "../models/follow.model.js";
 import { deleteFile, uploadFile } from "../utils/cloudinary.js";
 
 const createPost = asyncHandler(async (req, res) => {
@@ -241,4 +243,91 @@ const userAllPosts = asyncHandler(async  (req, res) => {
     )
 })
 
-export { createPost, postDetails, UpdatePost, deletePost, allPosts, userAllPosts }
+const followingPosts = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id)
+
+    if (!user) {
+        return res.status(404).json(new ApiResponse(404, {}, "User not found"))
+    }
+
+    const options = {
+        page: parseInt(req.query.page) || 1,
+        limit: parseInt(req.query.limit) || 10,
+    };
+
+    const following = await Follow.aggregate([
+        {
+            $match: {
+                follower: user._id
+            }
+        },
+        {
+            $project: {
+                following: 1,
+                _id: 0
+            }
+        }
+    ]);
+
+    const followingList = following.map(f => f.following);
+
+    // Aggregation query to fetch posts
+    const aggregateQuery = await Post.aggregate([
+        {
+            $match: {
+                author: {
+                    $in: followingList
+                }
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "author",
+                foreignField: "_id",
+                as: "user"
+            }
+        },
+        {
+            $unwind: "$user"
+        },
+        {
+            $project: {
+                username: "$user.username",
+                fullName: "$user.fullName",
+                avatar: "$user.avatar",
+                author: 1,
+                title: 1,
+                content: 1,
+                thumbnail: 1,
+                isPublic: 1,
+                createdAt: 1,
+                updatedAt: 1
+            }
+        },
+        // Pagination with limit and skip
+        {
+            $skip: (options.page - 1) * options.limit
+        },
+        {
+            $limit: options.limit
+        }
+    ]);
+
+    // Count total documents
+    const totalPosts = await Post.countDocuments({
+        author: { $in: followingList }
+    });
+
+    return res.status(200).json(
+        new ApiResponse(200, {
+            docs: aggregateQuery,
+            totalDocs: totalPosts,
+            limit: options.limit,
+            page: options.page,
+            totalPages: Math.ceil(totalPosts / options.limit)
+        }, "Posts fetched successfully")
+    );
+});
+
+export { createPost, postDetails, UpdatePost, deletePost, allPosts, userAllPosts, followingPosts }

@@ -20,8 +20,8 @@ import {
   resetFollow,
   fetchFollowersList,
   fetchFollowingList,
-  resetFollowingList,
 } from "@/features/FollowSlice";
+import { Separator } from "@/components/ui/separator";
 
 function ProfilePage() {
   const { userId } = useParams();
@@ -46,12 +46,6 @@ function ProfilePage() {
   const followersList = useSelector((state: any) => state.follow.followersList);
   const followingList = useSelector((state: any) => state.follow.followingList);
   const followingListData = followingList.data || [];
-  const followingListStatus = useSelector(
-    (state: any) => state.follow.followingListStatus
-  );
-  const followingListError = useSelector(
-    (state: any) => state.follow.followingListError
-  );
 
   useEffect(() => {
     if (!userInfo) {
@@ -113,10 +107,49 @@ function ProfilePage() {
                   <CardDescription>{userData.fullName}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p>Card Content</p>
+                  {userData.bio ? <p>{userData.bio}</p> : <p>No bio</p>}
                 </CardContent>
                 <CardFooter>
-                  <p>Card Footer</p>
+                  <div className="border-2 rounded-lg p-2 w-full space-y-2">
+                    <div className="flex justify-between">
+                      <div className="flex flex-col w-1/2">
+                        <p className="text-sm text-center font-semibold">
+                          {userData.totalPosts}
+                        </p>
+                        <p className="text-sm text-center font-semibold text-muted-foreground">
+                          Following
+                        </p>
+                      </div>
+                      <div className="flex flex-col w-1/2">
+                        <p className="text-sm text-center">
+                          {userData.totalFollowers}
+                        </p>
+                        <p className="text-sm text-center font-semibold text-muted-foreground">
+                          Followers
+                        </p>
+                      </div>
+                    </div>
+                    <Separator />
+
+                    <div className="flex justify-between">
+                      <div className="flex flex-col w-1/2">
+                        <p className="text-sm text-center font-semibold">
+                          {posts.length}
+                        </p>
+                        <p className="text-sm text-center font-semibold text-muted-foreground">
+                          Posts
+                        </p>
+                      </div>
+                      <div className="flex flex-col w-1/2">
+                        <p className="text-sm text-center">
+                          {followersList.data?.length}
+                        </p>
+                        <p className="text-sm text-center font-semibold text-muted-foreground">
+                          Total Likes
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </CardFooter>
               </Card>
             </div>

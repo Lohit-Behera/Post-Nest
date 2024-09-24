@@ -153,10 +153,72 @@ const userDetails = asyncHandler(async (req, res) => {
     if (!user) {
         res.status(404).json(new ApiResponse(404, {}, "username or email not found"))
     }
+
+    const aggregate = await User.aggregate([
+        {
+            $match: {
+              _id: user._id,
+            },
+          },
+          {
+            $lookup: {
+              from: "posts",
+              localField: "_id",
+              foreignField: "author",
+              as: "posts",
+            }
+          },
+          {
+            $addFields: {
+              totalPosts: {
+                $size: "$posts"
+              }
+            }
+          },
+          {
+            $lookup: {
+              from: "follows",
+              localField: "_id",
+              foreignField: "following",
+              as: "following"
+            }
+          },
+          {
+            $addFields: {
+              totalFollowing: {
+                $size: "$following"
+              }
+              }
+          },
+          {
+            $lookup: {
+              from: "follows",
+              localField: "_id",
+              foreignField: "follower",
+              as: "followers"
+            }
+          },
+          {
+            $addFields: {
+              totalFollowers: {
+                $size: "$followers"
+              }
+            }
+          },
+          {
+            $project: {
+              refreshToken: 0,
+              password: 0,
+              posts: 0,
+              followers: 0,
+              following: 0
+            }
+          }
+    ])
     
     // send response
     return res.status(200).json(
-        new ApiResponse(200, user, "User details fetched successfully")
+        new ApiResponse(200, aggregate[0], "User details fetched successfully")
     )
 })
 
@@ -237,8 +299,74 @@ const getUserDetails = async (req, res) => {
         return res.status(404).json(new ApiResponse(404, {}, "User not found"))
     }
 
+    const aggregate = await User.aggregate([
+        {
+            $match: {
+              _id: user._id,
+            },
+          },
+          {
+            $lookup: {
+              from: "posts",
+              localField: "_id",
+              foreignField: "author",
+              as: "posts",
+            }
+          },
+          {
+            $addFields: {
+              totalPosts: {
+                $size: "$posts"
+              }
+            }
+          },
+          {
+            $lookup: {
+              from: "follows",
+              localField: "_id",
+              foreignField: "following",
+              as: "following"
+            }
+          },
+          {
+            $addFields: {
+              totalFollowing: {
+                $size: "$following"
+              }
+              }
+          },
+          {
+            $lookup: {
+              from: "follows",
+              localField: "_id",
+              foreignField: "follower",
+              as: "followers"
+            }
+          },
+          {
+            $addFields: {
+              totalFollowers: {
+                $size: "$followers"
+              }
+            }
+          },
+          {
+            $project: {
+              refreshToken: 0,
+              password: 0,
+              posts: 0,
+              followers: 0,
+              following: 0
+            }
+          }
+    ])
+
+    if (!aggregate.length) {
+        return res.status(404).json(new ApiResponse(404, {}, "User not found"))
+    }
+
     return res.status(200).json(
-        new ApiResponse(200, user, "User details fetched successfully")
+        new ApiResponse(200, aggregate[0], "User details fetched successfully")
     )
 }
 

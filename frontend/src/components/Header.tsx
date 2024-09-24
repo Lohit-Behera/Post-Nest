@@ -51,7 +51,6 @@ function Header() {
                 <Button
                   variant={isActive ? "default" : "ghost"}
                   className="font-semibold"
-                  onClick={() => dispatch(fetchSendVerifyEmail())}
                 >
                   <Rss className="mr-2 h-4 w-4" />
                   Feed

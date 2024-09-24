@@ -57,7 +57,7 @@ function CreatePostPage() {
 
   useEffect(() => {
     if (!userInfo) {
-      navigate("/login");
+      navigate("/sign-in");
     }
   }, [userInfo, dispatch]);
 

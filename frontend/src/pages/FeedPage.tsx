@@ -37,16 +37,22 @@ function FeedPage() {
                 <CardTitle className="flex justify-between ">
                   <div className="flex space-x-2">
                     <Link to={`/profile/${post.authorDetails._id}`}>
-                      <Avatar className="w-14 h-14">
+                      <Avatar className="w-12 h-12 border-primary hover:border">
                         <AvatarImage src={post.authorDetails.avatar} />
                         <AvatarFallback>CN</AvatarFallback>
                       </Avatar>
                     </Link>
-                    <div className="flex flex-col space-y-1">
-                      <p>{post.authorDetails.username}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {post.authorDetails.fullName}
-                      </p>
+                    <div className="flex flex-col space-y-0.5">
+                      <Link to={`/profile/${post.authorDetails._id}`}>
+                        <p className="text-sm md:text-base hover:underline">
+                          {post.authorDetails.username}
+                        </p>
+                      </Link>
+                      <Link to={`/profile/${post.authorDetails._id}`}>
+                        <p className="text-sm text-muted-foreground hover:underline">
+                          {post.authorDetails.fullName}
+                        </p>
+                      </Link>
                     </div>
                   </div>
                   {useInfo._id !== post.authorDetails._id && (

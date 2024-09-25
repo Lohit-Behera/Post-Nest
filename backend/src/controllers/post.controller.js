@@ -241,16 +241,16 @@ const allPosts = asyncHandler(async (req, res) => {
         },
         {
             $project: {
+                author: 1,
                 title: 1,
                 content: 1,
                 thumbnail: 1,
                 isPublic: 1,
                 createdAt: 1,
                 updatedAt: 1,
-                "authorDetails.username": 1,
-                "authorDetails.fullName": 1,
-                "authorDetails._id": 1,
-                "authorDetails.avatar": 1,
+                username: "$authorDetails.username",
+                fullName: "$authorDetails.fullName",
+                avatar: "$authorDetails.avatar",
             },
         },
         {
@@ -281,8 +281,41 @@ const userAllPosts = asyncHandler(async  (req, res) => {
     };
 
     const aggregateQuery = Post.aggregate([
-        { $match: { author: user._id } },
-        { $sort: { createdAt: -1 } }, 
+        {
+            $match: {
+              author: user._id
+            }
+          },
+          {
+            $lookup: {
+              from: "users",
+              localField: "author",
+              foreignField: "_id",
+              as: "user"
+            }
+          },
+          {
+            $unwind: "$user"
+          },
+          {
+            $project: {
+                title: 1,
+              author: 1,
+              thumbnail: 1,
+              content: 1,
+              isPublic: 1,
+              createdAt: 1,
+              updatedAt: 1,
+              username: "$user.username",
+              fullName: "$user.fullName",
+              avatar: "$user.avatar"
+            }
+          },
+          {
+            $sort: {
+              createdAt: -1
+            }
+          }
     ]);
 
     const posts = await Post.aggregatePaginate(aggregateQuery, options);

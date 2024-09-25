@@ -30,7 +30,8 @@ function SignInPage() {
   const navigate = useNavigate();
 
   const userInfo = useSelector((state: any) => state.user.userInfo);
-  const loginStatus = useSelector((state: any) => state.user.loginStatus);
+  const userInfoStatus = useSelector((state: any) => state.user.userInfoStatus);
+  const userInfoError = useSelector((state: any) => state.user.userInfoError);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -47,10 +48,12 @@ function SignInPage() {
   }, [userInfo, navigate]);
 
   useEffect(() => {
-    if (loginStatus === "succeeded") {
+    if (userInfoStatus === "succeeded") {
       alert("Login successful");
+    } else if (userInfoStatus === "failed") {
+      alert(userInfoError);
     }
-  }, [loginStatus]);
+  }, [userInfoStatus]);
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     dispatch(

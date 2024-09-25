@@ -1,17 +1,9 @@
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { fetchAllPosts } from "@/features/PostSlice";
 import { useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { UserPlus } from "lucide-react";
+import Post from "@/components/Post";
+import { fetchFollowingList } from "@/features/FollowSlice";
 
 function FeedPage() {
   const dispatch = useDispatch<any>();
@@ -20,70 +12,26 @@ function FeedPage() {
   const useInfo = useSelector((state: any) => state.user.userInfo);
   const allPosts = useSelector((state: any) => state.post.allPosts);
   const posts = allPosts.data ? allPosts.data.docs : [];
+  const allPostsStatus = useSelector((state: any) => state.post.allPostsStatus);
+  const followingList = useSelector((state: any) => state.follow.followingList);
+  const followingListData = followingList.data || [];
   useEffect(() => {
     if (!useInfo) {
       navigate("/sign-in");
     } else {
       dispatch(fetchAllPosts());
+      dispatch(fetchFollowingList(useInfo._id));
     }
   }, [useInfo, dispatch, navigate]);
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-10">
-        {posts.map((post: any) => (
-          <Card key={post._id}>
-            <CardHeader>
-              <CardTitle>
-                <CardTitle className="flex justify-between ">
-                  <div className="flex space-x-2">
-                    <Link to={`/profile/${post.authorDetails._id}`}>
-                      <Avatar className="w-12 h-12 border-primary hover:border">
-                        <AvatarImage src={post.authorDetails.avatar} />
-                        <AvatarFallback>CN</AvatarFallback>
-                      </Avatar>
-                    </Link>
-                    <div className="flex flex-col space-y-0.5">
-                      <Link to={`/profile/${post.authorDetails._id}`}>
-                        <p className="text-sm md:text-base hover:underline">
-                          {post.authorDetails.username}
-                        </p>
-                      </Link>
-                      <Link to={`/profile/${post.authorDetails._id}`}>
-                        <p className="text-sm text-muted-foreground hover:underline">
-                          {post.authorDetails.fullName}
-                        </p>
-                      </Link>
-                    </div>
-                  </div>
-                  {useInfo._id !== post.authorDetails._id && (
-                    <div className="flex space-x-3">
-                      <Button variant="secondary" size="icon">
-                        <UserPlus />
-                      </Button>
-                    </div>
-                  )}
-                </CardTitle>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Link to={`/post/${post._id}`}>
-                <img
-                  src={post.thumbnail}
-                  alt=""
-                  className="w-full h-52 object-cover rounded-lg"
-                />
-              </Link>
-            </CardContent>
-            <CardFooter>
-              <Link to={`/post/${post._id}`}>
-                <p className="text-lg md:text-xl font-semibold hover:underline line-clamp-1">
-                  {post.title}
-                </p>
-              </Link>
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
+      {allPostsStatus === "loading" || allPostsStatus === "idle" ? (
+        <p>Loading</p>
+      ) : allPostsStatus === "failed" ? (
+        <p>Error</p>
+      ) : (
+        <Post posts={posts} followingList={followingListData} followButton />
+      )}
     </>
   );
 }

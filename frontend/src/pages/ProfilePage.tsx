@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate, useParams, Link } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -11,17 +11,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Pencil, UserMinus, UserPlus } from "lucide-react";
+import { Pencil } from "lucide-react";
 import { useEffect } from "react";
 import { fetchGetUserInfo } from "@/features/UserSlice";
 import { fetchUserAllPosts } from "@/features/PostSlice";
-import {
-  fetchFollow,
-  resetFollow,
-  fetchFollowersList,
-  fetchFollowingList,
-} from "@/features/FollowSlice";
+import { fetchFollowersList, fetchFollowingList } from "@/features/FollowSlice";
 import { Separator } from "@/components/ui/separator";
+import Post from "@/components/Post";
 
 function ProfilePage() {
   const { userId } = useParams();
@@ -39,9 +35,6 @@ function ProfilePage() {
   const userAllPostsStatus = useSelector(
     (state: any) => state.post.userAllPostsStatus
   );
-  const follow = useSelector((state: any) => state.follow.follow);
-  const followStatus = useSelector((state: any) => state.follow.followStatus);
-  const followError = useSelector((state: any) => state.follow.followError);
 
   const followersList = useSelector((state: any) => state.follow.followersList);
   const followingList = useSelector((state: any) => state.follow.followingList);
@@ -57,17 +50,6 @@ function ProfilePage() {
       dispatch(fetchFollowingList(userInfo._id as string));
     }
   }, [userId, dispatch]);
-
-  useEffect(() => {
-    if (followStatus === "succeeded") {
-      alert(follow.message);
-      dispatch(fetchFollowingList(userInfo._id as string));
-      dispatch(resetFollow());
-    } else if (followStatus === "failed") {
-      alert(followError);
-      dispatch(resetFollow());
-    }
-  }, [followStatus, followError, dispatch]);
   return (
     <>
       {getUserInfoStatus === "loading" || getUserInfoStatus === "idle" ? (
@@ -160,69 +142,7 @@ function ProfilePage() {
               ) : userAllPostsStatus === "failed" ? (
                 <p>Error</p>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {posts.map((post: any) => (
-                    <Card key={post._id}>
-                      <CardHeader>
-                        <CardTitle>
-                          <CardTitle className="flex justify-between ">
-                            <div className="flex space-x-2">
-                              <Avatar className="w-14 h-14">
-                                <AvatarImage src={userData.avatar} />
-                                <AvatarFallback>CN</AvatarFallback>
-                              </Avatar>
-                              <div className="flex flex-col space-y-1">
-                                <p>{userData.username}</p>
-                                <p className="text-sm text-muted-foreground">
-                                  {userData.fullName}
-                                </p>
-                              </div>
-                            </div>
-                            {userInfo && (
-                              <>
-                                {userInfo._id !== userData._id && (
-                                  <div className="flex space-x-3">
-                                    <Button
-                                      variant="secondary"
-                                      size="icon"
-                                      onClick={() =>
-                                        dispatch(fetchFollow(userId as string))
-                                      }
-                                    >
-                                      {followingListData.includes(
-                                        userData._id
-                                      ) ? (
-                                        <UserMinus />
-                                      ) : (
-                                        <UserPlus />
-                                      )}
-                                    </Button>
-                                  </div>
-                                )}
-                              </>
-                            )}
-                          </CardTitle>
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <Link to={`/post/${post._id}`}>
-                          <img
-                            src={post.thumbnail}
-                            alt=""
-                            className="w-full h-52 object-cover rounded-lg"
-                          />
-                        </Link>
-                      </CardContent>
-                      <CardFooter>
-                        <Link to={`/post/${post._id}`}>
-                          <p className="text-lg md:text-xl font-semibold hover:underline line-clamp-1">
-                            {post.title}
-                          </p>
-                        </Link>
-                      </CardFooter>
-                    </Card>
-                  ))}
-                </div>
+                <Post posts={posts} followingList={followingListData} />
               )}
             </div>
           </div>

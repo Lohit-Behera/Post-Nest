@@ -41,7 +41,7 @@ function UpdatePostPage() {
 
   useEffect(() => {
     if (!userInfo) {
-      navigate("/login");
+      navigate("/sign-in");
     } else {
       dispatch(fetchPostDetails(id as string));
     }

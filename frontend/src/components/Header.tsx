@@ -1,5 +1,5 @@
 import { ModeToggle } from "./mode-toggle";
-import { useNavigate, NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -18,7 +18,6 @@ import { fetchLogout } from "@/features/UserSlice";
 function Header() {
   const dispatch = useDispatch<any>();
   const navigate = useNavigate();
-
   const userInfo = useSelector((state: any) => state.user.userInfo);
   const userDetails = useSelector((state: any) => state.user.userDetails);
 

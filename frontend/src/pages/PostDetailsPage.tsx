@@ -15,8 +15,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Pencil, Trash } from "lucide-react";
+import { Heart, MessageCircle, Pencil, Trash } from "lucide-react";
 import Comments from "@/components/Comments";
+import {
+  fetchLikeUnlike,
+  fetchPostLikes,
+  resetLikeUnlike,
+} from "@/features/LikeSlice";
 
 function PostDetailsPage() {
   const { id } = useParams();
@@ -25,8 +30,7 @@ function PostDetailsPage() {
 
   const userInfo = useSelector((state: any) => state.user.userInfo);
   const postDetails = useSelector((state: any) => state.post.postDetails);
-  const post = postDetails.data ? postDetails.data.post : {};
-  const user = postDetails.data ? postDetails.data.user : {};
+  const post = postDetails.data || {};
   const PostDetailsStatus = useSelector(
     (state: any) => state.post.postDetailsStatus
   );
@@ -40,9 +44,20 @@ function PostDetailsPage() {
   const deletePostError = useSelector(
     (state: any) => state.post.deletePostError
   );
+  const likeUnlike = useSelector((state: any) => state.like.likeUnlike);
+  const likeUnlikeStatus = useSelector(
+    (state: any) => state.like.likeUnlikeStatus
+  );
+  const postLikes = useSelector((state: any) => state.like.postLikes);
+  const userList = postLikes.data || [];
+  const postLikesStatus = useSelector(
+    (state: any) => state.like.postLikesStatus
+  );
+  const postLikesError = useSelector((state: any) => state.like.postLikesError);
 
   useEffect(() => {
     dispatch(fetchPostDetails(id as string));
+    dispatch(fetchPostLikes(id as string));
   }, [dispatch, id]);
 
   useEffect(() => {
@@ -55,6 +70,16 @@ function PostDetailsPage() {
       dispatch(resetDeletePost());
     }
   });
+
+  useEffect(() => {
+    if (likeUnlikeStatus === "succeeded") {
+      dispatch(fetchPostLikes(id as string));
+      dispatch(resetLikeUnlike());
+    } else if (likeUnlikeStatus === "failed") {
+      alert(postLikesError);
+      dispatch(resetLikeUnlike());
+    }
+  }, [likeUnlikeStatus]);
 
   return (
     <>
@@ -69,17 +94,17 @@ function PostDetailsPage() {
               <CardTitle className="flex justify-between ">
                 <div className="flex space-x-2">
                   <Avatar className="w-14 h-14">
-                    <AvatarImage src={user.avatar} />
+                    <AvatarImage src={post.avatar} />
                     <AvatarFallback>CN</AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col space-y-1">
-                    <p>{user.username}</p>
+                    <p>{post.username}</p>
                     <p className="text-sm text-muted-foreground">
-                      {user.fullName}
+                      {post.fullName}
                     </p>
                   </div>
                 </div>
-                {userInfo._id === user._id && (
+                {userInfo._id === post.author && (
                   <div className="flex space-x-3">
                     <Button
                       variant="secondary"
@@ -105,6 +130,35 @@ function PostDetailsPage() {
               <p className="text-xl md:text-3xl font-semibold">{post.title}</p>
               <img className="rounded-lg" src={post.thumbnail} alt="" />
               <div dangerouslySetInnerHTML={{ __html: updatedContent }} />
+              <div className="flex justify-end space-x-2">
+                <div className="flex flex-col space-y-0.5">
+                  <span
+                    className="cursor-pointer"
+                    onClick={() => dispatch(fetchLikeUnlike({ postId: id }))}
+                  >
+                    {userList.includes(userInfo._id) ? (
+                      <Heart
+                        fill="red"
+                        color="red"
+                        className="w-6 md:w-7 h-6 md:h-7"
+                      />
+                    ) : (
+                      <Heart className="w-6 md:w-7 h-6 md:h-7" />
+                    )}
+                  </span>
+                  <p className="text-sm md:text-base text-center">
+                    {postLikes.data ? postLikes.data.length : 0}
+                  </p>
+                </div>
+                <div className="flex flex-col space-y-0.5">
+                  <span className="cursor-pointer">
+                    <MessageCircle className="w-6 md:w-7 h-6 md:h-7" />
+                  </span>
+                  <p className="text-sm md:text-base text-center">
+                    {post.totalComments}
+                  </p>
+                </div>
+              </div>
             </CardContent>
             <CardFooter>
               <Comments id={id} />

@@ -5,6 +5,7 @@ import UserSlice from "@/features/UserSlice";
 import PostSlice from "@/features/PostSlice";
 import FollowSlice from "@/features/FollowSlice";
 import CommentSlice from "@/features/CommentSlice";
+import LikeSlice from "@/features/LikeSlice";
 
 const store = configureStore({
   reducer: {
@@ -13,6 +14,7 @@ const store = configureStore({
     post: PostSlice,
     follow: FollowSlice,
     comment: CommentSlice,
+    like: LikeSlice,
   },
 });
 

@@ -13,7 +13,7 @@ import {
 import { Button } from "./ui/button";
 import Logo from "../assets/Logo.svg";
 import { Home, LogIn, LogOut, PanelLeft, Rss, SquarePlus } from "lucide-react";
-import { fetchLogout, fetchSendVerifyEmail } from "@/features/UserSlice";
+import { fetchLogout } from "@/features/UserSlice";
 
 function Header() {
   const dispatch = useDispatch<any>();

@@ -67,20 +67,73 @@ const createPost = asyncHandler(async (req, res) => {
 const postDetails = asyncHandler(async (req, res) => {
     const { id } = req.params
 
-    const post = await Post.findById(id)
+    const post = await Post.aggregate([
+            {
+              $match: {
+                _id: mongoose.Types.ObjectId.createFromHexString(id)
+              }
+            },
+            {
+              $lookup: {
+                from: "users",
+                localField: "author",
+                foreignField: "_id",
+                as: "user"
+              }
+            },
+            {
+              $unwind: "$user"
+            },
+            {
+              $lookup: {
+                from: "comments",
+                localField: "_id",
+                foreignField: "post",
+                as: "comments"
+              }
+            },
+            {
+              $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "post",
+                as: "likes"
+              }
+            },
+            {
+              $addFields: {
+                totalLikes: {
+                  $size: "$likes"
+                },
+                totalComments: {
+                  $size: "$comments"
+                }
+              }
+            },
+            {
+              $project: {
+                title: 1,
+                content: 1,
+                isPublic: 1,
+                createdAt: 1,
+                updatedAt: 1,
+                author: 1,
+                thumbnail: 1,
+                totalLikes: 1,
+                totalComments: 1,
+                username: "$user.username",
+                fullName: "$user.fullName",
+                avatar: "$user.avatar"
+              }
+            }
+    ])
 
     if (!post) {
         return res.status(404).json(new ApiResponse(404, {}, "Post not found"))
     }
 
-    const userDetails = await User.findById(post.author).select("-password -refreshToken -bio -website -createdAt -updatedAt -plan -isAdmin -isVerified -coverImage -__v")
-
-    if (!userDetails) {
-        return res.status(404).json(new ApiResponse(404, {}, "User not found"))
-    }
-
     return res.status(200).json(
-        new ApiResponse(200, {post: post, user: userDetails}, "Post details fetched successfully")
+        new ApiResponse(200, post[0], "Post details fetched successfully")
     )
 })
 

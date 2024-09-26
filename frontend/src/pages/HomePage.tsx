@@ -2,7 +2,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { fetchFollowingPosts } from "@/features/PostSlice";
 import { useEffect } from "react";
-import { fetchFollowingList } from "@/features/FollowSlice";
 import Post from "@/components/Post";
 
 function HomePage() {
@@ -16,16 +15,12 @@ function HomePage() {
   const followingPostsStatus = useSelector(
     (state: any) => state.post.followingPostsStatus
   );
-  const followingList =
-    useSelector((state: any) => state.follow.followingList) || {};
-  const followingListData = followingList.data || [];
 
   useEffect(() => {
     if (!useInfo) {
       navigate("/sign-in");
     } else {
       dispatch(fetchFollowingPosts());
-      dispatch(fetchFollowingList(useInfo._id));
     }
   }, []);
   return (
@@ -35,7 +30,7 @@ function HomePage() {
       ) : followingPostsStatus === "failed" ? (
         <p>Error</p>
       ) : (
-        <Post posts={posts} followingList={followingListData} followButton />
+        <Post posts={posts} followButton />
       )}
     </>
   );

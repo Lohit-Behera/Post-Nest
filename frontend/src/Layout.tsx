@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Header from "./components/Header";
 import { useEffect } from "react";
 import { fetchUserDetails } from "./features/UserSlice";
+import { fetchFollowingList } from "./features/FollowSlice";
 
 function Layout() {
   const dispatch = useDispatch<any>();
@@ -12,9 +13,8 @@ function Layout() {
   );
   useEffect(() => {
     if (userInfo) {
-      console.log(userInfo);
-
       dispatch(fetchUserDetails());
+      dispatch(fetchFollowingList(userInfo._id));
     }
   }, [userInfo, dispatch]);
   return (

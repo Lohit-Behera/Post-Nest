@@ -7,7 +7,8 @@ import {
     sendVerifyEmail,
     verifyEmail,
     getUserDetails,
-    updateUserDetails
+    updateUserDetails,
+    changePassword
  } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
@@ -44,5 +45,6 @@ router.route("/update/:userId").patch(
     updateUserDetails
 )
 
+router.route("/change-password").patch(authMiddleware, changePassword)
 
 export default router

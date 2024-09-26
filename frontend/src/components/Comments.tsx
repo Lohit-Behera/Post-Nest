@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { CardFooter } from "@/components/ui/card";
@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { MessageSquarePlus, Pencil, Trash, X } from "lucide-react";
+import { Ban, MessageSquarePlus, Pencil, Plus, Trash, X } from "lucide-react";
 import {
   fetchCreateComment,
   fetchDeleteComment,
@@ -23,11 +23,30 @@ import {
   fetchUpdateComment,
   resetCreateComment,
   resetDeleteComment,
+  resetGetComments,
   resetUpdateComment,
 } from "@/features/CommentSlice";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+
+const FormSchema = z.object({
+  comment: z
+    .string()
+    .min(2, { message: "Comment must be at least 2 characters." })
+    .max(200, { message: "Comment must be less than 200 characters." }),
+});
 function Comments({ id }: any) {
   const dispatch = useDispatch<any>();
 
@@ -36,7 +55,6 @@ function Comments({ id }: any) {
     (state: any) => state.comment.createCommentStatus
   );
   const getComments = useSelector((state: any) => state.comment.getComments);
-  const comments = getComments.data ? getComments.data.docs : [];
   const getCommentsStatus = useSelector(
     (state: any) => state.comment.getCommentsStatus
   );
@@ -50,18 +68,41 @@ function Comments({ id }: any) {
     (state: any) => state.comment.deleteCommentStatus
   );
 
+  const [comments, setComments] = useState<any>([]);
+  console.log(comments);
+
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+
   useEffect(() => {
-    dispatch(fetchGetComments(id));
+    setComments([]);
+    setPage(1);
+    setHasMore(true);
+    dispatch(fetchGetComments({ postId: id, page: 1 }));
   }, [dispatch, id]);
+
+  useEffect(() => {
+    if (getCommentsStatus === "succeeded") {
+      setComments((prevComments: any) => [
+        ...prevComments,
+        ...getComments.data.docs,
+      ]);
+      setPage(getComments.data.nextPage);
+      setHasMore(getComments.data.hasNextPage);
+      dispatch(resetGetComments());
+    } else if (getCommentsStatus === "failed") {
+      toast.error(getCommentsError);
+    }
+  }, [getCommentsStatus]);
 
   useEffect(() => {
     if (createCommentStatus === "succeeded") {
       dispatch(resetCreateComment());
-      dispatch(fetchGetComments(id));
+      dispatch(fetchGetComments({ postId: id, page: 1 }));
     } else if (createCommentStatus === "failed") {
     } else if (updateCommentStatus === "succeeded") {
       dispatch(resetUpdateComment());
-      dispatch(fetchGetComments(id));
+      dispatch(fetchGetComments({ postId: id, page: 1 }));
     } else if (updateCommentStatus === "failed") {
       dispatch(resetUpdateComment());
     }
@@ -69,30 +110,41 @@ function Comments({ id }: any) {
 
   useEffect(() => {
     if (deleteCommentStatus === "succeeded") {
-      dispatch(fetchGetComments(id));
+      dispatch(fetchGetComments({ postId: id, page: 1 }));
       dispatch(resetDeleteComment());
     } else if (deleteCommentStatus === "failed") {
       dispatch(resetDeleteComment());
     }
   }, [deleteCommentStatus]);
 
-  const [comment, setComment] = useState("");
   const [isEdit, setIsEdit] = useState(false);
   const [editId, setEditId] = useState("");
   const [updateComment, setUpdateComment] = useState("");
 
-  const handleComment = () => {
-    if (!comment) {
-      alert("Please write a comment");
-    } else {
-      dispatch(
-        fetchCreateComment({
-          postId: id,
-          comment: comment,
-        })
-      );
-      setComment("");
-    }
+  const form = useForm({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      comment: "",
+    },
+  });
+
+  const handleComment = (data: z.infer<typeof FormSchema>) => {
+    const commentPromise = dispatch(
+      fetchCreateComment({
+        postId: id,
+        comment: data.comment,
+      })
+    ).unwrap();
+    toast.promise(commentPromise, {
+      loading: "Creating comment...",
+      success: (data: any) => {
+        form.reset();
+        return data.message;
+      },
+      error: (error: any) => {
+        return error;
+      },
+    });
   };
 
   const handleEditButton = (userComment: any) => {
@@ -102,23 +154,51 @@ function Comments({ id }: any) {
   };
 
   const handleCommentEdit = (commentId: any) => {
-    console.log(commentId);
-
     if (!updateComment) {
-      alert("Please enter a comment");
+      toast.warning("Please write a comment");
+    } else if (updateComment.length < 2) {
+      toast.warning("Comment must be at least 2 characters");
+    } else if (updateComment.length > 200) {
+      toast.warning("Comment must be less than 200 characters");
     } else {
-      dispatch(
+      const commentUpdatePromise = dispatch(
         fetchUpdateComment({
           commentId: commentId,
           comment: updateComment,
         })
-      );
+      ).unwrap();
+      toast.promise(commentUpdatePromise, {
+        loading: "Updating comment...",
+        success: (data: any) => {
+          return data.message;
+        },
+        error: (error: any) => {
+          return error;
+        },
+      });
       setIsEdit(!isEdit);
     }
   };
 
   const handleCommentDelete = (commentId: any) => {
-    dispatch(fetchDeleteComment(commentId));
+    const commentDeletePromise = dispatch(
+      fetchDeleteComment(commentId)
+    ).unwrap();
+    toast.promise(commentDeletePromise, {
+      loading: "Deleting comment...",
+      success: (data: any) => {
+        return data.message;
+      },
+      error: (error: any) => {
+        return error;
+      },
+    });
+  };
+
+  const handleLoadMore = () => {
+    if (hasMore) {
+      dispatch(fetchGetComments({ postId: id, page: page }));
+    }
   };
 
   return (
@@ -126,26 +206,39 @@ function Comments({ id }: any) {
       {userInfo && (
         <CardFooter className="w-full flex flex-col space-y-3">
           <div className="grid grid-cols-1 gap-4 w-full">
-            <Label htmlFor="comment" className="text-muted-foreground">
-              Add a Comment
-            </Label>
-            <Textarea
-              id="comment"
-              required
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="Add a comment"
-              className="w-full resize-none"
-              rows={5}
-            />
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(handleComment)}
+                className="space-y-6"
+              >
+                <FormField
+                  control={form.control}
+                  name="comment"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Comment</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Add a comment"
+                          className="w-full resize-none"
+                          rows={5}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button className="w-full" size="sm">
+                  <MessageSquarePlus className="mr-2 h-4 md:h-5 w-4 md:w-5" />
+                  Add
+                </Button>
+              </form>
+            </Form>
           </div>
-          <Button className="w-full" size="sm" onClick={handleComment}>
-            <MessageSquarePlus className="mr-2 h-4 md:h-5 w-4 md:w-5" />
-            Add
-          </Button>
         </CardFooter>
       )}
-      {getCommentsStatus === "loading" || getCommentsStatus === "idle" ? (
+      {getCommentsStatus === "loading" ? (
         <p>Loading</p>
       ) : getCommentsStatus === "failed" ? (
         <p>{getCommentsError}</p>
@@ -251,6 +344,21 @@ function Comments({ id }: any) {
                   )}
                 </div>
               ))}
+              <div className="flex justify-center items-center">
+                <Button size="sm" disabled={!hasMore} onClick={handleLoadMore}>
+                  {hasMore ? (
+                    <>
+                      <Plus className="mr-2 w-4 h-4" />
+                      Load more
+                    </>
+                  ) : (
+                    <>
+                      <Ban className="mr-2 w-4 h-4" />
+                      No more comments
+                    </>
+                  )}
+                </Button>
+              </div>
             </CardFooter>
           ) : (
             <p className="text-center text-lg font-semibold mb-4">

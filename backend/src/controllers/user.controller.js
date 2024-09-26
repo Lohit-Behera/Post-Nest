@@ -484,6 +484,32 @@ const updateUserDetails = async (req, res) => {
     )
 }
 
+const changePassword = async (req, res) => {
+    const { oldPassword, newPassword, confirmNewPassword } = req.body
+
+    if (!oldPassword || !newPassword || !confirmNewPassword) {
+        return res.status(400).json(new ApiResponse(400, {}, "Please provide old password, new password and confirm new password"))
+    }
+
+    if (newPassword !== confirmNewPassword) {
+        return res.status(400).json(new ApiResponse(400, {}, "New password and confirm new password don't match"))
+    }
+
+    const user = await User.findById(req.user._id)
+
+    if (!user) {
+        return res.status(404).json(new ApiResponse(404, {}, "User not found"))
+    }
+
+    if (!await user.comparePassword(oldPassword)) {
+        return res.status(401).json(new ApiResponse(401, {}, "Incorrect old password"))
+    }
+
+    user.password = newPassword
+    await user.save({ validateBeforeSave: false })
+
+    return res.status(200).json(new ApiResponse(200, {}, "Password updated successfully"))
+}
 
 export {
     registerUser,
@@ -493,5 +519,6 @@ export {
     sendVerifyEmail,
     verifyEmail,
     getUserDetails,
-    updateUserDetails
+    updateUserDetails,
+    changePassword
 }

@@ -40,9 +40,9 @@ function UpdateProfilePage() {
     (state: any) => state.user.updateUserDetailsError
   );
 
-  const [fullName, setFullName] = useState("");
-  const [bio, setBio] = useState("");
-  const [website, setWebsite] = useState("");
+  const [fullName, setFullName] = useState(userDetails.fullName || "");
+  const [bio, setBio] = useState(userDetails.bio || "");
+  const [website, setWebsite] = useState(userDetails.website || "");
   const [avatar, setAvatar] = useState("");
   const [editAvatar, setEditAvatar] = useState(false);
   const [coverImage, setCoverImage] = useState("");
@@ -95,7 +95,7 @@ function UpdateProfilePage() {
     if (file.type.startsWith("image/")) {
       setAvatar(file);
     } else {
-      alert("Please select an image file");
+      toast.warning("Please select an image file");
     }
   };
 
@@ -116,9 +116,9 @@ function UpdateProfilePage() {
       ) : getUserInfoStatus === "failed" ? (
         <p>Error</p>
       ) : (
-        <Card>
+        <Card className="w-[98%] md:w-[95%] mx-auto">
           <CardHeader>
-            <CardTitle>Edit Profile</CardTitle>
+            <CardTitle className="text-lg md:text-xl">Update Profile</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4">
@@ -130,6 +130,7 @@ function UpdateProfilePage() {
                   <Input
                     id="fullName"
                     type="fullName"
+                    value={fullName}
                     placeholder="full Name"
                     onChange={(e) => setFullName(e.target.value)}
                   />
@@ -141,6 +142,7 @@ function UpdateProfilePage() {
                   id="bio"
                   type="text"
                   placeholder="Bio"
+                  value={bio}
                   onChange={(e) => setBio(e.target.value)}
                 />
               </div>
@@ -151,6 +153,7 @@ function UpdateProfilePage() {
                 <Input
                   id="website"
                   type="text"
+                  value={website}
                   placeholder="Website"
                   onChange={(e) => setWebsite(e.target.value)}
                 />
@@ -241,7 +244,11 @@ function UpdateProfilePage() {
             <Button className="w-full" size="sm" onClick={handleEditProfile}>
               Save
             </Button>
-            <Button className="w-full" size="sm">
+            <Button
+              className="w-full"
+              size="sm"
+              onClick={() => navigate("/change-password")}
+            >
               Change Password
             </Button>
           </CardFooter>

@@ -30,7 +30,10 @@ export const fetchCreateComment = createAsyncThunk(
 
 export const fetchGetComments = createAsyncThunk(
   "comments/getComments",
-  async (postId: string, { rejectWithValue }) => {
+  async (
+    comment: { postId: string; page: number },
+    { rejectWithValue }: any
+  ) => {
     try {
       const config = {
         headers: {
@@ -39,7 +42,7 @@ export const fetchGetComments = createAsyncThunk(
         withCredentials: true,
       };
       const { data } = await axios.get(
-        `${baseUrl}/api/v1/comments/${postId}`,
+        `${baseUrl}/api/v1/comments/${comment.postId}/?page=${comment.page}`,
         config
       );
       return data;
@@ -129,6 +132,11 @@ const commentSlice = createSlice({
       state.createCommentStatus = "idle";
       state.createCommentError = {};
     },
+    resetGetComments: (state) => {
+      state.getComments = {};
+      state.getCommentsStatus = "idle";
+      state.getCommentsError = {};
+    },
     resetDeleteComment: (state) => {
       state.deleteComment = {};
       state.deleteCommentStatus = "idle";
@@ -196,7 +204,11 @@ const commentSlice = createSlice({
   },
 });
 
-export const { resetCreateComment, resetDeleteComment, resetUpdateComment } =
-  commentSlice.actions;
+export const {
+  resetCreateComment,
+  resetDeleteComment,
+  resetUpdateComment,
+  resetGetComments,
+} = commentSlice.actions;
 
 export default commentSlice.reducer;

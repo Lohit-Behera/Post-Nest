@@ -17,7 +17,6 @@ import { fetchGetUserInfo } from "@/features/UserSlice";
 import { fetchUserAllPosts } from "@/features/PostSlice";
 import {
   fetchFollow,
-  fetchFollowersList,
   fetchFollowingList,
   resetFollow,
 } from "@/features/FollowSlice";
@@ -41,7 +40,6 @@ function ProfilePage() {
   const userAllPostsStatus = useSelector(
     (state: any) => state.post.userAllPostsStatus
   );
-  const follow = useSelector((state: any) => state.follow.follow);
   const followStatus = useSelector((state: any) => state.follow.followStatus);
   const followError = useSelector((state: any) => state.follow.followError);
   const followingList = useSelector((state: any) => state.follow.followingList);
@@ -203,11 +201,7 @@ function ProfilePage() {
               ) : userAllPostsStatus === "failed" ? (
                 <p>Error</p>
               ) : (
-                <Post
-                  posts={posts}
-                  followingList={followingListData}
-                  twoPosts
-                />
+                <Post posts={posts} twoPosts />
               )}
             </div>
           </div>

@@ -183,6 +183,32 @@ export const fetchUpdateUserDetails = createAsyncThunk(
   }
 );
 
+export const fetchChangePassword = createAsyncThunk(
+  "user/changePassword",
+  async (user: any, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      };
+      const { data } = await axios.patch(
+        `${baseUrl}/api/v1/users/change-password`,
+        user,
+        config
+      );
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 function getCookie(name: string) {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
@@ -226,6 +252,10 @@ const userSlice = createSlice({
     updateUserDetails: {},
     updateUserDetailsStatus: "idle",
     updateUserDetailsError: {},
+
+    changePassword: {},
+    changePasswordStatus: "idle",
+    changePasswordError: {},
   },
   reducers: {
     resetUserUpdate: (state) => {
@@ -237,6 +267,11 @@ const userSlice = createSlice({
       state.register = {};
       state.registerStatus = "idle";
       state.registerError = {};
+    },
+    resetChangePassword: (state) => {
+      state.changePassword = {};
+      state.changePasswordStatus = "idle";
+      state.changePasswordError = {};
     },
   },
   extraReducers: (builder) => {
@@ -334,9 +369,24 @@ const userSlice = createSlice({
         state.updateUserDetailsStatus = "failed";
         state.updateUserDetailsError =
           action.payload || "failed to update user details";
+      })
+
+      // Change Password
+      .addCase(fetchChangePassword.pending, (state) => {
+        state.changePasswordStatus = "loading";
+      })
+      .addCase(fetchChangePassword.fulfilled, (state, action) => {
+        state.changePasswordStatus = "succeeded";
+        state.changePassword = action.payload;
+      })
+      .addCase(fetchChangePassword.rejected, (state, action) => {
+        state.changePasswordStatus = "failed";
+        state.changePasswordError =
+          action.payload || "failed to change password";
       });
   },
 });
 
-export const { resetUserUpdate, resetRegister } = userSlice.actions;
+export const { resetUserUpdate, resetRegister, resetChangePassword } =
+  userSlice.actions;
 export default userSlice.reducer;

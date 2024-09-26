@@ -21,7 +21,7 @@ function UpdatePostPage() {
 
   const userInfo = useSelector((state: any) => state.user.userInfo);
   const postDetails = useSelector((state: any) => state.post.postDetails);
-  const post = postDetails.data ? postDetails.data.post : {};
+  const post = postDetails.data || {};
   const postDetailsStatus = useSelector(
     (state: any) => state.post.postDetailsStatus
   );

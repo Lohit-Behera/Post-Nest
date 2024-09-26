@@ -1,5 +1,5 @@
 import { ModeToggle } from "./mode-toggle";
-import { NavLink, Link, useNavigate } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -17,13 +17,13 @@ import { fetchLogout } from "@/features/UserSlice";
 
 function Header() {
   const dispatch = useDispatch<any>();
-  const navigate = useNavigate();
   const userInfo = useSelector((state: any) => state.user.userInfo);
   const userDetails = useSelector((state: any) => state.user.userDetails);
+  const userDetailsData = userDetails.data || {};
 
-  const handleLogout = () => {
-    dispatch(fetchLogout());
-    navigate("/sign-in");
+  const handleLogout = async () => {
+    await dispatch(fetchLogout());
+    window.location.reload();
   };
   return (
     <header className="z-20 w-full sticky top-0 p-2 backdrop-blur bg-background/50 shadow  ">
@@ -77,10 +77,10 @@ function Header() {
                   <LogOut className="mr-2 h-4 w-4" />
                   Logout
                 </Button>
-                <Link to={`/profile/${userInfo._id}`}>
+                <Link to={`/profile/${userDetailsData._id}`}>
                   <Avatar>
                     <AvatarImage
-                      src={userDetails.data?.avatar}
+                      src={userDetailsData.avatar}
                       className="object-cover"
                     />
                     <AvatarFallback>L</AvatarFallback>
@@ -152,7 +152,7 @@ function Header() {
             <>
               <Avatar>
                 <AvatarImage
-                  src={userDetails.data?.avatar}
+                  src={userDetailsData.avatar}
                   className="object-cover"
                 />
                 <AvatarFallback>L</AvatarFallback>

@@ -11,13 +11,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Pencil } from "lucide-react";
+import { Loader2, Pencil, UserMinus, UserPlus } from "lucide-react";
 import { useEffect } from "react";
 import { fetchGetUserInfo } from "@/features/UserSlice";
 import { fetchUserAllPosts } from "@/features/PostSlice";
-import { fetchFollowersList, fetchFollowingList } from "@/features/FollowSlice";
+import {
+  fetchFollow,
+  fetchFollowersList,
+  fetchFollowingList,
+  resetFollow,
+} from "@/features/FollowSlice";
 import { Separator } from "@/components/ui/separator";
 import Post from "@/components/Post";
+import { toast } from "sonner";
 
 function ProfilePage() {
   const { userId } = useParams();
@@ -35,10 +41,14 @@ function ProfilePage() {
   const userAllPostsStatus = useSelector(
     (state: any) => state.post.userAllPostsStatus
   );
-
-  const followersList = useSelector((state: any) => state.follow.followersList);
+  const follow = useSelector((state: any) => state.follow.follow);
+  const followStatus = useSelector((state: any) => state.follow.followStatus);
+  const followError = useSelector((state: any) => state.follow.followError);
   const followingList = useSelector((state: any) => state.follow.followingList);
   const followingListData = followingList.data || [];
+  const followingListStatus = useSelector(
+    (state: any) => state.follow.followingListStatus
+  );
 
   useEffect(() => {
     if (!userInfo) {
@@ -46,10 +56,33 @@ function ProfilePage() {
     } else {
       dispatch(fetchGetUserInfo(userId as string));
       dispatch(fetchUserAllPosts(userId as string));
-      dispatch(fetchFollowersList(userId as string));
       dispatch(fetchFollowingList(userInfo._id as string));
     }
   }, [userId, dispatch]);
+
+  useEffect(() => {
+    if (followStatus === "succeeded") {
+      dispatch(resetFollow());
+    } else if (followStatus === "failed") {
+      dispatch(resetFollow());
+    }
+  }, [followStatus, followError, dispatch]);
+
+  const handleFollow = (id: string) => {
+    if (followStatus === "idle") {
+      const followPromise = dispatch(fetchFollow(id)).unwrap();
+      toast.promise(followPromise, {
+        loading: "Following...",
+        success: (data: any) => {
+          return data.message;
+        },
+        error: (error: any) => {
+          return error;
+        },
+      });
+    }
+  };
+
   return (
     <>
       {getUserInfoStatus === "loading" || getUserInfoStatus === "idle" ? (
@@ -79,7 +112,35 @@ function ProfilePage() {
               </Button>
             )}
           </div>
-          <div className="flex flex-col md:flex-row mt-14 w-full h-full space-x-0 md:space-x-4 space-y-4 md:space-y-0">
+          {userInfo._id !== userData._id && (
+            <div className="mt-2 flex justify-end p-2">
+              <Button
+                className=" "
+                variant="outline"
+                disabled={
+                  followStatus === "loading" ||
+                  followingListStatus === "loading"
+                }
+                onClick={() => handleFollow(userData._id)}
+              >
+                {followingListData.includes(userData._id) ? (
+                  <>
+                    <UserMinus className="mr-2 h-4 w-4" /> Unfollow
+                  </>
+                ) : followStatus === "loading" ||
+                  followingListStatus === "loading" ? (
+                  <>
+                    <Loader2 className="mr-2 w-4 h-4 animate-spin" /> Loading...
+                  </>
+                ) : (
+                  <>
+                    <UserPlus className="mr-2 h-4 w-4" /> Follow
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
+          <div className="flex flex-col md:flex-row mt-8 w-full h-full space-x-0 md:space-x-4 space-y-4 md:space-y-0">
             <div className="w-full md:w-[30%]">
               <Card>
                 <CardHeader>
@@ -95,15 +156,15 @@ function ProfilePage() {
                   <div className="border-2 rounded-lg p-2 w-full space-y-2">
                     <div className="flex justify-between">
                       <div className="flex flex-col w-1/2">
-                        <p className="text-sm text-center font-semibold">
-                          {userData.totalPosts}
+                        <p className="text-sm text-center font-bold">
+                          {userData.totalFollowing}
                         </p>
                         <p className="text-sm text-center font-semibold text-muted-foreground">
                           Following
                         </p>
                       </div>
                       <div className="flex flex-col w-1/2">
-                        <p className="text-sm text-center">
+                        <p className="text-sm text-center font-bold">
                           {userData.totalFollowers}
                         </p>
                         <p className="text-sm text-center font-semibold text-muted-foreground">
@@ -115,16 +176,16 @@ function ProfilePage() {
 
                     <div className="flex justify-between">
                       <div className="flex flex-col w-1/2">
-                        <p className="text-sm text-center font-semibold">
-                          {posts.length}
+                        <p className="text-sm text-center font-bold">
+                          {userData.totalPosts}
                         </p>
                         <p className="text-sm text-center font-semibold text-muted-foreground">
                           Posts
                         </p>
                       </div>
                       <div className="flex flex-col w-1/2">
-                        <p className="text-sm text-center">
-                          {followersList.data?.length}
+                        <p className="text-sm text-center font-bold">
+                          {userData.totalLikes}
                         </p>
                         <p className="text-sm text-center font-semibold text-muted-foreground">
                           Total Likes
@@ -142,7 +203,11 @@ function ProfilePage() {
               ) : userAllPostsStatus === "failed" ? (
                 <p>Error</p>
               ) : (
-                <Post posts={posts} followingList={followingListData} />
+                <Post
+                  posts={posts}
+                  followingList={followingListData}
+                  twoPosts
+                />
               )}
             </div>
           </div>

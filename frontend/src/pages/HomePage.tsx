@@ -1,19 +1,9 @@
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { fetchFollowingPosts } from "@/features/PostSlice";
 import { useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { UserPlus } from "lucide-react";
-import Post from "@/components/Post";
 import { fetchFollowingList } from "@/features/FollowSlice";
+import Post from "@/components/Post";
 
 function HomePage() {
   const dispatch = useDispatch<any>();

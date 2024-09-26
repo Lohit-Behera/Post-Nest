@@ -262,6 +262,11 @@ const sendVerifyEmail = async (req, res) => {
 // verify email
 const verifyEmail = async (req, res) => {
     const { userId, token } = req.params
+
+    if (!userId || !token) {
+        return res.status(400).json(new ApiResponse(400, {}, "Invalid verification link"))
+    }
+
     const user = await User.findById(userId)
 
     if (!user) {
@@ -293,6 +298,10 @@ const verifyEmail = async (req, res) => {
 const getUserDetails = async (req, res) => {
     const { id } = req.params
 
+    if (!id) {
+        return res.status(400).json(new ApiResponse(400, {}, "Invalid user id"))
+    }
+
     const user = await User.findById(id).select("-password -refreshToken")
 
     if (!user) {
@@ -300,65 +309,81 @@ const getUserDetails = async (req, res) => {
     }
 
     const aggregate = await User.aggregate([
-        {
-            $match: {
-              _id: user._id,
-            },
-          },
-          {
-            $lookup: {
-              from: "posts",
-              localField: "_id",
-              foreignField: "author",
-              as: "posts",
-            }
-          },
-          {
-            $addFields: {
-              totalPosts: {
-                $size: "$posts"
-              }
-            }
-          },
-          {
-            $lookup: {
-              from: "follows",
-              localField: "_id",
-              foreignField: "following",
-              as: "following"
-            }
-          },
-          {
-            $addFields: {
-              totalFollowing: {
-                $size: "$following"
-              }
-              }
-          },
-          {
-            $lookup: {
-              from: "follows",
-              localField: "_id",
-              foreignField: "follower",
-              as: "followers"
-            }
-          },
-          {
-            $addFields: {
-              totalFollowers: {
-                $size: "$followers"
-              }
-            }
-          },
-          {
-            $project: {
-              refreshToken: 0,
-              password: 0,
-              posts: 0,
-              followers: 0,
-              following: 0
-            }
+      {
+        $match: {
+          _id: user._id,
+        },
+      },
+      {
+        $lookup: {
+          from: "posts",
+          localField: "_id",
+          foreignField: "author",
+          as: "posts",
+        }
+      },
+      {
+        $addFields: {
+          totalPosts: {
+            $size: "$posts"
           }
+        }
+      },
+      {
+        $lookup: {
+          from: "follows",
+          localField: "_id",
+          foreignField: "following",
+          as: "following"
+        }
+      },
+      {
+        $addFields: {
+          totalFollowers: {
+            $size: "$following"
+          }
+          }
+      },
+      {
+        $lookup: {
+          from: "follows",
+          localField: "_id",
+          foreignField: "follower",
+          as: "followers"
+        }
+      },
+      {
+        $addFields: {
+          totalFollowing: {
+            $size: "$followers"
+          }
+        }
+      },
+      {
+        $lookup: {
+          from: "likes",
+          localField: "_id",
+          foreignField: "user",
+          as: "likes"
+        }
+      },
+      {
+        $addFields: {
+          totalLikes: {
+            $size: "$likes"
+          }
+        }
+      },
+      {
+        $project: {
+          refreshToken: 0,
+          password: 0,
+          posts: 0,
+          followers: 0,
+          following: 0,
+          likes: 0
+        }
+      }
     ])
 
     if (!aggregate.length) {
@@ -373,6 +398,10 @@ const getUserDetails = async (req, res) => {
 // update user details
 const updateUserDetails = async (req, res) => {
     const { userId } = req.params
+
+    if (!userId) {
+        return res.status(400).json(new ApiResponse(400, {}, "Invalid user id"))
+    }
 
     if (userId !== req.user._id.toString()) {
         return res.status(403).json(new ApiResponse(403, {}, "You are not authorized to update this user"))

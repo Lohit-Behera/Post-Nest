@@ -17,6 +17,7 @@ import {
 import waterFall from "@/assets/waterfalls.jpg";
 import CustomPassword from "@/components/CustomPassword";
 import { useEffect } from "react";
+import { toast } from "sonner";
 
 const FormSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
@@ -49,19 +50,26 @@ function SignInPage() {
 
   useEffect(() => {
     if (userInfoStatus === "succeeded") {
-      alert("Login successful");
-    } else if (userInfoStatus === "failed") {
-      alert(userInfoError);
+      navigate("/");
     }
   }, [userInfoStatus]);
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    dispatch(
+    const signInPromise = dispatch(
       fetchLogin({
         email: data.email,
         password: data.password,
       })
-    );
+    ).unwrap();
+    toast.promise(signInPromise, {
+      loading: "Logging in...",
+      success: (data: any) => {
+        return data.message;
+      },
+      error: (error: any) => {
+        return error;
+      },
+    });
   }
   return (
     <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">

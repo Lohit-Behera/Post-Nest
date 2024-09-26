@@ -102,6 +102,9 @@ const getComments = asyncHandler(async (req, res) => {
 
 const deleteComment = asyncHandler(async (req, res) => {
     const { commentId } = req.params
+    if (!commentId) {
+        return res.status(400).json(new ApiResponse(400, {}, "Comment id is required"))
+    }
     const userId = req.user._id
 
     const comment = await Comment.findById(commentId)
@@ -123,6 +126,10 @@ const deleteComment = asyncHandler(async (req, res) => {
 const updateComment = asyncHandler(async (req, res) => {
     const userId = req.user._id
     const { comment, commentId } = req.body
+
+    if (!commentId) {
+        return res.status(400).json(new ApiResponse(400, {}, "Comment id is required"))
+    }
 
     const commentToUpdate = await Comment.findById(commentId)
 

@@ -17,6 +17,7 @@ import {
 import RichTextEditor from "@/components/TextEditor";
 import { fetchCreatePost, resetCreatePost } from "@/features/PostSlice";
 import { useEffect } from "react";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   title: z.string().min(2, {
@@ -67,7 +68,6 @@ function CreatePostPage() {
       navigate(`/post/${id}`);
       dispatch(resetCreatePost());
     } else if (createPostStatus === "failed") {
-      alert(createPostError);
       dispatch(resetCreatePost());
     }
   }, [createPostStatus]);
@@ -83,7 +83,16 @@ function CreatePostPage() {
   });
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
-    dispatch(fetchCreatePost(data));
+    const postPromise = dispatch(fetchCreatePost(data)).unwrap();
+    toast.promise(postPromise, {
+      loading: "Posting...",
+      success: (data: any) => {
+        return data.message;
+      },
+      error: (error: any) => {
+        return error;
+      },
+    });
   };
   return (
     <>

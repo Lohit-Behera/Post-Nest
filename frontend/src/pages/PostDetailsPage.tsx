@@ -22,6 +22,7 @@ import {
   fetchPostLikes,
   resetLikeUnlike,
 } from "@/features/LikeSlice";
+import { toast } from "sonner";
 
 function PostDetailsPage() {
   const { id } = useParams();
@@ -37,22 +38,14 @@ function PostDetailsPage() {
   const updatedContent = post.content
     ? post.content.replace("<h1>", '<h1 class="text-3xl font-bold">')
     : "";
-  const deletePost = useSelector((state: any) => state.post.deletePost);
   const deletePostStatus = useSelector(
     (state: any) => state.post.deletePostStatus
   );
-  const deletePostError = useSelector(
-    (state: any) => state.post.deletePostError
-  );
-  const likeUnlike = useSelector((state: any) => state.like.likeUnlike);
   const likeUnlikeStatus = useSelector(
     (state: any) => state.like.likeUnlikeStatus
   );
   const postLikes = useSelector((state: any) => state.like.postLikes);
   const userList = postLikes.data || [];
-  const postLikesStatus = useSelector(
-    (state: any) => state.like.postLikesStatus
-  );
   const postLikesError = useSelector((state: any) => state.like.postLikesError);
 
   useEffect(() => {
@@ -62,11 +55,9 @@ function PostDetailsPage() {
 
   useEffect(() => {
     if (deletePostStatus === "succeeded") {
-      alert(deletePost.message);
       dispatch(resetDeletePost());
       navigate("/");
     } else if (deletePostStatus === "failed") {
-      alert(deletePostError);
       dispatch(resetDeletePost());
     }
   });
@@ -76,10 +67,23 @@ function PostDetailsPage() {
       dispatch(fetchPostLikes(id as string));
       dispatch(resetLikeUnlike());
     } else if (likeUnlikeStatus === "failed") {
-      alert(postLikesError);
+      toast.error(postLikesError);
       dispatch(resetLikeUnlike());
     }
   }, [likeUnlikeStatus]);
+
+  const handleDeletePost = () => {
+    const deletePromise = dispatch(fetchDeletePost(id as string)).unwrap();
+    toast.promise(deletePromise, {
+      loading: "Deleting...",
+      success: (data: any) => {
+        return data.message;
+      },
+      error: (error: any) => {
+        return error;
+      },
+    });
+  };
 
   return (
     <>
@@ -118,7 +122,7 @@ function PostDetailsPage() {
                     <Button
                       variant="destructive"
                       size="icon"
-                      onClick={() => dispatch(fetchDeletePost(id as string))}
+                      onClick={handleDeletePost}
                     >
                       <Trash />
                     </Button>

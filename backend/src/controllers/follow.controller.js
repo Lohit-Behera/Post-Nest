@@ -6,6 +6,9 @@ import { Post } from "../models/post.model.js"
 
 const followUser = asyncHandler(async (req, res) => {
     const { followingToId } = req.params
+    if (!followingToId) {
+        return res.status(400).json(new ApiResponse(400, {}, "User id is required"))
+    }
     const user = await User.findById(req.user._id)
     const followingTo = await User.findById(followingToId)
 
@@ -42,6 +45,10 @@ const followUser = asyncHandler(async (req, res) => {
 const userFollowing = asyncHandler(async (req, res) => {
     const { userId } = req.params;
 
+    if (!userId) {
+        return res.status(400).json(new ApiResponse(400, {}, "User id is required"));
+    }
+
     const user = await User.findById(userId);
 
     if (!user) {
@@ -77,6 +84,10 @@ const userFollowing = asyncHandler(async (req, res) => {
 
 const userFollowers = asyncHandler(async (req, res) => {
     const { userId } = req.params
+
+    if (!userId) {
+        return res.status(400).json(new ApiResponse(400, {}, "User id is required"))
+    }
 
     const user = await User.findById(userId)
 

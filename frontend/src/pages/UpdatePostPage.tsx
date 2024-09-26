@@ -12,6 +12,7 @@ import {
   resetUpdatePost,
 } from "@/features/PostSlice";
 import { Pencil, X } from "lucide-react";
+import { toast } from "sonner";
 
 function UpdatePostPage() {
   const { id } = useParams();
@@ -55,7 +56,7 @@ function UpdatePostPage() {
   }, [updatePostStatus]);
 
   const handleUpdate = () => {
-    dispatch(
+    const updatePromise = dispatch(
       fetchUpdatePost({
         id: id as string,
         title: title,
@@ -63,7 +64,16 @@ function UpdatePostPage() {
         thumbnail: thumbnail,
         isPublic: isPublic,
       })
-    );
+    ).unwrap();
+    toast.promise(updatePromise, {
+      loading: "Updating post...",
+      success: (data: any) => {
+        return data.message;
+      },
+      error: (error: any) => {
+        return error.message;
+      },
+    });
   };
   return (
     <>

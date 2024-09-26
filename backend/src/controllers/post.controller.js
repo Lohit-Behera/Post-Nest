@@ -67,6 +67,10 @@ const createPost = asyncHandler(async (req, res) => {
 const postDetails = asyncHandler(async (req, res) => {
     const { id } = req.params
 
+    if (!id) {
+        return res.status(400).json(new ApiResponse(400, {}, "Post id is required"))
+    }
+
     const post = await Post.aggregate([
             {
               $match: {
@@ -139,6 +143,11 @@ const postDetails = asyncHandler(async (req, res) => {
 
 const UpdatePost = asyncHandler(async (req, res) => {
     const { id } = req.params
+
+    if (!id) {
+        return res.status(400).json(new ApiResponse(400, {}, "Post id is required"))
+    }
+
     const userId = req.user._id
     const { title, content, isPublic } = req.body
 
@@ -200,6 +209,10 @@ const UpdatePost = asyncHandler(async (req, res) => {
 
 const deletePost = asyncHandler(async (req, res) => {
     const { id } = req.params
+
+    if (!id) {
+        return res.status(400).json(new ApiResponse(400, {}, "Post id is required"))
+    }
     const userId = req.user._id
 
     const post = await Post.findById(id)
@@ -273,6 +286,9 @@ const allPosts = asyncHandler(async (req, res) => {
 
 const userAllPosts = asyncHandler(async  (req, res) => {
     const { userId } = req.params
+    if (!userId) {
+        return res.status(400).json(new ApiResponse(400, {}, "User id is required"))
+    }
     const user = await User.findById(userId)
 
     const options = {

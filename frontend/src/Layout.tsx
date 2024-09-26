@@ -12,18 +12,20 @@ function Layout() {
   );
   useEffect(() => {
     if (userInfo) {
+      console.log(userInfo);
+
       dispatch(fetchUserDetails());
     }
   }, [userInfo, dispatch]);
   return (
     <>
-      <Header />
       {userDetailsStatus === "loading" ? (
         <p>Loading</p>
       ) : userDetailsStatus === "failed" ? (
         <p>Error</p>
       ) : (
         <>
+          <Header />
           <main className="my-10">
             <Outlet />
           </main>

@@ -18,6 +18,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Pencil, X } from "lucide-react";
+import { toast } from "sonner";
 function UpdateProfilePage() {
   const { userId } = useParams();
   const dispatch = useDispatch<any>();
@@ -62,14 +63,12 @@ function UpdateProfilePage() {
         dispatch(resetUserUpdate());
       }
     } else if (updateUserDetailsStatus === "failed") {
-      console.log(`updateUserDetailsError: ${updateUserDetailsError}`);
-      alert(updateUserDetailsError);
       dispatch(resetUserUpdate());
     }
   }, [updateUserDetailsStatus]);
 
   const handleEditProfile = () => {
-    dispatch(
+    const updatePromise = dispatch(
       fetchUpdateUserDetails({
         id: userId,
         fullName: fullName,
@@ -78,7 +77,16 @@ function UpdateProfilePage() {
         avatar: avatar,
         coverImage: coverImage,
       })
-    );
+    ).unwrap();
+    toast.promise(updatePromise, {
+      loading: "Updating profile...",
+      success: (data: any) => {
+        return data.message;
+      },
+      error: (error: any) => {
+        return error;
+      },
+    });
   };
 
   const handleAvatar = (e: any) => {

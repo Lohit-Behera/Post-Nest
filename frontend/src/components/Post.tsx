@@ -16,35 +16,46 @@ import {
   resetFollow,
 } from "@/features/FollowSlice";
 import { useEffect } from "react";
-
-function Post({ posts, followingList, followButton = false }: any) {
+import { toast } from "sonner";
+function Post({ posts, followButton = false, twoPosts = false }: any) {
   const dispatch = useDispatch<any>();
   const userInfo = useSelector((state: any) => state.user.userInfo);
-  const follow = useSelector((state: any) => state.follow.follow);
   const followStatus = useSelector((state: any) => state.follow.followStatus);
   const followError = useSelector((state: any) => state.follow.followError);
-
+  const followingList = useSelector((state: any) => state.follow.followingList);
+  const followingListData = followingList.data || [];
   const followingListStatus = useSelector(
     (state: any) => state.follow.followingListStatus
   );
   useEffect(() => {
     if (followStatus === "succeeded") {
-      alert(follow.message);
       dispatch(fetchFollowingList(userInfo._id as string));
       dispatch(resetFollow());
     } else if (followStatus === "failed") {
-      alert(followError);
       dispatch(resetFollow());
     }
   }, [followStatus, followError, dispatch]);
 
   const handleFollow = (id: string) => {
     if (followStatus === "idle") {
-      dispatch(fetchFollow(id));
+      const followPromise = dispatch(fetchFollow(id)).unwrap();
+      toast.promise(followPromise, {
+        loading: "Following...",
+        success: (data: any) => {
+          return data.message;
+        },
+        error: (error: any) => {
+          return error;
+        },
+      });
     }
   };
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div
+      className={`grid grid-cols-1 md:grid-cols-2 ${
+        !twoPosts && "lg:grid-cols-3"
+      } gap-4`}
+    >
       {posts.map((post: any) => (
         <Card key={post._id}>
           <CardHeader>
@@ -70,7 +81,7 @@ function Post({ posts, followingList, followButton = false }: any) {
                     </Link>
                   </div>
                 </div>
-                {followButton && (
+                {followButton && userInfo && (
                   <>
                     {userInfo._id !== post.author && (
                       <div className="flex space-x-3">
@@ -83,7 +94,7 @@ function Post({ posts, followingList, followButton = false }: any) {
                             followingListStatus === "loading"
                           }
                         >
-                          {followingList.includes(post.author) ? (
+                          {followingListData.includes(post.author) ? (
                             <UserMinus />
                           ) : followStatus === "loading" ||
                             followingListStatus === "loading" ? (

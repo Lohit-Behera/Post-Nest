@@ -18,6 +18,7 @@ import CustomPassword from "@/components/CustomPassword";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchRegister } from "@/features/UserSlice";
 import { useEffect } from "react";
+import { toast } from "sonner";
 
 const FormSchema = z.object({
   username: z.string().min(2, {
@@ -57,12 +58,10 @@ function SignUpPage() {
 
   useEffect(() => {
     if (registerStatus === "succeeded") {
-      alert(register.data.message);
       navigate("/sign-in");
-    } else if (registerStatus === "failed") {
-      alert(registerError);
     }
   }, [register, registerStatus, registerError, navigate]);
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -84,9 +83,18 @@ function SignUpPage() {
       avatar: data.avatar,
     };
     if (data.password !== data.confirmPassword) {
-      alert("Passwords do not match.");
+      toast.warning("Passwords do not match.");
     } else {
-      dispatch(fetchRegister(userData));
+      const registerPromise = dispatch(fetchRegister(userData)).unwrap();
+      toast.promise(registerPromise, {
+        loading: "Registering...",
+        success: (data: any) => {
+          return data.message;
+        },
+        error: (error: any) => {
+          return error;
+        },
+      });
     }
   }
 

@@ -150,10 +150,10 @@ const commentSlice = createSlice({
       state.updateCommentError = {};
     },
     addComments: (state, action) => {
-      state.comments = action.payload;
+      state.comments = action.payload || [];
     },
     addMoreComments: (state: any, action) => {
-      state.comments = [...state.comments, ...action.payload];
+      state.comments = [...state.comments, ...action.payload] || [];
     },
     resetComments: (state) => {
       state.comments = [];

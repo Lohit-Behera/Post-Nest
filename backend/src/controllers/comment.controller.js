@@ -92,7 +92,7 @@ const getComments = asyncHandler(async (req, res) => {
     const comments = await Comment.aggregatePaginate(Comment.aggregate(aggregatePipeline), options);
 
     if (!comments.docs.length) {
-        return res.status(404).json(new ApiResponse(404, {}, "No comments found"));
+        return res.status(200).json(new ApiResponse(200, {}, "No comments found"));
     }
 
     return res.status(200).json(

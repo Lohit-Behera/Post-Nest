@@ -407,7 +407,11 @@ const followingPosts = asyncHandler(async (req, res) => {
                 updatedAt: 1
             }
         },
-        // Pagination with limit and skip
+        {
+            $sort: {
+                createdAt: -1
+            }
+        },
         {
             $skip: (options.page - 1) * options.limit
         },
@@ -418,16 +422,27 @@ const followingPosts = asyncHandler(async (req, res) => {
 
     // Count total documents
     const totalPosts = await Post.countDocuments({
-        author: { $in: followingList }
+        author: { $in: followingList },
     });
 
+    // Calculate pagination
+    const totalPages = Math.ceil(totalPosts / options.limit);
+    const hasPrevPage = options.page > 1;
+    const hasNextPage = options.page < totalPages;
+    const pagingCounter = (options.page - 1) * options.limit + 1;
+    
     return res.status(200).json(
         new ApiResponse(200, {
             docs: aggregateQuery,
             totalDocs: totalPosts,
             limit: options.limit,
             page: options.page,
-            totalPages: Math.ceil(totalPosts / options.limit)
+            totalPages: totalPages,
+            pagingCounter: pagingCounter,
+            hasPrevPage: hasPrevPage,
+            hasNextPage: hasNextPage,
+            prevPage: hasPrevPage ? options.page - 1 : null,
+            nextPage: hasNextPage ? options.page + 1 : null,
         }, "Posts fetched successfully")
     );
 });

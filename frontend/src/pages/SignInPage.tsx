@@ -134,14 +134,19 @@ function SignInPage() {
           </div>
         </div>
       </div>
-      <div className="hidden bg-muted lg:block">
-        <img
-          src={waterFall}
-          alt="Image"
-          width="1920"
-          height="1080"
-          className="h-full w-full object-cover grayscale hover:grayscale-0 duration-700 ease-in-out"
-        />
+      <div className="hidden bg-muted lg:block max-h-[110vh]">
+        <a
+          href="https://www.pexels.com/photo/waterfalls-surrounded-by-trees-2743287/"
+          target="_blank"
+        >
+          <img
+            src={waterFall}
+            alt="Image"
+            width="1920"
+            height="1080"
+            className="h-full w-full object-cover grayscale hover:filter-none duration-300 ease-in-out"
+          />
+        </a>
       </div>
     </div>
   );

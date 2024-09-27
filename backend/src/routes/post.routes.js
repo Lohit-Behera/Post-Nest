@@ -2,6 +2,7 @@ import { Router } from "express";
 import { upload } from "../middlewares/multer.middleware.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 import { createPost, postDetails, UpdatePost, deletePost, allPosts, userAllPosts, followingPosts } from "../controllers/post.controller.js";
+import { resizeImage } from "../middlewares/resize.middleware.js";
 
 const router = Router();
 
@@ -13,6 +14,7 @@ router.post(
     "/create",
     authMiddleware,
     upload.single("thumbnail"),
+    resizeImage,
     createPost
 );
 

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { CardFooter } from "@/components/ui/card";
@@ -79,6 +79,7 @@ function Comments({ id }: any) {
     (state: any) => state.comment.deleteCommentStatus
   );
 
+  // when i use useState to set comments state, it will runs twice
   const comments = useSelector((state: any) => state.comment.comments);
 
   console.log(comments);
@@ -95,10 +96,12 @@ function Comments({ id }: any) {
 
   useEffect(() => {
     if (getCommentsStatus === "succeeded") {
-      if (getComments.data.page === 1) {
-        dispatch(addComments(getComments.data.docs));
-      } else {
-        dispatch(addMoreComments(getComments.data.docs));
+      if (getComments.data.docs) {
+        if (getComments.data.page === 1) {
+          dispatch(addComments(getComments.data.docs));
+        } else {
+          dispatch(addMoreComments(getComments.data.docs));
+        }
       }
       setPage(getComments.data.nextPage);
       setHasMore(getComments.data.hasNextPage);

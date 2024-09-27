@@ -15,12 +15,23 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Ban, MessageSquarePlus, Pencil, Plus, Trash, X } from "lucide-react";
 import {
+  Ban,
+  Loader2,
+  MessageSquarePlus,
+  Pencil,
+  Plus,
+  Trash,
+  X,
+} from "lucide-react";
+import {
+  addComments,
+  addMoreComments,
   fetchCreateComment,
   fetchDeleteComment,
   fetchGetComments,
   fetchUpdateComment,
+  resetComments,
   resetCreateComment,
   resetDeleteComment,
   resetGetComments,
@@ -68,14 +79,15 @@ function Comments({ id }: any) {
     (state: any) => state.comment.deleteCommentStatus
   );
 
-  const [comments, setComments] = useState<any>([]);
+  const comments = useSelector((state: any) => state.comment.comments);
+
   console.log(comments);
 
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
-    setComments([]);
+    dispatch(resetComments());
     setPage(1);
     setHasMore(true);
     dispatch(fetchGetComments({ postId: id, page: 1 }));
@@ -83,10 +95,11 @@ function Comments({ id }: any) {
 
   useEffect(() => {
     if (getCommentsStatus === "succeeded") {
-      setComments((prevComments: any) => [
-        ...prevComments,
-        ...getComments.data.docs,
-      ]);
+      if (getComments.data.page === 1) {
+        dispatch(addComments(getComments.data.docs));
+      } else {
+        dispatch(addMoreComments(getComments.data.docs));
+      }
       setPage(getComments.data.nextPage);
       setHasMore(getComments.data.hasNextPage);
       dispatch(resetGetComments());
@@ -238,7 +251,7 @@ function Comments({ id }: any) {
           </div>
         </CardFooter>
       )}
-      {getCommentsStatus === "loading" ? (
+      {getCommentsStatus === "loading" && comments.length === 0 ? (
         <p>Loading</p>
       ) : getCommentsStatus === "failed" ? (
         <p>{getCommentsError}</p>
@@ -344,8 +357,17 @@ function Comments({ id }: any) {
                   )}
                 </div>
               ))}
+              {getCommentsStatus === "loading" && (
+                <div className="flex justify-center items-center my-4">
+                  <Loader2 className="mr-2 w-4 h-4 animate-spin" /> Loading...
+                </div>
+              )}
               <div className="flex justify-center items-center">
-                <Button size="sm" disabled={!hasMore} onClick={handleLoadMore}>
+                <Button
+                  size="sm"
+                  disabled={!hasMore || getCommentsStatus === "loading"}
+                  onClick={handleLoadMore}
+                >
                   {hasMore ? (
                     <>
                       <Plus className="mr-2 w-4 h-4" />

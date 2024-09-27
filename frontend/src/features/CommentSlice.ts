@@ -114,6 +114,8 @@ const commentSlice = createSlice({
     createCommentStatus: "idle",
     createCommentError: {},
 
+    comments: [],
+
     getComments: {},
     getCommentsStatus: "idle",
     getCommentsError: {},
@@ -146,6 +148,15 @@ const commentSlice = createSlice({
       state.updateComment = {};
       state.updateCommentStatus = "idle";
       state.updateCommentError = {};
+    },
+    addComments: (state, action) => {
+      state.comments = action.payload;
+    },
+    addMoreComments: (state: any, action) => {
+      state.comments = [...state.comments, ...action.payload];
+    },
+    resetComments: (state) => {
+      state.comments = [];
     },
   },
   extraReducers: (builder) => {
@@ -209,6 +220,9 @@ export const {
   resetDeleteComment,
   resetUpdateComment,
   resetGetComments,
+  addComments,
+  addMoreComments,
+  resetComments,
 } = commentSlice.actions;
 
 export default commentSlice.reducer;

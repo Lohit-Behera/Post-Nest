@@ -293,7 +293,7 @@ const userAllPosts = asyncHandler(async  (req, res) => {
 
     const options = {
         page: parseInt(req.query.page) || 1,
-        limit: parseInt(req.query.limit) || 8,
+        limit: parseInt(req.query.limit) || 12,
     };
 
     const aggregateQuery = Post.aggregate([

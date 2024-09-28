@@ -208,6 +208,9 @@ function SignUpPage() {
               </Button>
             </form>
           </Form>
+          <Button variant="outline" className="w-full">
+            Login with Google
+          </Button>
           <div className="mt-4 text-center text-sm">
             Already have an account?{" "}
             <Link to="/sign-in" className="underline">

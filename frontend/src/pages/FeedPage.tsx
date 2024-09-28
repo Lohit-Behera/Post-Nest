@@ -103,7 +103,7 @@ function FeedPage() {
         <div className="w-[98%] md:w-[95%] mx-auto">
           {showScrollToTop && (
             <Button
-              className="fixed bottom-10 right-10 rounded-full w-11 h-11"
+              className="fixed bottom-10 right-10 rounded-full w-11 h-11 z-10"
               variant="secondary"
               onClick={scrollToTop}
               size="icon"

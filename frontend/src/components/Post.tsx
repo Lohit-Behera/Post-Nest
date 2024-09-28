@@ -17,6 +17,7 @@ import {
 } from "@/features/FollowSlice";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import CustomImage from "./CustomImage";
 function Post({
   posts,
   followButton = false,
@@ -120,10 +121,11 @@ function Post({
           </CardHeader>
           <CardContent>
             <Link to={`/post/${post._id}`}>
-              <img
+              <CustomImage
                 src={post.thumbnail}
-                alt=""
-                className="w-full h-52 object-cover rounded-lg hover:opacity-70 hover:scale-103 transition-all duration-300"
+                alt={post.title}
+                maxHight="max-h-48"
+                className=""
               />
             </Link>
           </CardContent>

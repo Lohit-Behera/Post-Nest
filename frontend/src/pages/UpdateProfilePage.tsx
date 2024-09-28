@@ -64,6 +64,7 @@ function UpdateProfilePage() {
         dispatch(resetUserUpdate());
       }
     } else if (updateUserDetailsStatus === "failed") {
+      toast.error(updateUserDetailsError);
       dispatch(resetUserUpdate());
     }
   }, [updateUserDetailsStatus]);

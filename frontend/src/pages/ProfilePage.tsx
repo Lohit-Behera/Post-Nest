@@ -30,6 +30,7 @@ import { Separator } from "@/components/ui/separator";
 import Post from "@/components/Post";
 import { toast } from "sonner";
 import ProfileLoader from "@/components/Loader/ProfileLoader";
+import PostLoader from "@/components/Loader/PostLoader";
 
 function ProfilePage() {
   const { userId } = useParams();
@@ -275,14 +276,14 @@ function ProfilePage() {
             </div>
             <div className="w-full md:w-[68%]">
               {userAllPostsStatus === "loading" && posts.length === 0 ? (
-                <p>Loading</p>
+                <PostLoader />
               ) : userAllPostsStatus === "failed" ? (
                 <p>Error</p>
               ) : (
                 <div className="w-[98%] md:w-[95%] mx-auto">
                   {showScrollToTop && (
                     <Button
-                      className="fixed bottom-10 right-10 rounded-full w-11 h-11"
+                      className="fixed bottom-10 right-10 rounded-full w-11 h-11 z-10"
                       variant="secondary"
                       onClick={scrollToTop}
                       size="icon"

@@ -29,6 +29,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import Post from "@/components/Post";
 import { toast } from "sonner";
+import ProfileLoader from "@/components/Loader/ProfileLoader";
 
 function ProfilePage() {
   const { userId } = useParams();
@@ -152,11 +153,11 @@ function ProfilePage() {
   return (
     <>
       {getUserInfoStatus === "loading" || getUserInfoStatus === "idle" ? (
-        <p>Loading</p>
+        <ProfileLoader />
       ) : getUserInfoStatus === "failed" ? (
         <p>Error</p>
       ) : (
-        <div>
+        <>
           <div className="h-52 bg-secondary relative">
             <img
               src={userData.coverImage}
@@ -304,7 +305,7 @@ function ProfilePage() {
               )}
             </div>
           </div>
-        </div>
+        </>
       )}
     </>
   );

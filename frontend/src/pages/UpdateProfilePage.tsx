@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/card";
 import { Pencil, X } from "lucide-react";
 import { toast } from "sonner";
+import GlobalLoader from "@/components/Loader/GlobalLoader/GlobalLoader";
 function UpdateProfilePage() {
   const { userId } = useParams();
   const dispatch = useDispatch<any>();
@@ -112,7 +113,7 @@ function UpdateProfilePage() {
   return (
     <>
       {getUserInfoStatus === "loading" || getUserInfoStatus === "idle" ? (
-        <p>Loading</p>
+        <GlobalLoader fullHight={true} />
       ) : getUserInfoStatus === "failed" ? (
         <p>Error</p>
       ) : (

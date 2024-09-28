@@ -13,6 +13,7 @@ import {
 } from "@/features/PostSlice";
 import { Pencil, X } from "lucide-react";
 import { toast } from "sonner";
+import GlobalLoader from "@/components/Loader/GlobalLoader/GlobalLoader";
 
 function UpdatePostPage() {
   const { id } = useParams();
@@ -78,7 +79,7 @@ function UpdatePostPage() {
   return (
     <>
       {postDetailsStatus === "loading" || postDetailsStatus === "idle" ? (
-        <p>Loading</p>
+        <GlobalLoader fullHight={true} />
       ) : postDetailsStatus === "failed" ? (
         <p>Error</p>
       ) : (

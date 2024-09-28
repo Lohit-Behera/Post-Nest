@@ -22,6 +22,7 @@ router.patch(
     "/update/:id",
     authMiddleware,
     upload.single("thumbnail"),
+    resizeImage,
     UpdatePost
 );
 

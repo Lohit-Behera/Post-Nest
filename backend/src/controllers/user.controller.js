@@ -53,7 +53,7 @@ const registerUser = asyncHandler(async (req, res) => {
     }
     
     // check for images
-    const avatarLocalPath = req.files?.avatar[0]?.path
+    const avatarLocalPath = req.file?.path
     if (!avatarLocalPath) {
         res.status(400).json(new ApiResponse(400, {}, "Please provide an avatar"))
     }

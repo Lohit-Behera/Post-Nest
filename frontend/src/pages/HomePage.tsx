@@ -12,6 +12,7 @@ import Post from "@/components/Post";
 import { toast } from "sonner";
 import { ArrowUp, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import PostLoader from "@/components/Loader/PostLoader";
 
 function HomePage() {
   const dispatch = useDispatch<any>();
@@ -99,33 +100,35 @@ function HomePage() {
   return (
     <>
       {followingPostsStatus === "loading" && posts.length === 0 ? (
-        <p>Loading</p>
+        <PostLoader />
       ) : followingPostsStatus === "failed" ? (
         <p>Error</p>
       ) : (
-        <div className="w-[98%] md:w-[95%] mx-auto">
-          {showScrollToTop && (
-            <Button
-              className="fixed bottom-10 right-10 rounded-full w-11 h-11"
-              variant="secondary"
-              onClick={scrollToTop}
-              size="icon"
-            >
-              <ArrowUp />
-            </Button>
-          )}
-          <Post posts={posts} followButton />
-          {followingPostsStatus === "loading" && (
-            <div className="flex justify-center mt-6">
-              <Loader2 className="animate-spin w-14 h-14" />
-            </div>
-          )}
-          {!hasMore && (
-            <p className="text-center text-lg md:text-xl font-semibold mt-6">
-              No more posts
-            </p>
-          )}
-        </div>
+        <>
+          <div className="w-[98%] md:w-[95%] mx-auto my-6">
+            {showScrollToTop && (
+              <Button
+                className="fixed bottom-10 right-10 rounded-full w-11 h-11"
+                variant="secondary"
+                onClick={scrollToTop}
+                size="icon"
+              >
+                <ArrowUp />
+              </Button>
+            )}
+            <Post posts={posts} followButton />
+            {followingPostsStatus === "loading" && (
+              <div className="flex justify-center mt-6">
+                <Loader2 className="animate-spin w-14 h-14" />
+              </div>
+            )}
+            {!hasMore && (
+              <p className="text-center text-lg md:text-xl font-semibold mt-6">
+                No more posts
+              </p>
+            )}
+          </div>
+        </>
       )}
     </>
   );

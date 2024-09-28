@@ -51,6 +51,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import CommentLoader from "./Loader/CommentLoader";
 
 const FormSchema = z.object({
   comment: z
@@ -253,7 +254,7 @@ function Comments({ id }: any) {
         </CardFooter>
       )}
       {getCommentsStatus === "loading" && comments.length === 0 ? (
-        <p>Loading</p>
+        <CommentLoader />
       ) : getCommentsStatus === "failed" ? (
         <p>{getCommentsError}</p>
       ) : (

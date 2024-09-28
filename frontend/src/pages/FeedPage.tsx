@@ -12,6 +12,7 @@ import Post from "@/components/Post";
 import { toast } from "sonner";
 import { ArrowUp, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import PostLoader from "@/components/Loader/PostLoader";
 
 function FeedPage() {
   const dispatch = useDispatch<any>();
@@ -95,7 +96,7 @@ function FeedPage() {
   return (
     <>
       {allPostsStatus === "loading" && posts.length === 0 ? (
-        <p>Loading</p>
+        <PostLoader />
       ) : allPostsStatus === "failed" ? (
         <p>Error</p>
       ) : (

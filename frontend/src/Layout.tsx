@@ -4,6 +4,7 @@ import Header from "./components/Header";
 import { useEffect } from "react";
 import { fetchUserDetails } from "./features/UserSlice";
 import { fetchFollowingList } from "./features/FollowSlice";
+import GlobalLoader from "./components/Loader/GlobalLoader/GlobalLoader";
 
 function Layout() {
   const dispatch = useDispatch<any>();
@@ -20,13 +21,13 @@ function Layout() {
   return (
     <>
       {userDetailsStatus === "loading" ? (
-        <p>Loading</p>
+        <GlobalLoader fullHight />
       ) : userDetailsStatus === "failed" ? (
         <p>Error</p>
       ) : (
         <>
           <Header />
-          <main className="my-10">
+          <main>
             <Outlet />
           </main>
         </>

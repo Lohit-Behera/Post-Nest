@@ -6,6 +6,8 @@ import { Post } from "../models/post.model.js";
 import { Follow } from "../models/follow.model.js";
 import { deleteFile, uploadFile } from "../utils/cloudinary.js";
 import { sendEmail } from "../utils/sendMail.js";
+import { oAuth2Client } from "../utils/googleConfig.js";
+import axios from "axios";
 
 const options = {
     httpOnly: true,
@@ -223,7 +225,7 @@ const userDetails = asyncHandler(async (req, res) => {
 })
 
 // send verify email
-const sendVerifyEmail = async (req, res) => {
+const sendVerifyEmail = asyncHandler(async (req, res) => {
     const userId = req.user._id
 
     if (req.user.isVerified) {
@@ -256,11 +258,11 @@ const sendVerifyEmail = async (req, res) => {
     await sendEmail(req.user.email, "Verify Email", `Click on the link below to verify your email\n\n${verifyEmailLink}`);
 
     return res.status(200).json(new ApiResponse(200, {}, "Email verification link sent"))
-}
+})
 
 
 // verify email
-const verifyEmail = async (req, res) => {
+const verifyEmail = asyncHandler(async (req, res) => {
     const { userId, token } = req.params
 
     if (!userId || !token) {
@@ -293,9 +295,9 @@ const verifyEmail = async (req, res) => {
     await verifyEmailToken.deleteOne({ user: userId })
 
     return res.redirect(`http://localhost:5173?verified=true`)
-}
+})
 
-const getUserDetails = async (req, res) => {
+const getUserDetails = asyncHandler(async (req, res) => {
     const { id } = req.params
 
     if (!id) {
@@ -393,10 +395,10 @@ const getUserDetails = async (req, res) => {
     return res.status(200).json(
         new ApiResponse(200, aggregate[0], "User details fetched successfully")
     )
-}
+})
 
 // update user details
-const updateUserDetails = async (req, res) => {
+const updateUserDetails = asyncHandler(async (req, res) => {
     const { userId } = req.params
 
     if (!userId) {
@@ -476,9 +478,9 @@ const updateUserDetails = async (req, res) => {
     return res.status(200).json(
         new ApiResponse(200, {}, "User details updated successfully")
     )
-}
+})
 
-const changePassword = async (req, res) => {
+const changePassword = asyncHandler(async (req, res) => {
     const { oldPassword, newPassword, confirmNewPassword } = req.body
 
     if (!oldPassword || !newPassword || !confirmNewPassword) {
@@ -503,7 +505,86 @@ const changePassword = async (req, res) => {
     await user.save({ validateBeforeSave: false })
 
     return res.status(200).json(new ApiResponse(200, {}, "Password updated successfully"))
-}
+})
+
+const generateUniqueUsername = async (givenName) => {
+  let username = givenName.toLowerCase().replace(/\s+/g, ""); // Normalize the username
+  let user = await User.findOne({ username });
+
+  // Keep appending random string until a unique username is found
+  while (user) {
+      const randomStr = Math.random().toString(36).substring(2, 6); // Generate a random 4-character string
+      username = `${givenName.toLowerCase().replace(/\s+/g, "")}${randomStr}`;
+      user = await User.findOne({ username });
+  }
+
+  return username;
+};
+
+const googleAuth = asyncHandler(async (req, res) => {
+    const { token } = req.query
+
+    if (!token) {
+        return res.status(400).json(new ApiResponse(400, {}, "Token is required"))
+    }
+    const googleRes = await oAuth2Client.getToken(token)
+    oAuth2Client.setCredentials(googleRes.tokens)
+    
+    if (!googleRes.tokens.access_token) {
+        return res.status(500).json(new ApiResponse(500, {}, "Something went wrong while generating access token"))
+    }
+
+    const userRes =await axios.get(
+      `https://www.googleapis.com/oauth2/v3/userinfo?alt=json&access_token=${googleRes.tokens.access_token}`,
+    )
+
+    if (!userRes.data) {
+        return res.status(500).json(new ApiResponse(500, {}, "Something went wrong while fetching user details"))
+    }
+
+    const { email, name, given_name, picture, email_verified } = userRes.data
+
+    if (!email || !name || !given_name || !picture || !email_verified) {
+        return res.status(404).json(new ApiResponse(404, {}, "Email, name, given name, picture are not found"))
+    }
+
+    const user = await User.findOne({ email })
+
+    if (!user) {
+      const uniqueUsername = await generateUniqueUsername(given_name);
+
+        const user = await User.create({
+            username: uniqueUsername,
+            email,
+            fullName: name,
+            password: Math.random().toString(36).slice(-8),
+            avatar: picture,
+            isVerified: email_verified
+        })
+        const { accessToken, refreshToken } = await generateTokens(user._id)
+
+        const loggedInUser = await User.findById(user._id).select("-password -coverImage -bio -website -plan ")
+
+        // send response
+        return res.status(200)
+        .cookie("accessToken", accessToken, options) 
+        .cookie("refreshToken", refreshToken, options)
+        .json(
+            new ApiResponse(200, loggedInUser, "Sign up successful with google")
+        )
+    } else {
+        const { accessToken, refreshToken } = await generateTokens(user._id)
+        const loggedInUser = await User.findById(user._id).select("-password -coverImage -bio -website -plan ")
+
+        // send response
+        return res.status(200)
+        .cookie("accessToken", accessToken, options) 
+        .cookie("refreshToken", refreshToken, options)
+        .json(
+            new ApiResponse(200, loggedInUser, "Sign in successful with google")
+        )
+    }
+})
 
 export {
     registerUser,
@@ -514,5 +595,6 @@ export {
     verifyEmail,
     getUserDetails,
     updateUserDetails,
-    changePassword
+    changePassword,
+    googleAuth
 }

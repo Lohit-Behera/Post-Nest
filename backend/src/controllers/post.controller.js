@@ -337,7 +337,7 @@ const userAllPosts = asyncHandler(async  (req, res) => {
     const posts = await Post.aggregatePaginate(aggregateQuery, options);
 
     if (!posts.docs.length) {
-        return res.status(404).json(new ApiResponse(404, {}, "No posts found"));
+        return res.status(200).json(new ApiResponse(200, {}, "No posts found"));
     }
 
     return res.status(200).json(

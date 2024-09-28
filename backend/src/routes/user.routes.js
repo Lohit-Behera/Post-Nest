@@ -8,7 +8,8 @@ import {
     verifyEmail,
     getUserDetails,
     updateUserDetails,
-    changePassword
+    changePassword,
+    googleAuth
  } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
@@ -28,6 +29,8 @@ router.route("/login").post(loginUser)
 router.route("/verify-email/:userId/:token").get(verifyEmail)
 
 router.route("/user-details/:id").get(getUserDetails)
+
+router.route("/auth/google").get(googleAuth)
 
 // secure routes
 router.route("/logout").post(authMiddleware, logoutUser)

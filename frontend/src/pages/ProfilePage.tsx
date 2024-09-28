@@ -167,7 +167,9 @@ function ProfilePage() {
             />
             <Avatar className="w-24 h-24 absolute -bottom-10 left-10 border-4 border-white">
               <AvatarImage src={userData.avatar} className="object-cover" />
-              <AvatarFallback>L</AvatarFallback>
+              <AvatarFallback>
+                {userData.username ? userData.username[0] : "A"}
+              </AvatarFallback>
             </Avatar>
             {userData._id === userInfo._id && (
               <Button

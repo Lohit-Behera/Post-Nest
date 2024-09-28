@@ -83,7 +83,11 @@ function Header() {
                       src={userDetailsData.avatar}
                       className="object-cover"
                     />
-                    <AvatarFallback>L</AvatarFallback>
+                    <AvatarFallback>
+                      {userDetailsData.username
+                        ? userDetailsData.username[0]
+                        : "A"}
+                    </AvatarFallback>
                   </Avatar>
                 </Link>
               </>

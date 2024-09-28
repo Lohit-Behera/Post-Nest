@@ -209,6 +209,29 @@ export const fetchChangePassword = createAsyncThunk(
   }
 );
 
+export const fetchGoogleAuth = createAsyncThunk(
+  "user/googleAuth",
+  async (token: string, { rejectWithValue }) => {
+    try {
+      const { data } = await axios.get(
+        `${baseUrl}/api/v1/users/auth/google?token=${token}`
+      );
+      if (data.data) {
+        document.cookie = `userInfoPostNest=${encodeURIComponent(
+          JSON.stringify(data.data)
+        )}; path=/; max-age=${30 * 24 * 60 * 60}; secure;`;
+      }
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 function getCookie(name: string) {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
@@ -256,6 +279,10 @@ const userSlice = createSlice({
     changePassword: {},
     changePasswordStatus: "idle",
     changePasswordError: {},
+
+    googleAuth: {},
+    googleAuthStatus: "idle",
+    googleAuthError: {},
   },
   reducers: {
     resetUserUpdate: (state) => {
@@ -383,6 +410,20 @@ const userSlice = createSlice({
         state.changePasswordStatus = "failed";
         state.changePasswordError =
           action.payload || "failed to change password";
+      })
+
+      // google auth
+      .addCase(fetchGoogleAuth.pending, (state) => {
+        state.googleAuthStatus = "loading";
+      })
+      .addCase(fetchGoogleAuth.fulfilled, (state, action) => {
+        state.googleAuthStatus = "succeeded";
+        state.userInfo = action.payload;
+        state.googleAuth = action.payload;
+      })
+      .addCase(fetchGoogleAuth.rejected, (state, action) => {
+        state.googleAuthStatus = "failed";
+        state.googleAuthError = action.payload || "Google auth failed";
       });
   },
 });

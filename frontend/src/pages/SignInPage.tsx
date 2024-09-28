@@ -3,7 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { fetchLogin } from "@/features/UserSlice";
+import { useGoogleLogin } from "@react-oauth/google";
+import { fetchGoogleAuth, fetchLogin } from "@/features/UserSlice";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -71,6 +72,20 @@ function SignInPage() {
       },
     });
   }
+
+  const responseGoogle = (authResponse: any) => {
+    try {
+      dispatch(fetchGoogleAuth(authResponse.code));
+    } catch (error) {
+      toast.error("Failed to Sign Up with Google. Please try again later.");
+    }
+  };
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: responseGoogle,
+    onError: responseGoogle,
+    flow: "auth-code",
+  });
   return (
     <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
       <div className="flex items-center justify-center py-12">
@@ -126,6 +141,9 @@ function SignInPage() {
               </Button>
             </form>
           </Form>
+          <Button variant="outline" className="w-full" onClick={googleLogin}>
+            Sign in with Google
+          </Button>
           <div className="mt-4 text-center text-sm">
             Don&apos;t have an account?{" "}
             <Link to="/sign-up" className="underline">

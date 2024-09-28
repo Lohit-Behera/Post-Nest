@@ -106,7 +106,7 @@ export const fetchDeletePost = createAsyncThunk(
 
 export const fetchAllPosts = createAsyncThunk(
   "posts/allPosts",
-  async (_, { rejectWithValue }) => {
+  async (page: number, { rejectWithValue }) => {
     try {
       const config = {
         headers: {
@@ -114,7 +114,10 @@ export const fetchAllPosts = createAsyncThunk(
         },
         withCredentials: true,
       };
-      const { data } = await axios.get(`${baseUrl}/api/v1/posts/all`, config);
+      const { data } = await axios.get(
+        `${baseUrl}/api/v1/posts/all?page=${page || 1}`,
+        config
+      );
       return data;
     } catch (error: any) {
       const errorMessage =
@@ -128,7 +131,7 @@ export const fetchAllPosts = createAsyncThunk(
 
 export const fetchUserAllPosts = createAsyncThunk(
   "posts/userAllPosts",
-  async (id: string, { rejectWithValue }) => {
+  async ({ id, page }: { id: string; page: number }, { rejectWithValue }) => {
     try {
       const config = {
         headers: {
@@ -137,7 +140,7 @@ export const fetchUserAllPosts = createAsyncThunk(
         withCredentials: true,
       };
       const { data } = await axios.get(
-        `${baseUrl}/api/v1/posts/user/all/${id}`,
+        `${baseUrl}/api/v1/posts/user/all/${id}?page=${page || 1}`,
         config
       );
       return data;
@@ -153,7 +156,7 @@ export const fetchUserAllPosts = createAsyncThunk(
 
 export const fetchFollowingPosts = createAsyncThunk(
   "posts/followingPosts",
-  async (_, { rejectWithValue }) => {
+  async (page: number, { rejectWithValue }) => {
     try {
       const config = {
         headers: {
@@ -162,7 +165,7 @@ export const fetchFollowingPosts = createAsyncThunk(
         withCredentials: true,
       };
       const { data } = await axios.get(
-        `${baseUrl}/api/v1/posts//following/all`,
+        `${baseUrl}/api/v1/posts//following/all?page=${page || 1}`,
         config
       );
       return data;
@@ -206,6 +209,8 @@ const postSlice = createSlice({
     followingPosts: [],
     followingPostsStatus: "idle",
     followingPostsError: {},
+
+    posts: [],
   },
   reducers: {
     resetCreatePost: (state) => {
@@ -222,6 +227,30 @@ const postSlice = createSlice({
       state.deletePost = {};
       state.deletePostStatus = "idle";
       state.deletePostError = {};
+    },
+    resetAllPosts: (state) => {
+      state.allPosts = [];
+      state.allPostsStatus = "idle";
+      state.allPostsError = {};
+    },
+    resetUserPosts: (state) => {
+      state.userAllPosts = [];
+      state.userAllPostsStatus = "idle";
+      state.userAllPostsError = {};
+    },
+    resetFollowingPosts: (state) => {
+      state.followingPosts = [];
+      state.followingPostsStatus = "idle";
+      state.followingPostsError = {};
+    },
+    addPosts: (state, action) => {
+      state.posts = action.payload;
+    },
+    addMorePosts: (state: any, action) => {
+      state.posts = [...state.posts, ...action.payload];
+    },
+    resetPosts: (state) => {
+      state.posts = [];
     },
   },
   extraReducers: (builder) => {
@@ -312,7 +341,16 @@ const postSlice = createSlice({
   },
 });
 
-export const { resetCreatePost, resetUpdatePost, resetDeletePost } =
-  postSlice.actions;
+export const {
+  resetCreatePost,
+  resetUpdatePost,
+  resetDeletePost,
+  resetAllPosts,
+  resetUserPosts,
+  resetFollowingPosts,
+  addPosts,
+  addMorePosts,
+  resetPosts,
+} = postSlice.actions;
 
 export default postSlice.reducer;

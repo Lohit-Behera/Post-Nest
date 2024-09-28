@@ -82,8 +82,6 @@ function Comments({ id }: any) {
   // when i use useState to set comments state, it will runs twice
   const comments = useSelector((state: any) => state.comment.comments);
 
-  console.log(comments);
-
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 

@@ -17,7 +17,15 @@ import {
 } from "@/features/FollowSlice";
 import { useEffect } from "react";
 import { toast } from "sonner";
-function Post({ posts, followButton = false, twoPosts = false }: any) {
+function Post({
+  posts,
+  followButton = false,
+  twoPosts = false,
+}: {
+  posts: any;
+  followButton?: boolean;
+  twoPosts?: boolean;
+}) {
   const dispatch = useDispatch<any>();
   const userInfo = useSelector((state: any) => state.user.userInfo);
   const followStatus = useSelector((state: any) => state.follow.followStatus);
@@ -63,7 +71,7 @@ function Post({ posts, followButton = false, twoPosts = false }: any) {
               <CardTitle className="flex justify-between ">
                 <div className="flex space-x-2">
                   <Link to={`/profile/${post.author}`}>
-                    <Avatar className="w-12 h-12 border-primary hover:border">
+                    <Avatar className="w-12 h-12 outline-primary hover:outline outline-2  outline-offset-2">
                       <AvatarImage src={post.avatar} />
                       <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
@@ -115,7 +123,7 @@ function Post({ posts, followButton = false, twoPosts = false }: any) {
               <img
                 src={post.thumbnail}
                 alt=""
-                className="w-full h-52 object-cover rounded-lg"
+                className="w-full h-52 object-cover rounded-lg hover:opacity-70 hover:scale-103 transition-all duration-300"
               />
             </Link>
           </CardContent>

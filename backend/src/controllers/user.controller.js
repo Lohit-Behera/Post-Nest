@@ -419,30 +419,24 @@ const updateUserDetails = async (req, res) => {
         return res.status(400).json(new ApiResponse(400, {}, "Nothing to update"))
     }
 
-    if (fullName !== "") {
-        if (fullName === user.fullName) {
-            return res.status(400).json(new ApiResponse(400, {}, "Full name is same as before"))
-        } else if (fullName.length < 2) {
+    if (fullName !== "" && fullName !== user.fullName) {
+        if (fullName.length < 2) {
             return res.status(400).json(new ApiResponse(400, {}, "Full name should be atleast 2 characters long"))
         } else {
             user.fullName = fullName
         }
     }
 
-    if (bio !== "") {
-        if (bio === user.bio) {
-            return res.status(400).json(new ApiResponse(400, {}, "Bio is same as before"))
-        } else if (bio.length < 2) {
+    if (bio !== "" && bio !== user.bio) {
+        if (bio.length < 2) {
             return res.status(400).json(new ApiResponse(400, {}, "Bio should be atleast 2 characters long"))
         } else {
             user.bio = bio
         }
     }
 
-    if (website !== "") {
-        if (website === user.website) {
-            return res.status(400).json(new ApiResponse(400, {}, "Website is same as before"))
-        } else if (website.length < 2) {
+    if (website !== "" && website !== user.website) {
+        if (website.length < 2) {
             return res.status(400).json(new ApiResponse(400, {}, "Website should be atleast 2 characters long"))
         } else {
             user.website = website

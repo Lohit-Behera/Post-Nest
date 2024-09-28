@@ -11,10 +11,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Loader2, Pencil, UserMinus, UserPlus } from "lucide-react";
-import { useEffect } from "react";
+import { ArrowUp, Loader2, Pencil, UserMinus, UserPlus } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import { fetchGetUserInfo } from "@/features/UserSlice";
-import { fetchUserAllPosts } from "@/features/PostSlice";
+import {
+  fetchUserAllPosts,
+  resetUserPosts,
+  addPosts,
+  addMorePosts,
+  resetPosts,
+} from "@/features/PostSlice";
 import {
   fetchFollow,
   fetchFollowingList,
@@ -36,9 +42,11 @@ function ProfilePage() {
   );
   const userData = getUserInfo.data || {};
   const userAllPosts = useSelector((state: any) => state.post.userAllPosts);
-  const posts = userAllPosts.data ? userAllPosts.data.docs : [];
   const userAllPostsStatus = useSelector(
     (state: any) => state.post.userAllPostsStatus
+  );
+  const userAllPostsError = useSelector(
+    (state: any) => state.post.userAllPostsError
   );
   const followStatus = useSelector((state: any) => state.follow.followStatus);
   const followError = useSelector((state: any) => state.follow.followError);
@@ -47,16 +55,50 @@ function ProfilePage() {
   const followingListStatus = useSelector(
     (state: any) => state.follow.followingListStatus
   );
+  const posts = useSelector((state: any) => state.post.posts);
+
+  const [once, setOnce] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const [showScrollToTop, setShowScrollToTop] = useState(false);
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
 
   useEffect(() => {
     if (!userInfo) {
       navigate(`/sign-in`);
     } else {
+      dispatch(resetPosts());
+      setPage(1);
+      setHasMore(false);
       dispatch(fetchGetUserInfo(userId as string));
-      dispatch(fetchUserAllPosts(userId as string));
+      dispatch(fetchUserAllPosts({ id: userId as string, page }));
       dispatch(fetchFollowingList(userInfo._id as string));
     }
   }, [userId, dispatch]);
+
+  useEffect(() => {
+    if (userAllPostsStatus === "succeeded") {
+      if (userAllPosts.data.page === 1) {
+        dispatch(addPosts(userAllPosts.data.docs));
+      } else {
+        if (once) {
+          dispatch(addMorePosts(userAllPosts.data.docs));
+          setOnce(false);
+        }
+      }
+      setHasMore(userAllPosts.data.hasNextPage);
+      setPage(userAllPosts.data.nextPage);
+      dispatch(resetUserPosts());
+    } else if (userAllPostsStatus === "failed") {
+      toast.error(userAllPostsError);
+    }
+  }, [userAllPostsStatus, dispatch]);
 
   useEffect(() => {
     if (followStatus === "succeeded") {
@@ -80,6 +122,32 @@ function ProfilePage() {
       });
     }
   };
+
+  const handleScroll = useCallback(() => {
+    const scrollableHeight = document.documentElement.scrollHeight;
+    const scrolledFromTop = window.innerHeight + window.scrollY;
+    const scrollTrigger = (scrollableHeight * 90) / 100;
+
+    if (Math.ceil(scrolledFromTop) > scrollTrigger) {
+      if (hasMore) {
+        setOnce(true);
+        dispatch(fetchUserAllPosts({ id: userId as string, page }));
+      }
+    }
+
+    if (window.scrollY > 300) {
+      setShowScrollToTop(true);
+    } else {
+      setShowScrollToTop(false);
+    }
+  }, [hasMore, dispatch, page]);
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [handleScroll]);
 
   return (
     <>
@@ -149,6 +217,16 @@ function ProfilePage() {
                 </CardHeader>
                 <CardContent>
                   {userData.bio ? <p>{userData.bio}</p> : <p>No bio</p>}
+                  <Separator className="mt-2" />
+                  {userData.website ? (
+                    <Button variant="link" asChild>
+                      <a href={userData.website} target="_blank">
+                        Website
+                      </a>
+                    </Button>
+                  ) : (
+                    <p>No website</p>
+                  )}
                 </CardContent>
                 <CardFooter>
                   <div className="border-2 rounded-lg p-2 w-full space-y-2">
@@ -195,13 +273,34 @@ function ProfilePage() {
               </Card>
             </div>
             <div className="w-full md:w-[68%]">
-              {userAllPostsStatus === "loading" ||
-              userAllPostsStatus === "idle" ? (
+              {userAllPostsStatus === "loading" && posts.length === 0 ? (
                 <p>Loading</p>
               ) : userAllPostsStatus === "failed" ? (
                 <p>Error</p>
               ) : (
-                <Post posts={posts} twoPosts />
+                <div className="w-[98%] md:w-[95%] mx-auto">
+                  {showScrollToTop && (
+                    <Button
+                      className="fixed bottom-10 right-10 rounded-full w-11 h-11"
+                      variant="secondary"
+                      onClick={scrollToTop}
+                      size="icon"
+                    >
+                      <ArrowUp />
+                    </Button>
+                  )}
+                  <Post posts={posts} followButton />
+                  {userAllPostsStatus === "loading" && (
+                    <div className="flex justify-center mt-6">
+                      <Loader2 className="animate-spin w-14 h-14" />
+                    </div>
+                  )}
+                  {!hasMore && (
+                    <p className="text-center text-lg md:text-xl font-semibold mt-6">
+                      No more posts
+                    </p>
+                  )}
+                </div>
               )}
             </div>
           </div>

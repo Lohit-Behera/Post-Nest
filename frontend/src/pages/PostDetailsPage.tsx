@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchDeletePost,
@@ -97,15 +97,23 @@ function PostDetailsPage() {
             <CardHeader>
               <CardTitle className="flex justify-between ">
                 <div className="flex space-x-2">
-                  <Avatar className="w-14 h-14">
-                    <AvatarImage src={post.avatar} />
-                    <AvatarFallback>CN</AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col space-y-1">
-                    <p>{post.username}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {post.fullName}
-                    </p>
+                  <Link to={`/profile/${post.author}`}>
+                    <Avatar className="w-14 h-14 outline-primary hover:outline outline-2  outline-offset-2 ">
+                      <AvatarImage src={post.avatar} />
+                      <AvatarFallback>CN</AvatarFallback>
+                    </Avatar>
+                  </Link>
+                  <div className="flex flex-col space-y-0.5">
+                    <Link to={`/profile/${post.author}`}>
+                      <p className="text-sm md:text-base hover:underline">
+                        {post.username}
+                      </p>
+                    </Link>
+                    <Link to={`/profile/${post.author}`}>
+                      <p className="text-sm text-muted-foreground hover:underline">
+                        {post.fullName}
+                      </p>
+                    </Link>
                   </div>
                 </div>
                 {userInfo._id === post.author && (

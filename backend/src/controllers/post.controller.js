@@ -237,7 +237,7 @@ const deletePost = asyncHandler(async (req, res) => {
 const allPosts = asyncHandler(async (req, res) => {
     const options = {
         page: parseInt(req.query.page) || 1,
-        limit: parseInt(req.query.limit) || 10,
+        limit: parseInt(req.query.limit) || 12,
     };
 
     const aggregate = Post.aggregate([
@@ -293,7 +293,7 @@ const userAllPosts = asyncHandler(async  (req, res) => {
 
     const options = {
         page: parseInt(req.query.page) || 1,
-        limit: parseInt(req.query.limit) || 10,
+        limit: parseInt(req.query.limit) || 8,
     };
 
     const aggregateQuery = Post.aggregate([
@@ -354,7 +354,7 @@ const followingPosts = asyncHandler(async (req, res) => {
 
     const options = {
         page: parseInt(req.query.page) || 1,
-        limit: parseInt(req.query.limit) || 10,
+        limit: parseInt(req.query.limit) || 12,
     };
 
     const following = await Follow.aggregate([

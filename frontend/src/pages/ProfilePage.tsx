@@ -210,7 +210,7 @@ function ProfilePage() {
               </Button>
             </div>
           )}
-          <div className="flex flex-col md:flex-row mt-8 w-full h-full space-x-0 md:space-x-4 space-y-4 md:space-y-0">
+          <div className="flex flex-col md:flex-row mt-8 mx-2 w-full h-full space-x-0 md:space-x-4 space-y-4 md:space-y-0">
             <div className="w-full md:w-[30%]">
               <Card>
                 <CardHeader>
@@ -283,26 +283,34 @@ function ProfilePage() {
                 <p>Error</p>
               ) : (
                 <div className="w-[98%] md:w-[95%] mx-auto">
-                  {showScrollToTop && (
-                    <Button
-                      className="fixed bottom-10 right-10 rounded-full w-11 h-11 z-10"
-                      variant="secondary"
-                      onClick={scrollToTop}
-                      size="icon"
-                    >
-                      <ArrowUp />
-                    </Button>
-                  )}
-                  <Post posts={posts} followButton />
-                  {userAllPostsStatus === "loading" && (
-                    <div className="flex justify-center mt-6">
-                      <Loader2 className="animate-spin w-14 h-14" />
-                    </div>
-                  )}
-                  {!hasMore && (
+                  {posts.length === 0 ? (
                     <p className="text-center text-lg md:text-xl font-semibold mt-6">
-                      No more posts
+                      You don't have any posts.
                     </p>
+                  ) : (
+                    <>
+                      {showScrollToTop && (
+                        <Button
+                          className="fixed bottom-10 right-10 rounded-full w-11 h-11 z-10"
+                          variant="secondary"
+                          onClick={scrollToTop}
+                          size="icon"
+                        >
+                          <ArrowUp />
+                        </Button>
+                      )}
+                      <Post posts={posts} followButton />
+                      {userAllPostsStatus === "loading" && (
+                        <div className="flex justify-center mt-6">
+                          <Loader2 className="animate-spin w-14 h-14" />
+                        </div>
+                      )}
+                      {!hasMore && (
+                        <p className="text-center text-lg md:text-xl font-semibold mt-6">
+                          No more posts
+                        </p>
+                      )}
+                    </>
                   )}
                 </div>
               )}

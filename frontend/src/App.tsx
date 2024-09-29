@@ -19,6 +19,7 @@ import PostDetailsPage from "./pages/PostDetailsPage";
 import UpdatePostPage from "./pages/UpdatePostPage";
 import FeedPage from "./pages/FeedPage";
 import ChangePasswordPage from "./pages/ChangePasswordPage";
+import PageNotFound from "./pages/Error/PageNotFound";
 
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -41,6 +42,7 @@ const GoogleAuthWrapperSignIn = () => {
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<Layout />}>
+      <Route path="*" element={<PageNotFound />} />
       <Route index element={<HomePage />} />
       <Route path="/sign-up" element={<GoogleAuthWrapperSignUp />} />
       <Route path="/sign-in" element={<GoogleAuthWrapperSignIn />} />

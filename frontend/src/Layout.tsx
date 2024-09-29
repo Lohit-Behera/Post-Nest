@@ -1,10 +1,13 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, ScrollRestoration } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { ErrorBoundary } from "react-error-boundary";
 import Header from "./components/Header";
 import { useEffect } from "react";
 import { fetchUserDetails } from "./features/UserSlice";
 import { fetchFollowingList } from "./features/FollowSlice";
 import GlobalLoader from "./components/Loader/GlobalLoader/GlobalLoader";
+import ServerErrorPage from "./pages/Error/ServerErrorPage";
+import SomethingWentWrong from "./pages/Error/SomethingWentWrong";
 
 function Layout() {
   const dispatch = useDispatch<any>();
@@ -23,13 +26,16 @@ function Layout() {
       {userDetailsStatus === "loading" ? (
         <GlobalLoader fullHight />
       ) : userDetailsStatus === "failed" ? (
-        <p>Error</p>
+        <ServerErrorPage />
       ) : (
         <>
-          <Header />
-          <main>
-            <Outlet />
-          </main>
+          <ErrorBoundary FallbackComponent={SomethingWentWrong}>
+            <Header />
+            <main className="overflow-x-hidden">
+              <ScrollRestoration />
+              <Outlet />
+            </main>
+          </ErrorBoundary>
         </>
       )}
     </>

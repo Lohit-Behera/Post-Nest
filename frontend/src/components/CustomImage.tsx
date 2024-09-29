@@ -34,14 +34,14 @@ function CustomImage({
     <div
       className={`${className} ${
         absolute ? "absolute" : "relative"
-      } flex justify-center mx-auto rounded-lg ${
+      } flex justify-center mx-auto rounded-lg min-h-56 ${
         hover &&
         "duration-200 hover:drop-shadow-[0_0px_12px_rgba(250,204,21,0.7)] ease-in-out"
       }`}
       onClick={onClick}
     >
       <div
-        className="absolute inset-0 w-full h-full min-h-40 flex items-center justify-center bg-background"
+        className="absolute inset-0 w-full h-full min-h-40 flex items-center justify-center bg-background rounded-lg"
         style={{
           opacity: loaded ? 0 : 1,
           transition: "opacity 0.5s ease-in-out",
@@ -50,7 +50,9 @@ function CustomImage({
         <ImageLoader />
       </div>
       <img
-        className={`w-full ${maxHight} object-cover rounded-lg`}
+        className={`w-full ${maxHight} object-cover rounded-lg hover:scale-103 ${
+          hover && "hover:scale-103"
+        }`}
         src={error ? ErrorImage : src}
         alt={alt}
         style={imagesStyle}

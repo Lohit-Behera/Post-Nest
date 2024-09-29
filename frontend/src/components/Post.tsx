@@ -74,7 +74,9 @@ function Post({
                   <Link to={`/profile/${post.author}`}>
                     <Avatar className="w-12 h-12 outline-primary hover:outline outline-2  outline-offset-2">
                       <AvatarImage src={post.avatar} />
-                      <AvatarFallback>CN</AvatarFallback>
+                      <AvatarFallback>
+                        {post.username ? post.username[0].toUpperCase() : "A"}
+                      </AvatarFallback>
                     </Avatar>
                   </Link>
                   <div className="flex flex-col space-y-0.5">
@@ -126,6 +128,7 @@ function Post({
                 alt={post.title}
                 maxHight="max-h-48"
                 className=""
+                hover
               />
             </Link>
           </CardContent>

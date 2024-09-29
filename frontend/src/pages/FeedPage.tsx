@@ -100,7 +100,7 @@ function FeedPage() {
       ) : allPostsStatus === "failed" ? (
         <p>Error</p>
       ) : (
-        <div className="w-[98%] md:w-[95%] mx-auto">
+        <div className="w-[98%] md:w-[95%] mx-auto my-6">
           {showScrollToTop && (
             <Button
               className="fixed bottom-10 right-10 rounded-full w-11 h-11 z-10"

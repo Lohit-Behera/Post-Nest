@@ -16,8 +16,6 @@ import {
   fetchFollowingListWithDetails,
 } from "@/features/FollowSlice";
 import { toast } from "sonner";
-import { UserPlus } from "lucide-react";
-import { Button } from "./ui/button";
 
 function FollowList({
   userId,
@@ -30,6 +28,7 @@ function FollowList({
   text: string;
   following: boolean;
 }) {
+  //TODO show more users with pagination
   const dispatch = useDispatch<any>();
 
   const followingListWithDetails = useSelector(

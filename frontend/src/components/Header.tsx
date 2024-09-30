@@ -9,11 +9,13 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+  SheetClose,
 } from "@/components/ui/sheet";
 import { Button } from "./ui/button";
 import Logo from "../assets/Logo.svg";
 import { Home, LogIn, LogOut, PanelLeft, Rss, SquarePlus } from "lucide-react";
 import { fetchLogout } from "@/features/UserSlice";
+import SearchUser from "@/components/SearchUser";
 
 function Header() {
   const dispatch = useDispatch<any>();
@@ -58,6 +60,7 @@ function Header() {
                     </Button>
                   )}
                 </NavLink>
+                <SearchUser />
                 <NavLink to="/create-post">
                   {({ isActive }) => (
                     <Button
@@ -126,26 +129,77 @@ function Header() {
               </SheetTitle>
               <SheetFooter>
                 <div className="flex flex-col mx-auto space-y-3">
-                  <Button variant="ghost" className="font-semibold">
-                    <Home className="mr-2 h-4 w-4" />
-                    Home
-                  </Button>
-                  <Button variant="ghost" className="font-semibold">
-                    <Rss className="mr-2 h-4 w-4" />
-                    Feed
-                  </Button>
-                  <Button variant="ghost" className="font-semibold">
-                    <SquarePlus className="mr-2 h-4 w-4" />
-                    Create Post
-                  </Button>
-                  <Button variant="ghost" className="font-semibold">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Logout
-                  </Button>
-                  <Button variant="ghost" className="font-semibold">
-                    <LogIn className="mr-2 h-4 w-4" />
-                    Login
-                  </Button>
+                  {userInfo && (
+                    <>
+                      <SheetClose asChild>
+                        <NavLink to="/">
+                          {({ isActive }) => (
+                            <Button
+                              variant={isActive ? "default" : "ghost"}
+                              className="font-semibold"
+                            >
+                              <Home className="mr-2 h-4 w-4" />
+                              Home
+                            </Button>
+                          )}
+                        </NavLink>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <NavLink to="/feed">
+                          {({ isActive }) => (
+                            <Button
+                              variant={isActive ? "default" : "ghost"}
+                              className="font-semibold"
+                            >
+                              <Rss className="mr-2 h-4 w-4" />
+                              Feed
+                            </Button>
+                          )}
+                        </NavLink>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <SearchUser />
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <NavLink to="/create-post">
+                          {({ isActive }) => (
+                            <Button
+                              variant={isActive ? "default" : "ghost"}
+                              className="font-semibold"
+                            >
+                              <SquarePlus className="mr-2 h-4 w-4" />
+                              Create Post
+                            </Button>
+                          )}
+                        </NavLink>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Button
+                          variant="ghost"
+                          className="font-semibold"
+                          onClick={handleLogout}
+                        >
+                          <LogOut className="mr-2 h-4 w-4" />
+                          Logout
+                        </Button>
+                      </SheetClose>
+                    </>
+                  )}
+                  {!userInfo && (
+                    <SheetClose asChild>
+                      <NavLink to="/sign-in">
+                        {({ isActive }) => (
+                          <Button
+                            variant={isActive ? "default" : "ghost"}
+                            className="font-semibold"
+                          >
+                            <LogIn className="mr-2 h-4 w-4" />
+                            Sign In
+                          </Button>
+                        )}
+                      </NavLink>
+                    </SheetClose>
+                  )}
                 </div>
               </SheetFooter>
             </SheetHeader>

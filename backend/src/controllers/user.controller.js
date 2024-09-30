@@ -586,6 +586,25 @@ const googleAuth = asyncHandler(async (req, res) => {
     }
 })
 
+const userSearch = asyncHandler(async (req, res) => {
+    const { username } = req.body
+
+    if (!username) {
+        return res.status(400).json(new ApiResponse(400, {}, "Please provide username"))  
+    }
+
+    const user = await User.find({ username: { $regex: `^${username}`, $options: "i" } })
+        .select("_id username fullName avatar")
+        .limit(5);
+
+    if (!user) {
+        return res.status(404).json(new ApiResponse(404, {}, "User not found"))
+    }
+
+    res.status(200).json(new ApiResponse(200, user, "User details fetched successfully"))
+})
+
+
 export {
     registerUser,
     loginUser,
@@ -596,5 +615,6 @@ export {
     getUserDetails,
     updateUserDetails,
     changePassword,
-    googleAuth
+    googleAuth,
+    userSearch
 }

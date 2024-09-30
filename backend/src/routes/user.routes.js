@@ -9,7 +9,8 @@ import {
     getUserDetails,
     updateUserDetails,
     changePassword,
-    googleAuth
+    googleAuth,
+    userSearch
  } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
@@ -50,5 +51,7 @@ router.route("/update/:userId").patch(
 )
 
 router.route("/change-password").patch(authMiddleware, changePassword)
+
+router.route("/search").post(authMiddleware, userSearch)
 
 export default router

@@ -232,6 +232,32 @@ export const fetchGoogleAuth = createAsyncThunk(
   }
 );
 
+export const fetchSearchUser = createAsyncThunk(
+  "user/searchUser",
+  async (username: string, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      };
+      const { data } = await axios.post(
+        `${baseUrl}/api/v1/users/search`,
+        { username },
+        config
+      );
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 function getCookie(name: string) {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
@@ -283,6 +309,10 @@ const userSlice = createSlice({
     googleAuth: {},
     googleAuthStatus: "idle",
     googleAuthError: {},
+
+    searchUser: {},
+    searchUserStatus: "idle",
+    searchUserError: {},
   },
   reducers: {
     resetUserUpdate: (state) => {
@@ -424,6 +454,19 @@ const userSlice = createSlice({
       .addCase(fetchGoogleAuth.rejected, (state, action) => {
         state.googleAuthStatus = "failed";
         state.googleAuthError = action.payload || "Google auth failed";
+      })
+
+      // search user
+      .addCase(fetchSearchUser.pending, (state) => {
+        state.searchUserStatus = "loading";
+      })
+      .addCase(fetchSearchUser.fulfilled, (state, action) => {
+        state.searchUserStatus = "succeeded";
+        state.searchUser = action.payload;
+      })
+      .addCase(fetchSearchUser.rejected, (state, action) => {
+        state.searchUserStatus = "failed";
+        state.searchUserError = action.payload || "Search user failed";
       });
   },
 });

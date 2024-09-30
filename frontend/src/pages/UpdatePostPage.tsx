@@ -14,6 +14,7 @@ import {
 import { Pencil, X } from "lucide-react";
 import { toast } from "sonner";
 import GlobalLoader from "@/components/Loader/GlobalLoader/GlobalLoader";
+import ServerErrorPage from "./Error/ServerErrorPage";
 
 function UpdatePostPage() {
   const { id } = useParams();
@@ -81,7 +82,7 @@ function UpdatePostPage() {
       {postDetailsStatus === "loading" || postDetailsStatus === "idle" ? (
         <GlobalLoader fullHight={true} />
       ) : postDetailsStatus === "failed" ? (
-        <p>Error</p>
+        <ServerErrorPage />
       ) : (
         <div className="w-[90%] mx-auto bg-accent p-4 rounded-lg my-10">
           <div className="grid gap-4">

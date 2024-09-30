@@ -48,6 +48,8 @@ function CreatePostPage() {
   const navigate = useNavigate();
 
   const userInfo = useSelector((state: any) => state.user.userInfo);
+  const userDetails = useSelector((state: any) => state.user.userDetails);
+  const userDetailsData = userDetails.data || {};
   const createPost = useSelector((state: any) => state.post.createPost);
   const createPostStatus = useSelector(
     (state: any) => state.post.createPostStatus
@@ -59,6 +61,9 @@ function CreatePostPage() {
   useEffect(() => {
     if (!userInfo) {
       navigate("/sign-in");
+    } else if (!userDetailsData.isVerified) {
+      navigate(`/profile/${userDetailsData._id}`);
+      toast.warning("Please verify your account first");
     }
   }, [userInfo, dispatch]);
 
@@ -68,6 +73,7 @@ function CreatePostPage() {
       navigate(`/post/${id}`);
       dispatch(resetCreatePost());
     } else if (createPostStatus === "failed") {
+      toast.error(createPostError);
       dispatch(resetCreatePost());
     }
   }, [createPostStatus]);

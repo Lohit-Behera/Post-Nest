@@ -281,7 +281,7 @@ function Comments({ id }: any) {
                         </h3>
                       </Link>
                     </div>
-                    {userInfo._id === comment.user && (
+                    {userInfo && userInfo._id === comment.user && (
                       <div className="flex space-x-2">
                         <Button
                           className="w-8 h-8 hover:bg-background/40"

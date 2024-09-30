@@ -3,6 +3,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { Follow } from "../models/follow.model.js";
 import { User } from "../models/user.model.js";
 import { Post } from "../models/post.model.js"
+import mongoose from "mongoose";
 
 const followUser = asyncHandler(async (req, res) => {
     const { followingToId } = req.params
@@ -120,4 +121,116 @@ const userFollowers = asyncHandler(async (req, res) => {
     )
 })
 
-export { followUser, userFollowing, userFollowers }
+const userFollowingListWithDetails = asyncHandler(async (req, res) => {
+    const { userId } = req.params
+
+    if (!userId) {
+        return res.status(400).json(new ApiResponse(400, {}, "User id is required"))
+    }
+
+    const options = {
+        page: parseInt(req.query.page) || 1,
+        limit: parseInt(req.query.limit) || 12,
+    };
+
+    const aggregateQuery = Follow.aggregate([
+        [
+            {
+              $match: {
+                follower: mongoose.Types.ObjectId.createFromHexString(userId)
+              }
+            },
+            {
+              $lookup: {
+                from: "users",
+                localField: "following",
+                foreignField: "_id",
+                as: "userDetails"
+              }
+            },
+            {
+              $unwind: "$userDetails"
+            },
+            {
+              $project: {
+                _id: "$userDetails._id",
+                avatar: "$userDetails.avatar",
+                username: "$userDetails.username",
+              }
+            },
+            {
+              $sort: {
+                username: 1
+              }
+            }
+          ]
+    ])
+
+    const followingList = await Follow.aggregatePaginate(aggregateQuery, options)
+
+    if (!followingList) {
+        return res.status(404).json(new ApiResponse(404, {}, "No following found"))
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, followingList, "Following list fetched successfully")
+    )
+})
+
+const userFollowersListWithDetails = asyncHandler(async (req, res) => {
+    const { userId } = req.params
+
+    if (!userId) {
+        return res.status(400).json(new ApiResponse(400, {}, "User id is required"))
+    }
+
+    const options = {
+        page: parseInt(req.query.page) || 1,
+        limit: parseInt(req.query.limit) || 12,
+    };
+
+    const aggregateQuery = Follow.aggregate([
+        [
+            {
+              $match: {
+                following: mongoose.Types.ObjectId.createFromHexString(userId)
+              }
+            },
+            {
+              $lookup: {
+                from: "users",
+                localField: "follower",
+                foreignField: "_id",
+                as: "userDetails"
+              }
+            },
+            {
+              $unwind: "$userDetails"
+            },
+            {
+              $project: {   
+                _id: "$userDetails._id",
+                avatar: "$userDetails.avatar",
+                username: "$userDetails.username",
+              }
+            },
+            {
+              $sort: {
+                username: 1
+              }
+            }
+          ]
+    ])
+
+    const followersList = await Follow.aggregatePaginate(aggregateQuery, options)
+
+    if (!followersList) {
+        return res.status(404).json(new ApiResponse(404, {}, "No followers found"))
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, followersList, "Followers list fetched successfully")
+    )
+})
+
+export { followUser, userFollowing, userFollowers, userFollowingListWithDetails, userFollowersListWithDetails }

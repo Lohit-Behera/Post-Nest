@@ -7,7 +7,9 @@ import { resizeImage } from "../middlewares/resize.middleware.js";
 const router = Router();
 
 // public routes
-router.get("/details/:id", authMiddleware, postDetails);
+router.get("/details/:id", postDetails);
+
+router.get("/user/all/:userId", userAllPosts);
 
 // secure routes
 router.post(
@@ -30,7 +32,6 @@ router.delete("/delete/:id", authMiddleware, deletePost);
 
 router.get("/all", authMiddleware, allPosts);
 
-router.get("/user/all/:userId", authMiddleware, userAllPosts);
 
 router.get("/following/all", authMiddleware, followingPosts);
 

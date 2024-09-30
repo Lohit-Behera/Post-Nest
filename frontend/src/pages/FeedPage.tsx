@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { ArrowUp, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import PostLoader from "@/components/Loader/PostLoader";
+import ServerErrorPage from "./Error/ServerErrorPage";
 
 function FeedPage() {
   const dispatch = useDispatch<any>();
@@ -98,7 +99,7 @@ function FeedPage() {
       {allPostsStatus === "loading" && posts.length === 0 ? (
         <PostLoader />
       ) : allPostsStatus === "failed" ? (
-        <p>Error</p>
+        <ServerErrorPage />
       ) : (
         <div className="w-[98%] md:w-[95%] mx-auto my-6">
           {showScrollToTop && (

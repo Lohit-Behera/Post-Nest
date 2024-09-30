@@ -34,41 +34,41 @@ function Header() {
             <AvatarFallback>L</AvatarFallback>
           </Avatar>
           <div className="flex my-auto space-x-2">
-            <NavLink to="/">
-              {({ isActive }) => (
-                <Button
-                  variant={isActive ? "default" : "ghost"}
-                  className="font-semibold"
-                >
-                  <Home className="mr-2 h-4 w-4" />
-                  Home
-                </Button>
-              )}
-            </NavLink>
-            <NavLink to="/feed">
-              {({ isActive }) => (
-                <Button
-                  variant={isActive ? "default" : "ghost"}
-                  className="font-semibold"
-                >
-                  <Rss className="mr-2 h-4 w-4" />
-                  Feed
-                </Button>
-              )}
-            </NavLink>
-            <NavLink to="/create-post">
-              {({ isActive }) => (
-                <Button
-                  variant={isActive ? "default" : "ghost"}
-                  className="font-semibold"
-                >
-                  <SquarePlus className="mr-2 h-4 w-4" />
-                  Create Post
-                </Button>
-              )}
-            </NavLink>
             {userInfo && (
               <>
+                <NavLink to="/">
+                  {({ isActive }) => (
+                    <Button
+                      variant={isActive ? "default" : "ghost"}
+                      className="font-semibold"
+                    >
+                      <Home className="mr-2 h-4 w-4" />
+                      Home
+                    </Button>
+                  )}
+                </NavLink>
+                <NavLink to="/feed">
+                  {({ isActive }) => (
+                    <Button
+                      variant={isActive ? "default" : "ghost"}
+                      className="font-semibold"
+                    >
+                      <Rss className="mr-2 h-4 w-4" />
+                      Feed
+                    </Button>
+                  )}
+                </NavLink>
+                <NavLink to="/create-post">
+                  {({ isActive }) => (
+                    <Button
+                      variant={isActive ? "default" : "ghost"}
+                      className="font-semibold"
+                    >
+                      <SquarePlus className="mr-2 h-4 w-4" />
+                      Create Post
+                    </Button>
+                  )}
+                </NavLink>
                 <Button
                   variant="ghost"
                   className="font-semibold"
@@ -100,7 +100,7 @@ function Header() {
                     className="font-semibold"
                   >
                     <LogIn className="mr-2 h-4 w-4" />
-                    Login
+                    Sign In
                   </Button>
                 )}
               </NavLink>

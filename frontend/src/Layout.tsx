@@ -15,6 +15,7 @@ function Layout() {
   const userDetailsStatus = useSelector(
     (state: any) => state.user.userDetailsStatus
   );
+  const logoutStatus = useSelector((state: any) => state.user.logoutStatus);
   useEffect(() => {
     if (userInfo) {
       dispatch(fetchUserDetails());
@@ -23,7 +24,7 @@ function Layout() {
   }, [userInfo, dispatch]);
   return (
     <>
-      {userDetailsStatus === "loading" ? (
+      {userDetailsStatus === "loading" || logoutStatus === "loading" ? (
         <GlobalLoader fullHight />
       ) : userDetailsStatus === "failed" ? (
         <ServerErrorPage />

@@ -11,9 +11,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ArrowUp, Loader2, Pencil, UserMinus, UserPlus } from "lucide-react";
+import {
+  ArrowUp,
+  BadgeCheck,
+  Loader2,
+  Pencil,
+  UserMinus,
+  UserPlus,
+} from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { fetchGetUserInfo } from "@/features/UserSlice";
+import { fetchGetUserInfo, fetchSendVerifyEmail } from "@/features/UserSlice";
 import {
   fetchUserAllPosts,
   resetUserPosts,
@@ -31,6 +38,8 @@ import Post from "@/components/Post";
 import { toast } from "sonner";
 import ProfileLoader from "@/components/Loader/ProfileLoader";
 import PostLoader from "@/components/Loader/PostLoader";
+import ServerErrorPage from "./Error/ServerErrorPage";
+import FollowList from "@/components/FollowList";
 
 function ProfilePage() {
   const { userId } = useParams();
@@ -38,6 +47,8 @@ function ProfilePage() {
   const navigate = useNavigate();
 
   const userInfo = useSelector((state: any) => state.user.userInfo);
+  const userDetails = useSelector((state: any) => state.user.userDetails);
+  const userDetailsData = userDetails.data || {};
   const getUserInfo = useSelector((state: any) => state.user.getUserInfo);
   const getUserInfoStatus = useSelector(
     (state: any) => state.user.getUserInfoStatus
@@ -72,14 +83,12 @@ function ProfilePage() {
   };
 
   useEffect(() => {
-    if (!userInfo) {
-      navigate(`/sign-in`);
-    } else {
-      dispatch(resetPosts());
-      setPage(1);
-      setHasMore(false);
-      dispatch(fetchGetUserInfo(userId as string));
-      dispatch(fetchUserAllPosts({ id: userId as string, page }));
+    dispatch(resetPosts());
+    setPage(1);
+    setHasMore(false);
+    dispatch(fetchGetUserInfo(userId as string));
+    dispatch(fetchUserAllPosts({ id: userId as string, page }));
+    if (userInfo) {
       dispatch(fetchFollowingList(userInfo._id as string));
     }
   }, [userId, dispatch]);
@@ -151,18 +160,32 @@ function ProfilePage() {
     };
   }, [handleScroll]);
 
+  const handleVerifyAccount = () => {
+    const verifyPromise = dispatch(fetchSendVerifyEmail()).unwrap();
+    toast.promise(verifyPromise, {
+      loading: "Verifying...",
+      success: (data: any) => {
+        return data.message;
+      },
+      error: (error: any) => {
+        return error;
+      },
+    });
+  };
+
   return (
     <>
       {getUserInfoStatus === "loading" || getUserInfoStatus === "idle" ? (
         <ProfileLoader />
       ) : getUserInfoStatus === "failed" ? (
-        <p>Error</p>
+        <ServerErrorPage />
       ) : (
-        <>
-          <div className="h-52 bg-secondary relative">
+        <div className="mb-6">
+          <div className="h-52 bg-secondary relative ">
             <img
               src={userData.coverImage}
               alt=""
+              loading="lazy"
               className="h-52 w-full object-cover"
             />
             <Avatar className="w-24 h-24 absolute -bottom-10 left-10 border-4 border-white">
@@ -171,7 +194,7 @@ function ProfilePage() {
                 {userData.username ? userData.username[0] : "A"}
               </AvatarFallback>
             </Avatar>
-            {userData._id === userInfo._id && (
+            {userInfo && userData._id === userInfo._id && (
               <Button
                 variant="secondary"
                 size="icon"
@@ -182,7 +205,7 @@ function ProfilePage() {
               </Button>
             )}
           </div>
-          {userInfo._id !== userData._id && (
+          {userInfo && userDetailsData._id !== userData._id && (
             <div className="mt-2 flex justify-end p-2">
               <Button
                 className=" "
@@ -210,6 +233,19 @@ function ProfilePage() {
               </Button>
             </div>
           )}
+
+          {userData._id === userDetailsData._id &&
+            !userDetailsData.isVerified && (
+              <div className="mt-2 flex justify-end p-2">
+                <Button
+                  className=" "
+                  variant="outline"
+                  onClick={handleVerifyAccount}
+                >
+                  <BadgeCheck className="mr-2 h-4 w-4" /> Verify Account
+                </Button>
+              </div>
+            )}
           <div className="flex flex-col md:flex-row mt-8 mx-2 w-full h-full space-x-0 md:space-x-4 space-y-4 md:space-y-0">
             <div className="w-full md:w-[30%]">
               <Card>
@@ -220,7 +256,7 @@ function ProfilePage() {
                   <CardDescription>{userData.fullName}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {userData.bio ? <p>{userData.bio}</p> : <p>No bio</p>}
+                  {userData.bio ? <p>{userData.bio} </p> : <p>No bio</p>}
                   <Separator className="mt-2" />
                   {userData.website ? (
                     <Button variant="link" asChild>
@@ -234,26 +270,21 @@ function ProfilePage() {
                 </CardContent>
                 <CardFooter>
                   <div className="border-2 rounded-lg p-2 w-full space-y-2">
-                    <div className="flex justify-between">
-                      <div className="flex flex-col w-1/2">
-                        <p className="text-sm text-center font-bold">
-                          {userData.totalFollowing}
-                        </p>
-                        <p className="text-sm text-center font-semibold text-muted-foreground">
-                          Following
-                        </p>
-                      </div>
-                      <div className="flex flex-col w-1/2">
-                        <p className="text-sm text-center font-bold">
-                          {userData.totalFollowers}
-                        </p>
-                        <p className="text-sm text-center font-semibold text-muted-foreground">
-                          Followers
-                        </p>
-                      </div>
+                    <div className="grid gap-2 grid-cols-2 mx-auto">
+                      <FollowList
+                        userId={userData._id}
+                        followNumber={userData.totalFollowing}
+                        text="Following"
+                        following
+                      />
+                      <FollowList
+                        userId={userData._id}
+                        followNumber={userData.totalFollowers}
+                        text="Followers"
+                        following={false}
+                      />
                     </div>
                     <Separator />
-
                     <div className="flex justify-between">
                       <div className="flex flex-col w-1/2">
                         <p className="text-sm text-center font-bold">
@@ -316,7 +347,7 @@ function ProfilePage() {
               )}
             </div>
           </div>
-        </>
+        </div>
       )}
     </>
   );

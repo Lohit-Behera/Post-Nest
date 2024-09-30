@@ -78,6 +78,56 @@ export const fetchFollowersList = createAsyncThunk(
   }
 );
 
+export const fetchFollowingListWithDetails = createAsyncThunk(
+  "follow/followingListWithDetails",
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      };
+      const { data } = await axios.get(
+        `${baseUrl}/api/v1/follow/following/list/${id}`,
+        config
+      );
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const fetchFollowersListWithDetails = createAsyncThunk(
+  "follow/followersListWithDetails",
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      };
+      const { data } = await axios.get(
+        `${baseUrl}/api/v1/follow/followers/list/${id}`,
+        config
+      );
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 const followSlice = createSlice({
   name: "follow",
   initialState: {
@@ -92,6 +142,14 @@ const followSlice = createSlice({
     followersList: {},
     followersListStatus: "idle",
     followersListError: {},
+
+    followingListWithDetails: {},
+    followingListWithDetailsStatus: "idle",
+    followingListWithDetailsError: {},
+
+    followersListWithDetails: {},
+    followersListWithDetailsStatus: "idle",
+    followersListWithDetailsError: {},
   },
   reducers: {
     resetFollow: (state) => {
@@ -146,6 +204,32 @@ const followSlice = createSlice({
       .addCase(fetchFollowersList.rejected, (state, action) => {
         state.followersListStatus = "failed";
         state.followersListError = action.payload || "Followers list failed";
+      })
+
+      .addCase(fetchFollowingListWithDetails.pending, (state) => {
+        state.followingListWithDetailsStatus = "loading";
+      })
+      .addCase(fetchFollowingListWithDetails.fulfilled, (state, action) => {
+        state.followingListWithDetailsStatus = "succeeded";
+        state.followingListWithDetails = action.payload;
+      })
+      .addCase(fetchFollowingListWithDetails.rejected, (state, action) => {
+        state.followingListWithDetailsStatus = "failed";
+        state.followingListWithDetailsError =
+          action.payload || "Following list with details failed";
+      })
+
+      .addCase(fetchFollowersListWithDetails.pending, (state) => {
+        state.followersListWithDetailsStatus = "loading";
+      })
+      .addCase(fetchFollowersListWithDetails.fulfilled, (state, action) => {
+        state.followersListWithDetailsStatus = "succeeded";
+        state.followersListWithDetails = action.payload;
+      })
+      .addCase(fetchFollowersListWithDetails.rejected, (state, action) => {
+        state.followersListWithDetailsStatus = "failed";
+        state.followersListWithDetailsError =
+          action.payload || "Followers list with details failed";
       });
   },
 });

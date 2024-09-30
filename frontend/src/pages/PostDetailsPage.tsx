@@ -24,6 +24,8 @@ import {
 } from "@/features/LikeSlice";
 import { toast } from "sonner";
 import PostDetailsLoader from "@/components/Loader/PostDetailsLoader";
+import CustomImage from "@/components/CustomImage";
+import ServerErrorPage from "./Error/ServerErrorPage";
 
 function PostDetailsPage() {
   const { id } = useParams();
@@ -86,12 +88,21 @@ function PostDetailsPage() {
     });
   };
 
+  const handleLikeUnlike = () => {
+    if (userInfo) {
+      dispatch(fetchLikeUnlike({ postId: id }));
+    } else {
+      navigate("/sign-in");
+      toast.warning("Please sing in first");
+    }
+  };
+
   return (
     <>
       {PostDetailsStatus === "loading" || PostDetailsStatus === "idle" ? (
         <PostDetailsLoader />
       ) : PostDetailsStatus === "failed" ? (
-        <p>Error</p>
+        <ServerErrorPage />
       ) : (
         <>
           <div className="w-full md:w-[90%] mx-auto">
@@ -118,7 +129,7 @@ function PostDetailsPage() {
                       </Link>
                     </div>
                   </div>
-                  {userInfo._id === post.author && (
+                  {userInfo && userInfo._id === post.author && (
                     <div className="flex space-x-3">
                       <Button
                         variant="secondary"
@@ -132,7 +143,7 @@ function PostDetailsPage() {
                       <Button
                         variant="destructive"
                         size="icon"
-                        onClick={handleDeletePost}
+                        onClick={() => handleDeletePost()}
                       >
                         <Trash />
                       </Button>
@@ -144,15 +155,16 @@ function PostDetailsPage() {
                 <p className="text-xl md:text-3xl font-semibold">
                   {post.title}
                 </p>
-                <img className="rounded-lg" src={post.thumbnail} alt="" />
+                <CustomImage
+                  className="min-h-[50vh]"
+                  src={post.thumbnail}
+                  alt={post.title}
+                />
                 <div dangerouslySetInnerHTML={{ __html: updatedContent }} />
                 <div className="flex justify-end space-x-2">
                   <div className="flex flex-col space-y-0.5">
-                    <span
-                      className="cursor-pointer"
-                      onClick={() => dispatch(fetchLikeUnlike({ postId: id }))}
-                    >
-                      {userList.includes(userInfo._id) ? (
+                    <span className="cursor-pointer" onClick={handleLikeUnlike}>
+                      {userInfo && userList.includes(userInfo._id) ? (
                         <Heart
                           fill="red"
                           color="red"

@@ -20,6 +20,7 @@ import {
 import { Pencil, X } from "lucide-react";
 import { toast } from "sonner";
 import GlobalLoader from "@/components/Loader/GlobalLoader/GlobalLoader";
+import ServerErrorPage from "./Error/ServerErrorPage";
 function UpdateProfilePage() {
   const { userId } = useParams();
   const dispatch = useDispatch<any>();
@@ -116,7 +117,7 @@ function UpdateProfilePage() {
       {getUserInfoStatus === "loading" || getUserInfoStatus === "idle" ? (
         <GlobalLoader fullHight={true} />
       ) : getUserInfoStatus === "failed" ? (
-        <p>Error</p>
+        <ServerErrorPage />
       ) : (
         <Card className="w-[98%] md:w-[95%] mx-auto">
           <CardHeader>

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -10,7 +11,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Skeleton } from "./ui/skeleton";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -31,18 +31,16 @@ function SearchUser() {
     (state: any) => state.user.searchUserError
   );
 
-  // Debounce logic
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedUsername(username);
     }, 500);
 
     return () => {
-      clearTimeout(timer); // Clear the timer if the user is still typing
+      clearTimeout(timer);
     };
   }, [username]);
 
-  // Dispatch search API when debouncedUsername changes
   useEffect(() => {
     if (debouncedUsername !== "") {
       dispatch(fetchSearchUser(debouncedUsername));
@@ -51,7 +49,7 @@ function SearchUser() {
 
   return (
     <Dialog>
-      <DialogTrigger>
+      <DialogTrigger asChild>
         <Button variant="ghost" className="font-semibold">
           <Search className="mr-2 h-4 w-4" /> Search
         </Button>
@@ -86,25 +84,31 @@ function SearchUser() {
                     className="flex justify-between space-x-2 bg-muted p-1 md:p-3 rounded-lg"
                   >
                     <div className="flex space-x-2">
-                      <Link to={`/profile/${user._id}`}>
-                        <Avatar className="w-10 h-10 outline-primary hover:outline outline-2  outline-offset-2">
-                          <AvatarImage src={user.avatar} />
-                          <AvatarFallback>
-                            {user.username ? user.username[0] : "A"}
-                          </AvatarFallback>
-                        </Avatar>
-                      </Link>
+                      <DialogClose asChild>
+                        <Link to={`/profile/${user._id}`}>
+                          <Avatar className="w-10 h-10 outline-primary hover:outline outline-2  outline-offset-2">
+                            <AvatarImage src={user.avatar} />
+                            <AvatarFallback>
+                              {user.username ? user.username[0] : "A"}
+                            </AvatarFallback>
+                          </Avatar>
+                        </Link>
+                      </DialogClose>
                       <div className="flex flex-col space-y-0.5">
-                        <Link to={`/profile/${user._id}`}>
-                          <p className="text-sm font-semibold hover:underline hover:cursor-pointer">
-                            {user.username}
-                          </p>
-                        </Link>
-                        <Link to={`/profile/${user._id}`}>
-                          <p className="text-xs font-semibold hover:underline hover:cursor-pointer ">
-                            {user.fullName}
-                          </p>
-                        </Link>
+                        <DialogClose asChild>
+                          <Link to={`/profile/${user._id}`}>
+                            <p className="text-sm font-semibold hover:underline hover:cursor-pointer">
+                              {user.username}
+                            </p>
+                          </Link>
+                        </DialogClose>
+                        <DialogClose asChild>
+                          <Link to={`/profile/${user._id}`}>
+                            <p className="text-xs font-semibold hover:underline hover:cursor-pointer ">
+                              {user.fullName}
+                            </p>
+                          </Link>
+                        </DialogClose>
                       </div>
                     </div>
                   </div>

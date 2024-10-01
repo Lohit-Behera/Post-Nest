@@ -316,7 +316,9 @@ function ProfilePage() {
                 <div className="w-[98%] md:w-[95%] mx-auto">
                   {posts.length === 0 ? (
                     <p className="text-center text-lg md:text-xl font-semibold mt-6">
-                      You don't have any posts.
+                      {!userInfo || userDetailsData._id !== userData._id
+                        ? "This user didn't create any posts yet"
+                        : "You didn't create any posts yet"}
                     </p>
                   ) : (
                     <>

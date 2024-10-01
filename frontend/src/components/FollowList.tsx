@@ -112,31 +112,39 @@ function FollowList({
                 <p>Error...</p>
               ) : (
                 <>
-                  {listOfUser.map(
-                    (user: {
-                      _id: string;
-                      username: string;
-                      avatar: string;
-                    }) => (
-                      <div
-                        key={user._id}
-                        className="flex justify-between space-x-2 bg-muted p-1 md:p-3 rounded-lg"
-                      >
-                        <div className="flex space-x-2">
-                          <Link to={`/profile/${user._id}`}>
-                            <Avatar className="w-12 h-12 outline-primary hover:outline outline-2  outline-offset-2">
-                              <AvatarImage src={user.avatar} />
-                              <AvatarFallback>P</AvatarFallback>
-                            </Avatar>
-                          </Link>
-                          <Link to={`/profile/${user._id}`}>
-                            <p className="text-base md:text-lg font-semibold hover:underline hover:cursor-pointer">
-                              {user.username}
-                            </p>
-                          </Link>
-                        </div>
-                      </div>
-                    )
+                  {listOfUser.length === 0 ? (
+                    <p className="text-center">No {text} yet</p>
+                  ) : (
+                    <>
+                      {listOfUser.map(
+                        (user: {
+                          _id: string;
+                          username: string;
+                          avatar: string;
+                        }) => (
+                          <div
+                            key={user._id}
+                            className="flex justify-between space-x-2 bg-muted p-1 md:p-3 rounded-lg"
+                          >
+                            <div className="flex space-x-2">
+                              <Link to={`/profile/${user._id}`}>
+                                <Avatar className="w-12 h-12 outline-primary hover:outline outline-2  outline-offset-2">
+                                  <AvatarImage src={user.avatar} />
+                                  <AvatarFallback>
+                                    {user.username ? user.username[0] : "A"}
+                                  </AvatarFallback>
+                                </Avatar>
+                              </Link>
+                              <Link to={`/profile/${user._id}`}>
+                                <p className="text-base md:text-lg font-semibold hover:underline hover:cursor-pointer">
+                                  {user.username}
+                                </p>
+                              </Link>
+                            </div>
+                          </div>
+                        )
+                      )}
+                    </>
                   )}
                 </>
               )}

@@ -33,7 +33,6 @@ function SignInPage() {
 
   const userInfo = useSelector((state: any) => state.user.userInfo);
   const userInfoStatus = useSelector((state: any) => state.user.userInfoStatus);
-  const userInfoError = useSelector((state: any) => state.user.userInfoError);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),

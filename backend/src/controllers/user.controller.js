@@ -105,14 +105,14 @@ const loginUser = asyncHandler(async (req, res) => {
 
     if (!user) {
         return res.status(401).json(
-            new ApiResponse(401, {}, "username or email not found")
+            new ApiResponse(401, {}, "Invalid credentials")
         )
     }
     
     // check if password is correct
     if (!await user.comparePassword(password)) {
         return res.status(401).json(
-            new ApiResponse(401, {}, "Incorrect password")
+            new ApiResponse(401, {}, "Invalid credentials")
         )
     }
 
@@ -126,7 +126,7 @@ const loginUser = asyncHandler(async (req, res) => {
     .cookie("accessToken", accessToken, options) 
     .cookie("refreshToken", refreshToken, options)
     .json(
-        new ApiResponse(200, loggedInUser, "Login successful")
+        new ApiResponse(200, loggedInUser, "Sign in successful")
     )
 })
 

@@ -8,6 +8,7 @@ import { deleteFile, uploadFile } from "../utils/cloudinary.js";
 import { sendEmail } from "../utils/sendMail.js";
 import { oAuth2Client } from "../utils/googleConfig.js";
 import axios from "axios";
+import { ForgotPasswordEmailTemplate } from "../utils/html/ForgotPassword.js";
 
 const options = {
     httpOnly: true,
@@ -604,6 +605,85 @@ const userSearch = asyncHandler(async (req, res) => {
     res.status(200).json(new ApiResponse(200, user, "User details fetched successfully"))
 })
 
+const sendForgotPasswordMail = asyncHandler(async (req, res) => {
+    const { email } = req.body
+    if (!email) {
+        return res.status(400).json(new ApiResponse(400, {}, "Please provide email"))
+    }
+
+    const user = await User.findOne({ email })
+
+    if (!user) {
+        return res.status(404).json(new ApiResponse(404, {}, "User not found"))
+    }
+
+    const token = await Token.findOne({ user: user._id })
+
+    if (!token) {
+        await Token.create({ user: user._id })
+    }
+
+    const forgotPasswordToken = await Token.findOne({ user: user._id })
+
+    if (!forgotPasswordToken) {
+        return res.status(500).json(new ApiResponse(500, {}, "Something went wrong while generating forgot password token"))
+    }
+
+    const generateForgotPasswordToken = forgotPasswordToken.generateForgotPasswordToken()
+
+    if (!generateForgotPasswordToken) {
+        return res.status(500).json(new ApiResponse(500, {}, "Something went wrong while generating email forgot password token"))
+    }
+
+    forgotPasswordToken.token = generateForgotPasswordToken
+
+    await forgotPasswordToken.save({ validateBeforeSave: false })
+
+    const forgotPasswordEmailLink = `${process.env.CORS_ORIGIN || "http://localhost:5173"}/forgot-password/${user._id}/${generateForgotPasswordToken}`
+
+    await sendEmail("lohitsekhar.2002@gmail.com", "Forgot Password", ForgotPasswordEmailTemplate(forgotPasswordEmailLink));
+
+    return res.status(200).json(new ApiResponse(200, {}, "Forgot password link sent"))
+})
+
+const forgotPassword = asyncHandler(async (req, res) => {
+    const { userId, token } = req.params
+    const { password, confirmPassword } = req.body
+
+    if (!userId || !token) {
+        return res.status(400).json(new ApiResponse(400, {}, "Please provide userId and token"))
+    }
+
+    if (!password || !confirmPassword) {
+        return res.status(400).json(new ApiResponse(400, {}, "Please provide password and confirmPassword"))
+    }
+
+    if (password !== confirmPassword) {
+        return res.status(400).json(new ApiResponse(400, {}, "Password and confirmPassword should be same"))
+    }
+
+    const user = await User.findById(userId)
+
+    if (!user) {
+        return res.status(404).json(new ApiResponse(404, {}, "User not found"))
+    }
+
+    const forgotPasswordToken = await Token.findOne({ token: token })
+
+    if (!forgotPasswordToken) {
+        return res.status(404).json(new ApiResponse(404, {}, "Forgot password token not found"))
+    }
+
+    if (forgotPasswordToken.user.toString() !== user._id.toString()) {
+        return res.status(401).json(new ApiResponse(401, {}, "Invalid user"))
+    }
+
+    user.password = password
+    await user.save({ validateBeforeSave: false })
+
+    return res.status(200).json(new ApiResponse(200, {}, "Password changed successfully"))
+})
+
 
 export {
     registerUser,
@@ -616,5 +696,7 @@ export {
     updateUserDetails,
     changePassword,
     googleAuth,
-    userSearch
+    userSearch,
+    sendForgotPasswordMail,
+    forgotPassword
 }

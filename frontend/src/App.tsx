@@ -20,6 +20,7 @@ import UpdatePostPage from "./pages/UpdatePostPage";
 import FeedPage from "./pages/FeedPage";
 import ChangePasswordPage from "./pages/ChangePasswordPage";
 import PageNotFound from "./pages/Error/PageNotFound";
+import ForgotPassword from "./pages/ForgotPassword";
 
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -53,6 +54,10 @@ const router = createBrowserRouter(
       <Route path="/post/update/:id" element={<UpdatePostPage />} />
       <Route path="/feed" element={<FeedPage />} />
       <Route path="/change-password" element={<ChangePasswordPage />} />
+      <Route
+        path="/forgot-password/:userId?/:token?"
+        element={<ForgotPassword />}
+      />
     </Route>
   )
 );

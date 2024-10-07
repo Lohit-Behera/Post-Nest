@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 
-export const sendEmail = async (email, subject, text) => {
+export const sendEmail = async (email, subject, htmlContent) => {
     const transporter = nodemailer.createTransport({
         host: process.env.EMAIL_HOST,
         port: process.env.EMAIL_PORT,
@@ -13,6 +13,6 @@ export const sendEmail = async (email, subject, text) => {
         from: process.env.EMAIL_HOST_USER,
         to: email,
         subject: subject,
-        text: text
+        html: htmlContent 
     });
 }

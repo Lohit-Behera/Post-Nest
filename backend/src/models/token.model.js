@@ -24,4 +24,11 @@ tokenSchema.methods.generateVerifyEmailToken = function () {
     return verifyEmailToken;
 }
 
+tokenSchema.methods.generateForgotPasswordToken = function () {
+    const forgotPasswordToken = crypto
+        .randomBytes(32)
+        .toString("hex");
+    return forgotPasswordToken;
+}
+
 export const Token = mongoose.model("Token", tokenSchema)

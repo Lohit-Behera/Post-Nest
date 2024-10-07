@@ -258,6 +258,71 @@ export const fetchSearchUser = createAsyncThunk(
   }
 );
 
+export const fetchSendForgotPasswordEmail = createAsyncThunk(
+  "user/sendForgotPasswordEmail",
+  async (email: string, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      };
+      const { data } = await axios.post(
+        `${baseUrl}/api/v1/users//send/forgot-password/mail`,
+        { email },
+        config
+      );
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const fetchResetPassword = createAsyncThunk(
+  "user/resetPassword",
+  async (
+    {
+      userId,
+      token,
+      password,
+      confirmPassword,
+    }: {
+      userId: string;
+      token: string;
+      password: string;
+      confirmPassword: string;
+    },
+    { rejectWithValue }
+  ) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      };
+      const { data } = await axios.patch(
+        `${baseUrl}/api/v1/users/forgot-password/${userId}/${token}`,
+        { password, confirmPassword },
+        config
+      );
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 function getCookie(name: string) {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
@@ -313,6 +378,14 @@ const userSlice = createSlice({
     searchUser: {},
     searchUserStatus: "idle",
     searchUserError: {},
+
+    sendForgotPasswordEmail: {},
+    sendForgotPasswordEmailStatus: "idle",
+    sendForgotPasswordEmailError: {},
+
+    resetPassword: {},
+    resetPasswordStatus: "idle",
+    resetPasswordError: {},
   },
   reducers: {
     resetUserUpdate: (state) => {
@@ -329,6 +402,16 @@ const userSlice = createSlice({
       state.changePassword = {};
       state.changePasswordStatus = "idle";
       state.changePasswordError = {};
+    },
+    resetSendForgotPasswordEmail: (state) => {
+      state.sendForgotPasswordEmail = {};
+      state.sendForgotPasswordEmailStatus = "idle";
+      state.sendForgotPasswordEmailError = {};
+    },
+    resetResetPassword: (state) => {
+      state.resetPassword = {};
+      state.resetPasswordStatus = "idle";
+      state.resetPasswordError = {};
     },
   },
   extraReducers: (builder) => {
@@ -467,10 +550,42 @@ const userSlice = createSlice({
       .addCase(fetchSearchUser.rejected, (state, action) => {
         state.searchUserStatus = "failed";
         state.searchUserError = action.payload || "Search user failed";
+      })
+
+      // send password reset email
+      .addCase(fetchSendForgotPasswordEmail.pending, (state) => {
+        state.sendForgotPasswordEmailStatus = "loading";
+      })
+      .addCase(fetchSendForgotPasswordEmail.fulfilled, (state, action) => {
+        state.sendForgotPasswordEmailStatus = "succeeded";
+        state.sendForgotPasswordEmail = action.payload;
+      })
+      .addCase(fetchSendForgotPasswordEmail.rejected, (state, action) => {
+        state.sendForgotPasswordEmailStatus = "failed";
+        state.sendForgotPasswordEmailError =
+          action.payload || "Send password forgot email failed";
+      })
+
+      // reset password
+      .addCase(fetchResetPassword.pending, (state) => {
+        state.resetPasswordStatus = "loading";
+      })
+      .addCase(fetchResetPassword.fulfilled, (state, action) => {
+        state.resetPasswordStatus = "succeeded";
+        state.resetPassword = action.payload;
+      })
+      .addCase(fetchResetPassword.rejected, (state, action) => {
+        state.resetPasswordStatus = "failed";
+        state.resetPasswordError = action.payload || "Reset password failed";
       });
   },
 });
 
-export const { resetUserUpdate, resetRegister, resetChangePassword } =
-  userSlice.actions;
+export const {
+  resetUserUpdate,
+  resetRegister,
+  resetChangePassword,
+  resetSendForgotPasswordEmail,
+  resetResetPassword,
+} = userSlice.actions;
 export default userSlice.reducer;

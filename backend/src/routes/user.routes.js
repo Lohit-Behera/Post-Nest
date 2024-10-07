@@ -10,7 +10,9 @@ import {
     updateUserDetails,
     changePassword,
     googleAuth,
-    userSearch
+    userSearch,
+    sendForgotPasswordMail,
+    forgotPassword
  } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
@@ -32,6 +34,10 @@ router.route("/verify-email/:userId/:token").get(verifyEmail)
 router.route("/user-details/:id").get(getUserDetails)
 
 router.route("/auth/google").get(googleAuth)
+
+router.route("/send/forgot-password/mail").post(sendForgotPasswordMail)
+
+router.route("/forgot-password/:userId/:token").patch(forgotPassword)
 
 // secure routes
 router.route("/logout").post(authMiddleware, logoutUser)

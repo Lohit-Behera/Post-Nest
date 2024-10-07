@@ -118,7 +118,7 @@ function SignInPage() {
                     <div className="flex justify-between">
                       <FormLabel>Password</FormLabel>
                       <Link
-                        to="/forget-password"
+                        to="/forgot-password"
                         className="text-sm hover:underline"
                       >
                         Forget Password

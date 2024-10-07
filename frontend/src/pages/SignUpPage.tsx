@@ -21,33 +21,40 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 import GlobalLoader from "@/components/Loader/GlobalLoader/GlobalLoader";
 
-const FormSchema = z.object({
-  username: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
-  fullName: z.string().min(2, {
-    message: "Full name must be at least 2 characters.",
-  }),
-  email: z.string().email({ message: "Invalid email address." }),
-  password: z.string().min(8, {
-    message: "Password must be at least 8 characters.",
-  }),
-  confirmPassword: z.string().min(8, {
-    message: "Password must be at least 8 characters.",
-  }),
-  avatar: z
-    .any()
-    .refine((file) => file instanceof File, { message: "Avatar is required." })
-    .refine((file) => file?.size <= 3 * 1024 * 1024, {
-      message: "Avatar size must be less than 5MB.",
-    })
-    .refine(
-      (file) => ["image/jpeg", "image/png", "image/gif"].includes(file?.type),
-      {
-        message: "Only .jpg, .png, and .gif formats are supported.",
-      }
-    ),
-});
+const FormSchema = z
+  .object({
+    username: z.string().min(2, {
+      message: "Username must be at least 2 characters.",
+    }),
+    fullName: z.string().min(2, {
+      message: "Full name must be at least 2 characters.",
+    }),
+    email: z.string().email({ message: "Invalid email address." }),
+    password: z.string().min(8, {
+      message: "Password must be at least 8 characters.",
+    }),
+    confirmPassword: z.string().min(8, {
+      message: "Password must be at least 8 characters.",
+    }),
+    avatar: z
+      .any()
+      .refine((file) => file instanceof File, {
+        message: "Avatar is required.",
+      })
+      .refine((file) => file?.size <= 3 * 1024 * 1024, {
+        message: "Avatar size must be less than 5MB.",
+      })
+      .refine(
+        (file) => ["image/jpeg", "image/png", "image/gif"].includes(file?.type),
+        {
+          message: "Only .jpg, .png, and .gif formats are supported.",
+        }
+      ),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match.",
+    path: ["confirmPassword"],
+  });
 
 function SignUpPage() {
   const dispatch = useDispatch<any>();

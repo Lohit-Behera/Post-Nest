@@ -18,8 +18,6 @@ import { Loader2, Search } from "lucide-react";
 import { fetchSearchUser } from "@/features/UserSlice";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { fetchSearchPosts } from "@/features/PostSlice";
-import { toast } from "sonner";
-
 function SearchUserAndPosts() {
   const dispatch = useDispatch<any>();
   const [username, setUsername] = useState("");

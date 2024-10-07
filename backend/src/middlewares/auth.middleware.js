@@ -17,6 +17,7 @@ function isTokenExpired(token, res) {
 export const authMiddleware = asyncHandler(async (req, res, next) => {
     try {
         console.log(req.cookies);
+        console.log(req)
         
         let token = req.cookies.accessToken || "";
 

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { upload } from "../middlewares/multer.middleware.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
-import { createPost, postDetails, UpdatePost, deletePost, allPosts, userAllPosts, followingPosts } from "../controllers/post.controller.js";
+import { createPost, postDetails, UpdatePost, deletePost, allPosts, userAllPosts, followingPosts, searchPosts } from "../controllers/post.controller.js";
 import { resizeImage } from "../middlewares/resize.middleware.js";
 
 const router = Router();
@@ -34,5 +34,8 @@ router.get("/all", authMiddleware, allPosts);
 
 
 router.get("/following/all", authMiddleware, followingPosts);
+
+
+router.get("/search/:title", authMiddleware, searchPosts);
 
 export default router;

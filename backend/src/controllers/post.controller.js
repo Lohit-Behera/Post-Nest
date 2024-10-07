@@ -447,4 +447,22 @@ const followingPosts = asyncHandler(async (req, res) => {
     );
 });
 
-export { createPost, postDetails, UpdatePost, deletePost, allPosts, userAllPosts, followingPosts }
+const searchPosts = asyncHandler(async (req, res) => {
+    const { title } = req.params
+
+    if (!title) {
+        return res.status(400).json(new ApiResponse(400, {}, "Title is required"))
+    }
+
+    const posts = await Post.find({ title: { $regex: title, $options: "i" } }).select("title").limit(5)
+
+    if (!posts.length) {
+        return res.status(200).json(new ApiResponse(200, [], "No posts found"))
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, posts, "Posts fetched successfully")
+    )
+})
+
+export { createPost, postDetails, UpdatePost, deletePost, allPosts, userAllPosts, followingPosts, searchPosts }

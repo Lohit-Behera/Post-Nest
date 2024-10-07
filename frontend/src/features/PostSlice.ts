@@ -179,6 +179,31 @@ export const fetchFollowingPosts = createAsyncThunk(
   }
 );
 
+export const fetchSearchPosts = createAsyncThunk(
+  "posts/searchPosts",
+  async (title: string, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      };
+      const { data } = await axios.get(
+        `${baseUrl}/api/v1/posts/search/${title}`,
+        config
+      );
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 const postSlice = createSlice({
   name: "post",
   initialState: {
@@ -209,6 +234,10 @@ const postSlice = createSlice({
     followingPosts: [],
     followingPostsStatus: "idle",
     followingPostsError: {},
+
+    searchPosts: [],
+    searchPostsStatus: "idle",
+    searchPostsError: {},
 
     posts: [],
   },
@@ -242,6 +271,11 @@ const postSlice = createSlice({
       state.followingPosts = [];
       state.followingPostsStatus = "idle";
       state.followingPostsError = {};
+    },
+    resetSearchPosts: (state) => {
+      state.searchPosts = [];
+      state.searchPostsStatus = "idle";
+      state.searchPostsError = {};
     },
     addPosts: (state, action) => {
       state.posts = action.payload;
@@ -337,6 +371,18 @@ const postSlice = createSlice({
       .addCase(fetchFollowingPosts.rejected, (state, action) => {
         state.followingPostsStatus = "failed";
         state.followingPostsError = action.payload || "Following posts failed";
+      })
+
+      .addCase(fetchSearchPosts.pending, (state) => {
+        state.searchPostsStatus = "loading";
+      })
+      .addCase(fetchSearchPosts.fulfilled, (state, action) => {
+        state.searchPostsStatus = "succeeded";
+        state.searchPosts = action.payload;
+      })
+      .addCase(fetchSearchPosts.rejected, (state, action) => {
+        state.searchPostsStatus = "failed";
+        state.searchPostsError = action.payload || "Search posts failed";
       });
   },
 });
@@ -351,6 +397,7 @@ export const {
   addPosts,
   addMorePosts,
   resetPosts,
+  resetSearchPosts,
 } = postSlice.actions;
 
 export default postSlice.reducer;

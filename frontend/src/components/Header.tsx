@@ -15,7 +15,7 @@ import { Button } from "./ui/button";
 import Logo from "../assets/Logo.svg";
 import { Home, LogIn, LogOut, PanelLeft, Rss, SquarePlus } from "lucide-react";
 import { fetchLogout } from "@/features/UserSlice";
-import SearchUser from "@/components/SearchUser";
+import SearchUserAndPosts from "@/components/SearchUserAndPosts";
 
 function Header() {
   const dispatch = useDispatch<any>();
@@ -60,7 +60,7 @@ function Header() {
                     </Button>
                   )}
                 </NavLink>
-                <SearchUser />
+                <SearchUserAndPosts />
                 <NavLink to="/create-post">
                   {({ isActive }) => (
                     <Button
@@ -158,7 +158,7 @@ function Header() {
                         </NavLink>
                       </SheetClose>
                       <SheetClose asChild>
-                        <SearchUser />
+                        <SearchUserAndPosts />
                       </SheetClose>
                       <SheetClose asChild>
                         <NavLink to="/create-post">

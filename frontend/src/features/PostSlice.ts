@@ -165,7 +165,7 @@ export const fetchFollowingPosts = createAsyncThunk(
         withCredentials: true,
       };
       const { data } = await axios.get(
-        `${baseUrl}/api/v1/posts//following/all?page=${page || 1}`,
+        `${baseUrl}/api/v1/posts/following/all?page=${page || 1}`,
         config
       );
       return data;

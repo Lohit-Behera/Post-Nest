@@ -521,67 +521,72 @@ const generateUniqueUsername = async (givenName) => {
 };
 
 const googleAuth = asyncHandler(async (req, res) => {
-    const { token } = req.query
-
-    if (!token) {
-        return res.status(400).json(new ApiResponse(400, {}, "Token is required"))
-    }
-    const googleRes = await oAuth2Client.getToken(token)
-    oAuth2Client.setCredentials(googleRes.tokens)
+    try {
+        const { token } = req.query
     
-    if (!googleRes.tokens.access_token) {
-        return res.status(500).json(new ApiResponse(500, {}, "Something went wrong while generating access token"))
-    }
-
-    const userRes =await axios.get(
-      `https://www.googleapis.com/oauth2/v3/userinfo?alt=json&access_token=${googleRes.tokens.access_token}`,
-    )
-
-    if (!userRes.data) {
-        return res.status(500).json(new ApiResponse(500, {}, "Something went wrong while fetching user details"))
-    }
-
-    const { email, name, given_name, picture, email_verified } = userRes.data
-
-    if (!email || !name || !given_name || !picture || !email_verified) {
-        return res.status(404).json(new ApiResponse(404, {}, "Email, name, given name, picture are not found"))
-    }
-
-    const user = await User.findOne({ email })
-
-    if (!user) {
-      const uniqueUsername = await generateUniqueUsername(given_name);
-
-        const user = await User.create({
-            username: uniqueUsername,
-            email,
-            fullName: name,
-            password: Math.random().toString(36).slice(-8),
-            avatar: picture,
-            isVerified: email_verified
-        })
-        const { accessToken, refreshToken } = await generateTokens(user._id)
-
-        const loggedInUser = await User.findById(user._id).select("-password -coverImage -bio -website -plan ")
-
-        // send response
-        return res.status(200)
-        .cookie("accessToken", accessToken, options) 
-        .cookie("refreshToken", refreshToken, options)
-        .json(
-            new ApiResponse(200, loggedInUser, "Sign up successful with google")
+        if (!token) {
+            return res.status(400).json(new ApiResponse(400, {}, "Token is required"))
+        }
+        const googleRes = await oAuth2Client.getToken(token)
+        oAuth2Client.setCredentials(googleRes.tokens)
+        
+        if (!googleRes.tokens.access_token) {
+            return res.status(500).json(new ApiResponse(500, {}, "Something went wrong while generating access token"))
+        }
+    
+        const userRes =await axios.get(
+          `https://www.googleapis.com/oauth2/v3/userinfo?alt=json&access_token=${googleRes.tokens.access_token}`,
         )
-    } else {
-        const { accessToken, refreshToken } = await generateTokens(user._id)
-        const loggedInUser = await User.findById(user._id).select("-password -coverImage -bio -website -plan ")
-
-        // send response
-        return res.status(200)
-        .cookie("accessToken", accessToken, options) 
-        .cookie("refreshToken", refreshToken, options)
-        .json(
-            new ApiResponse(200, loggedInUser, "Sign in successful with google")
-        )
+    
+        if (!userRes.data) {
+            return res.status(500).json(new ApiResponse(500, {}, "Something went wrong while fetching user details"))
+        }
+    
+        const { email, name, given_name, picture, email_verified } = userRes.data
+    
+        if (!email || !name || !given_name || !picture || !email_verified) {
+            return res.status(404).json(new ApiResponse(404, {}, "Email, name, given name, picture are not found"))
+        }
+    
+        const user = await User.findOne({ email })
+    
+        if (!user) {
+          const uniqueUsername = await generateUniqueUsername(given_name);
+    
+            const user = await User.create({
+                username: uniqueUsername,
+                email,
+                fullName: name,
+                password: Math.random().toString(36).slice(-8),
+                avatar: picture,
+                isVerified: email_verified
+            })
+            const { accessToken, refreshToken } = await generateTokens(user._id)
+    
+            const loggedInUser = await User.findById(user._id).select("-password -coverImage -bio -website -plan ")
+    
+            // send response
+            return res.status(200)
+            .cookie("accessToken", accessToken, options) 
+            .cookie("refreshToken", refreshToken, options)
+            .json(
+                new ApiResponse(200, loggedInUser, "Sign up successful with google")
+            )
+        } else {
+            const { accessToken, refreshToken } = await generateTokens(user._id)
+            const loggedInUser = await User.findById(user._id).select("-password -coverImage -bio -website -plan ")
+    
+            // send response
+            return res.status(200)
+            .cookie("accessToken", accessToken, options) 
+            .cookie("refreshToken", refreshToken, options)
+            .json(
+                new ApiResponse(200, loggedInUser, "Sign in successful with google")
+            )
+        }
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json(new ApiResponse(500, {}, "Something went wrong"))
     }
 })
 

@@ -46,7 +46,7 @@ export const fetchLogin = createAsyncThunk(
       document.cookie = `userInfoPostNest=${encodeURIComponent(
         JSON.stringify(data.data)
       )}; path=/; max-age=${30 * 24 * 60 * 60}; secure; sameSite=None;`;
-      return data;
+      return data.data;
     } catch (error: any) {
       const errorMessage =
         error.response && error.response.data
@@ -227,7 +227,7 @@ export const fetchGoogleAuth = createAsyncThunk(
           JSON.stringify(data.data)
         )}; path=/; max-age=${30 * 24 * 60 * 60}; secure;`;
       }
-      return data;
+      return data.data;
     } catch (error: any) {
       const errorMessage =
         error.response && error.response.data
@@ -329,6 +329,32 @@ export const fetchResetPassword = createAsyncThunk(
   }
 );
 
+export const fetchChangeUsername = createAsyncThunk(
+  "user/changeUsername",
+  async (username: string, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      };
+      const { data } = await axios.patch(
+        `${baseUrl}/api/v1/users/change-username`,
+        { username },
+        config
+      );
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 function getCookie(name: string) {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
@@ -392,6 +418,10 @@ const userSlice = createSlice({
     resetPassword: {},
     resetPasswordStatus: "idle",
     resetPasswordError: {},
+
+    changeUsername: {},
+    changeUsernameStatus: "idle",
+    changeUsernameError: {},
   },
   reducers: {
     resetUserUpdate: (state) => {
@@ -423,6 +453,11 @@ const userSlice = createSlice({
       state.userDetails = {};
       state.userDetailsStatus = "idle";
       state.userDetailsError = {};
+    },
+    resetChangeUsername: (state) => {
+      state.changeUsername = {};
+      state.changeUsernameStatus = "idle";
+      state.changeUsernameError = {};
     },
     reSignIn: (state) => {
       state.userInfo = null;
@@ -593,6 +628,19 @@ const userSlice = createSlice({
       .addCase(fetchResetPassword.rejected, (state, action) => {
         state.resetPasswordStatus = "failed";
         state.resetPasswordError = action.payload || "Reset password failed";
+      })
+
+      // Change Username
+      .addCase(fetchChangeUsername.pending, (state) => {
+        state.changeUsernameStatus = "loading";
+      })
+      .addCase(fetchChangeUsername.fulfilled, (state, action) => {
+        state.changeUsernameStatus = "succeeded";
+        state.changeUsername = action.payload;
+      })
+      .addCase(fetchChangeUsername.rejected, (state, action) => {
+        state.changeUsernameStatus = "failed";
+        state.changeUsernameError = action.payload || "Change username failed";
       });
   },
 });
@@ -605,5 +653,6 @@ export const {
   resetResetPassword,
   reSignIn,
   resetUserDetails,
+  resetChangeUsername,
 } = userSlice.actions;
 export default userSlice.reducer;

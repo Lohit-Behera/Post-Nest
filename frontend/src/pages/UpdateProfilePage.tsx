@@ -5,6 +5,7 @@ import {
   fetchUpdateUserDetails,
   fetchGetUserInfo,
   resetUserUpdate,
+  fetchChangeUsername,
 } from "@/features/UserSlice";
 
 import { Button } from "@/components/ui/button";
@@ -17,10 +18,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Pencil, X } from "lucide-react";
+import { Loader2, Pencil, X } from "lucide-react";
 import { toast } from "sonner";
 import GlobalLoader from "@/components/Loader/GlobalLoader/GlobalLoader";
 import ServerErrorPage from "./Error/ServerErrorPage";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
 function UpdateProfilePage() {
   const { userId } = useParams();
   const dispatch = useDispatch<any>();
@@ -41,6 +52,12 @@ function UpdateProfilePage() {
   const updateUserDetailsError = useSelector(
     (state: any) => state.user.updateUserDetailsError
   );
+  const changeUsernameStatus = useSelector(
+    (state: any) => state.user.changeUsernameStatus
+  );
+  const changeUsernameError = useSelector(
+    (state: any) => state.user.changeUsernameError
+  );
 
   const [fullName, setFullName] = useState(userDetails.fullName || "");
   const [bio, setBio] = useState(userDetails.bio || "");
@@ -49,6 +66,7 @@ function UpdateProfilePage() {
   const [editAvatar, setEditAvatar] = useState(false);
   const [coverImage, setCoverImage] = useState("");
   const [editCoverImage, setEditCoverImage] = useState(false);
+  const [username, setUsername] = useState(userDetails.username || "");
 
   useEffect(() => {
     if (!userInfo) {
@@ -109,6 +127,25 @@ function UpdateProfilePage() {
       setCoverImage(file);
     } else {
       alert("Please select an image file");
+    }
+  };
+
+  const handleChangeUsername = () => {
+    if (username === userDetails.username) {
+      toast.warning("Please enter a new username");
+    } else {
+      const changeUsernamePromise = dispatch(
+        fetchChangeUsername(username)
+      ).unwrap();
+      toast.promise(changeUsernamePromise, {
+        loading: "Updating username...",
+        success: (data: any) => {
+          return data.message;
+        },
+        error: (error: any) => {
+          return error;
+        },
+      });
     }
   };
 
@@ -247,6 +284,58 @@ function UpdateProfilePage() {
             <Button className="w-full" size="sm" onClick={handleEditProfile}>
               Save
             </Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button className="w-full" size="sm">
+                  Change Username
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Change Username</DialogTitle>
+                </DialogHeader>
+                <div className="grid gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="username">Username</Label>
+                    <Input
+                      id="username"
+                      type="text"
+                      value={username}
+                      placeholder="username"
+                      onChange={(e) => setUsername(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex justify-between space-x-3">
+                    <Button
+                      className="w-full"
+                      size="sm"
+                      onClick={handleChangeUsername}
+                      disabled={changeUsernameStatus === "loading"}
+                    >
+                      Save
+                    </Button>
+                    <DialogClose asChild>
+                      <Button className="w-full">Close</Button>
+                    </DialogClose>
+                  </div>
+                  {changeUsernameStatus === "loading" ? (
+                    <div className="flex justify-center">
+                      <Loader2 className="animate-spin h-6 w-6" />
+                    </div>
+                  ) : changeUsernameStatus === "succeeded" ? (
+                    <span className="text-base md:text-lg text-green-500 text-center">
+                      Username updated successfully
+                    </span>
+                  ) : changeUsernameStatus === "failed" ? (
+                    <span className="text-base md:text-lg text-red-500 text-center">
+                      {changeUsernameError ===
+                        "User with this username already exists" &&
+                        "User with this username already exists"}
+                    </span>
+                  ) : null}
+                </div>
+              </DialogContent>
+            </Dialog>
             <Button
               className="w-full"
               size="sm"

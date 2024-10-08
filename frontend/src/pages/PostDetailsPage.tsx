@@ -124,7 +124,9 @@ function PostDetailsPage() {
                     <Link to={`/profile/${post.author}`}>
                       <Avatar className="w-14 h-14 outline-primary hover:outline outline-2  outline-offset-2 ">
                         <AvatarImage src={post.avatar} />
-                        <AvatarFallback>CN</AvatarFallback>
+                        <AvatarFallback>
+                          {post.username ? post.username[0] : "A"}
+                        </AvatarFallback>
                       </Avatar>
                     </Link>
                     <div className="flex flex-col space-y-0.5">

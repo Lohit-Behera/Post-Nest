@@ -682,6 +682,31 @@ const forgotPassword = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, {}, "Password changed successfully"))
 })
 
+const changeUsername = asyncHandler(async (req, res) => {
+    const { username } = req.body
+
+    if (!username) {
+        return res.status(400).json(new ApiResponse(400, {}, "Please provide username"))
+    }
+
+    const user = await User.findById(req.user._id)
+
+    if (!user) {
+        return res.status(404).json(new ApiResponse(404, {}, "User not found"))
+    }
+
+    const existingUser = await User.findOne({ username })
+
+    if (existingUser) {
+        return res.status(409).json(new ApiResponse(409, {}, "User with this username already exists"))
+    }
+
+    user.username = username
+    await user.save({ validateBeforeSave: false })
+
+    return res.status(200).json(new ApiResponse(200, {}, "Username changed successfully"))
+})
+
 
 export {
     registerUser,
@@ -696,5 +721,6 @@ export {
     googleAuth,
     userSearch,
     sendForgotPasswordMail,
-    forgotPassword
+    forgotPassword,
+    changeUsername
 }

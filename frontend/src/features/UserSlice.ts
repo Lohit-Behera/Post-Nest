@@ -45,8 +45,7 @@ export const fetchLogin = createAsyncThunk(
 
       document.cookie = `userInfoPostNest=${encodeURIComponent(
         JSON.stringify(data.data)
-      )}; path=/; max-age=${30 * 24 * 60 * 60}; secure;`;
-
+      )}; path=/; max-age=${30 * 24 * 60 * 60}; secure; sameSite=None;`;
       return data;
     } catch (error: any) {
       const errorMessage =

@@ -41,7 +41,7 @@ function CustomImage({
       onClick={onClick}
     >
       <div
-        className="absolute inset-0 w-full h-full min-h-40 flex items-center justify-center bg-background rounded-lg"
+        className={`absolute inset-0 w-full h-full min-h-56 flex items-center justify-center bg-background rounded-lg`}
         style={{
           opacity: loaded ? 0 : 1,
           transition: "opacity 0.5s ease-in-out",
@@ -50,7 +50,7 @@ function CustomImage({
         <ImageLoader />
       </div>
       <img
-        className={`w-full ${maxHight} object-cover rounded-lg hover:scale-103 ${
+        className={`w-full ${maxHight} min-h-56 object-cover rounded-lg hover:scale-103 ${
           hover && "hover:scale-103"
         }`}
         src={error ? ErrorImage : src}

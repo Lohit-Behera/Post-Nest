@@ -212,8 +212,15 @@ export const fetchGoogleAuth = createAsyncThunk(
   "user/googleAuth",
   async (token: string, { rejectWithValue }) => {
     try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      };
       const { data } = await axios.get(
-        `${baseUrl}/api/v1/users/auth/google?token=${token}`
+        `${baseUrl}/api/v1/users/auth/google?token=${token}`,
+        config
       );
       if (data.data) {
         document.cookie = `userInfoPostNest=${encodeURIComponent(
@@ -412,6 +419,16 @@ const userSlice = createSlice({
       state.resetPasswordStatus = "idle";
       state.resetPasswordError = {};
     },
+    resetUserDetails: (state) => {
+      state.userDetails = {};
+      state.userDetailsStatus = "idle";
+      state.userDetailsError = {};
+    },
+    reSignIn: (state) => {
+      state.userInfo = null;
+      document.cookie =
+        "userInfoPostNest=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -586,5 +603,7 @@ export const {
   resetChangePassword,
   resetSendForgotPasswordEmail,
   resetResetPassword,
+  reSignIn,
+  resetUserDetails,
 } = userSlice.actions;
 export default userSlice.reducer;

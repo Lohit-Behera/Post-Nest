@@ -73,7 +73,7 @@ function UpdatePostPage() {
         return data.message;
       },
       error: (error: any) => {
-        return error.message;
+        return error;
       },
     });
   };
@@ -120,34 +120,41 @@ function UpdatePostPage() {
               )}
             </div>
             <div className="grid gap-2">
-              <Label>Content</Label>
               {editContent ? (
-                <div className="w-full flex flex-col space-y-3">
-                  <RichTextEditor
-                    value={post.content || ""}
-                    onChange={setContent}
-                  />
-                  <Button
-                    className="mx-auto"
-                    variant="outline"
-                    size="icon"
-                    onClick={() => setEditContent(false)}
-                  >
-                    <X />
-                  </Button>
-                </div>
+                <>
+                  <Label>Content</Label>
+                  <div className="w-full flex flex-col space-y-3">
+                    <RichTextEditor
+                      value={post.content || ""}
+                      onChange={setContent}
+                    />
+                    <Button
+                      className="mx-auto"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setEditContent(false)}
+                    >
+                      <X />
+                    </Button>
+                  </div>
+                </>
               ) : (
-                <div className="flex justify-between space-x-3">
-                  <div dangerouslySetInnerHTML={{ __html: updatedContent }} />
-                  <Button
-                    className="my-auto"
-                    variant="outline"
-                    size="icon"
-                    onClick={() => setEditContent(true)}
-                  >
-                    <Pencil />
-                  </Button>
-                </div>
+                <>
+                  <div className="flex justify-between">
+                    <Label>Content</Label>
+                    <Button
+                      className="my-auto"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setEditContent(true)}
+                    >
+                      <Pencil />
+                    </Button>
+                  </div>
+                  <div className="flex justify-between space-x-3">
+                    <div dangerouslySetInnerHTML={{ __html: updatedContent }} />
+                  </div>
+                </>
               )}
             </div>
             <div className="grid gap-2">

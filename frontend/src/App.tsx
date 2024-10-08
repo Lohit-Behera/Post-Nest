@@ -21,6 +21,7 @@ import FeedPage from "./pages/FeedPage";
 import ChangePasswordPage from "./pages/ChangePasswordPage";
 import PageNotFound from "./pages/Error/PageNotFound";
 import ForgotPassword from "./pages/ForgotPassword";
+import TokenExpired from "./pages/TokenExpired";
 
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -58,6 +59,7 @@ const router = createBrowserRouter(
         path="/forgot-password/:userId?/:token?"
         element={<ForgotPassword />}
       />
+      <Route path="/token-expired" element={<TokenExpired />} />
     </Route>
   )
 );

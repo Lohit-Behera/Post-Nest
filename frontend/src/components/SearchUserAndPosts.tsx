@@ -35,8 +35,6 @@ function SearchUserAndPosts() {
   );
   const searchPosts = useSelector((state: any) => state.post.searchPosts);
   const searchPostsData = searchPosts.data || [];
-  console.log(searchPostsData);
-
   const searchPostsStatus = useSelector(
     (state: any) => state.post.searchPostsStatus
   );

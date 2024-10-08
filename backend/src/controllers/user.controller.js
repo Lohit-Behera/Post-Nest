@@ -639,7 +639,7 @@ const sendForgotPasswordMail = asyncHandler(async (req, res) => {
 
     const forgotPasswordEmailLink = `${process.env.CORS_ORIGIN || "http://localhost:5173"}/forgot-password/${user._id}/${generateForgotPasswordToken}`
 
-    await sendEmail("lohitsekhar.2002@gmail.com", "Forgot Password", ForgotPasswordEmailTemplate(forgotPasswordEmailLink));
+    await sendEmail(user.email, "Forgot Password", ForgotPasswordEmailTemplate(forgotPasswordEmailLink));
 
     return res.status(200).json(new ApiResponse(200, {}, "Forgot password link sent"))
 })

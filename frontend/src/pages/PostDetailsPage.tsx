@@ -90,7 +90,18 @@ function PostDetailsPage() {
 
   const handleLikeUnlike = () => {
     if (userInfo) {
-      dispatch(fetchLikeUnlike({ postId: id }));
+      const likeUnlikePromise = dispatch(
+        fetchLikeUnlike({ postId: id })
+      ).unwrap();
+      toast.promise(likeUnlikePromise, {
+        loading: "Loading...",
+        success: (data: any) => {
+          return data.message;
+        },
+        error: (error: any) => {
+          return error;
+        },
+      });
     } else {
       navigate("/sign-in");
       toast.warning("Please sing in first");

@@ -98,7 +98,7 @@ function SearchUserAndPosts() {
           </TabsList>
           <TabsContent value="user">
             <>
-              <div className="grid gap-2">
+              <div className="grid gap-2 mb-4">
                 <Label htmlFor="username">Username</Label>
                 <Input
                   id="username"
@@ -160,7 +160,7 @@ function SearchUserAndPosts() {
           </TabsContent>
           <TabsContent value="posts">
             <>
-              <div className="grid gap-2">
+              <div className="grid gap-2 mb-4">
                 <Label htmlFor="title">Title</Label>
                 <Input
                   id="title"

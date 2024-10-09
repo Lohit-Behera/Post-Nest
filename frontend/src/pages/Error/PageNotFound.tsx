@@ -5,7 +5,7 @@ import PageNotFoundImage from "../../assets/PageNotFound.svg";
 function PageNotFound() {
   const navigate = useNavigate();
   return (
-    <div className="bg-muted mt-10 w-full md:w-[90%] min-h-[80vh] mx-auto border-2 rounded-lg ">
+    <div className="bg-muted mt-10 w-[98%] md:w-[90%] min-h-[80vh] mx-auto border-2 rounded-lg ">
       <div className="flex-grow md:flex min-h-[75vh] justify-between p-2 space-x-0 md:space-x-2">
         <div className="w-full md:w-1/2 my-auto">
           <img

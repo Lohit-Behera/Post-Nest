@@ -8,11 +8,21 @@ import { oAuth2Client } from "../utils/googleConfig.js";
 import axios from "axios";
 import { ForgotPasswordEmailTemplate } from "../utils/html/ForgotPassword.js";
 
-const options = {
+const accessTokenOptions = {
     httpOnly: true,
     secure: true,
     sameSite: 'None',
+    maxAge: 24 * 60 * 60 * 1000, 
 };
+
+const refreshTokenOptions = {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'None',
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+};
+
+
 
 
 // generate access token and refresh token
@@ -122,8 +132,8 @@ const loginUser = asyncHandler(async (req, res) => {
 
     // send response
     return res.status(200)
-    .cookie("accessToken", accessToken, options) 
-    .cookie("refreshToken", refreshToken, options)
+    .cookie("accessToken", accessToken, accessTokenOptions) 
+    .cookie("refreshToken", refreshToken, refreshTokenOptions)
     .json(
         new ApiResponse(200, loggedInUser, "Sign in successful")
     )
@@ -140,8 +150,16 @@ const logoutUser = asyncHandler(async (req, res) => {
     })
 
     return res.status(200)
-    .clearCookie("accessToken", options)
-    .clearCookie("refreshToken", options)
+    .clearCookie("accessToken", {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'None',
+    })
+    .clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'None',
+    })
     .json(
         new ApiResponse(200, {}, "Logout successful")
     )
@@ -565,8 +583,8 @@ const googleAuth = asyncHandler(async (req, res) => {
     
             // send response
             return res.status(200)
-            .cookie("accessToken", accessToken, options) 
-            .cookie("refreshToken", refreshToken, options)
+            .cookie("accessToken", accessToken, accessTokenOptions) 
+            .cookie("refreshToken", refreshToken, refreshTokenOptions)
             .json(
                 new ApiResponse(200, loggedInUser, "Sign up successful with google")
             )
@@ -576,8 +594,8 @@ const googleAuth = asyncHandler(async (req, res) => {
     
             // send response
             return res.status(200)
-            .cookie("accessToken", accessToken, options) 
-            .cookie("refreshToken", refreshToken, options)
+            .cookie("accessToken", accessToken, accessTokenOptions) 
+            .cookie("refreshToken", refreshToken, refreshTokenOptions)
             .json(
                 new ApiResponse(200, loggedInUser, "Sign in successful with google")
             )

@@ -8,7 +8,7 @@ function ServerErrorPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch<any>();
   return (
-    <div className="bg-muted mt-10 w-full md:w-[90%] min-h-[80vh] mx-auto border-2 rounded-lg ">
+    <div className="bg-muted mt-10 w-[98%] md:w-[90%] min-h-[80vh] mx-auto border-2 rounded-lg ">
       <div className="flex-grow md:flex min-h-[75vh] justify-between p-2 space-x-0 md:space-x-2">
         <div className="w-full md:w-1/2 my-auto">
           <img
@@ -26,7 +26,7 @@ function ServerErrorPage() {
             Sorry about that! Please try go to homepage or reload the page or
             re-sign in if the problem persists contact us.
           </p>
-          <div className="flex justify-between">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             <Button size="sm" onClick={() => navigate("/")}>
               Home
             </Button>

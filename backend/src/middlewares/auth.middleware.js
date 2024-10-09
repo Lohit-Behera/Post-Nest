@@ -22,14 +22,10 @@ export const authMiddleware = asyncHandler(async (req, res, next) => {
         const isAccessTokenExpired = isTokenExpired(token);
 
         if (!req.cookies.accessToken || isAccessTokenExpired) {
-            let refreshToken = req.cookies.refreshToken;
+            const refreshToken = req.cookies.refreshToken;
 
             if (!refreshToken) {
-                try {
-                    refreshToken = JSON.parse(req.cookies.userInfoPostNest).refreshToken;
-                } catch (error) {
-                    return res.status(401).json(new ApiResponse(401, {}, "Unauthorized"));
-                }
+                return res.status(401).json(new ApiResponse(401, {}, "Unauthorized"));
             }
             const isRefreshTokenExpired = isTokenExpired(refreshToken, res);
             if (isRefreshTokenExpired) {
@@ -48,12 +44,14 @@ export const authMiddleware = asyncHandler(async (req, res, next) => {
                 httpOnly: true,
                 secure: true,
                 sameSite: 'None',
+                maxAge: 24 * 60 * 60 * 1000,
             });
             const newRefreshToken = user.generateRefreshToken();
             res.cookie("refreshToken", newRefreshToken, {
                 httpOnly: true,
                 secure: true,
                 sameSite: 'None',
+                maxAge: 30 * 24 * 60 * 60 * 1000,
             });
             token = newAccessToken;
         }

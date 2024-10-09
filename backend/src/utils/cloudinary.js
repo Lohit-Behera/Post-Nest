@@ -8,19 +8,43 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const uploadFile = async (filePath) => {
+const uploadFile = async (file) => {
     try {
-        if(!filePath) return null;
-        const response = await cloudinary.uploader.upload(filePath, {
-            resource_type: "auto",
-        });
-        fs.unlinkSync(filePath);
+        let response;
+
+        if (process.env.MEMORY === 'true') {
+            if (!file || !file.buffer) return null;
+            
+            response = await new Promise((resolve, reject) => {
+                const uploadStream = cloudinary.uploader.upload_stream(
+                    { resource_type: "auto" },
+                    (error, result) => {
+                        if (error) return reject(error);
+                        resolve(result);
+                    }
+                );
+                uploadStream.end(file.buffer);
+            });
+            file.buffer = null;
+        } else {
+            if (!file || !file.path) return null;
+            
+            response = await cloudinary.uploader.upload(file.path, {
+                resource_type: "auto",
+            });
+            fs.unlinkSync(file.path);
+        }
         return response.url;
     } catch (error) {
-        fs.unlinkSync(filePath);
+        console.log(error);
+        if (process.env.MEMORY === 'false') {
+            fs.unlinkSync(file.path);
+        } else if (process.env.MEMORY === 'true') {
+            file.buffer = null;
+        }
         return null;
     }
-}
+};
 
 const deleteFile = async (filePath, res) => {
     try {

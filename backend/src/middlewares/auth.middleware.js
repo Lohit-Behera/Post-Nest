@@ -4,14 +4,14 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 
 
-function isTokenExpired(token, res) {
+function isTokenExpired(token) {
     try {
         const decoded = jwt.decode(token);
         const currentTime = Math.floor(Date.now() / 1000);
         return decoded.exp < currentTime;
         
     } catch (err) {
-        return res.status(401).json(new ApiResponse(401, err.message, "invalid token"));
+        return true;
     }
 }
 
@@ -19,15 +19,18 @@ export const authMiddleware = asyncHandler(async (req, res, next) => {
     try {
         let token = req.cookies.accessToken || "";
         
-        const isAccessTokenExpired = isTokenExpired(token, res);
+        const isAccessTokenExpired = isTokenExpired(token);
 
         if (!req.cookies.accessToken || isAccessTokenExpired) {
-            const refreshToken = req.cookies.refreshToken;
+            let refreshToken = req.cookies.refreshToken;
 
             if (!refreshToken) {
-                return res.status(401).json(new ApiResponse(401, {}, "Unauthorized"));
+                try {
+                    refreshToken = JSON.parse(req.cookies.userInfoPostNest).refreshToken;
+                } catch (error) {
+                    return res.status(401).json(new ApiResponse(401, {}, "Unauthorized"));
+                }
             }
-
             const isRefreshTokenExpired = isTokenExpired(refreshToken, res);
             if (isRefreshTokenExpired) {
                 return res.status(401).json(new ApiResponse(401, {}, "Refresh token expired"));
@@ -42,6 +45,12 @@ export const authMiddleware = asyncHandler(async (req, res, next) => {
 
             const newAccessToken = user.generateAccessToken();
             res.cookie("accessToken", newAccessToken, {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'None',
+            });
+            const newRefreshToken = user.generateRefreshToken();
+            res.cookie("refreshToken", newRefreshToken, {
                 httpOnly: true,
                 secure: true,
                 sameSite: 'None',

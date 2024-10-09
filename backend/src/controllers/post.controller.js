@@ -16,23 +16,19 @@ const createPost = asyncHandler(async (req, res) => {
     // validate data
     if (!title || !content) {
         return res.status(400).json(
-            new ApiResponse(400, "Title and content are required")
+            new ApiResponse(400,{}, "Title and content are required")
         )
     }
-
-    // get thumbnail form file
-    const thumbnailLocalPath = req.file?.path
-    
     
     // validate thumbnail
-    if (!thumbnailLocalPath) {
+    if (!req.file) {
         return res.status(400).json(
-            new ApiResponse(400, "Please provide an thumbnail")
+            new ApiResponse(400,{}, "Please provide an thumbnail")
         )
     }
 
     // upload thumbnail to cloudinary
-    const thumbnailUrl = await uploadFile(thumbnailLocalPath)
+    const thumbnailUrl = await uploadFile(req.file)
 
     // check thumbnail is uploaded
     if (!thumbnailUrl) {
@@ -180,8 +176,8 @@ const UpdatePost = asyncHandler(async (req, res) => {
     }
 
     if (req.file) {
-        const thumbnailLocalPath = req.file?.path
-        const thumbnailUrl = await uploadFile(thumbnailLocalPath)
+        const thumbnailFile = req.file
+        const thumbnailUrl = await uploadFile(thumbnailFile)
         
         if (!thumbnailUrl) {
             return res.status(500).json(new ApiResponse(500, {}, "Something went wrong while uploading thumbnail"))
@@ -224,10 +220,11 @@ const deletePost = asyncHandler(async (req, res) => {
     if (post.author.toString() !== userId.toString()) {
         return res.status(403).json(new ApiResponse(403, {}, "You are not authorized to delete this post"))
     }
+    if (post.thumbnail) {
+        const publicId = post.thumbnail.split('/').pop().split('.')[0];
+        await deleteFile(publicId, res)
+    }
 
-    const publicId = post.thumbnail.split('/').pop().split('.')[0];
-
-    await deleteFile(publicId, res)
     await Post.findByIdAndDelete(id)
     return res.status(200).json(
         new ApiResponse(200, {}, "Post deleted successfully")

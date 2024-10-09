@@ -54,13 +54,13 @@ const registerUser = asyncHandler(async (req, res) => {
     }
     
     // check for images
-    const avatarLocalPath = req.file?.path
-    if (!avatarLocalPath) {
+    const avatarFile = req.file
+    if (!avatarFile) {
         res.status(400).json(new ApiResponse(400, {}, "Please provide an avatar"))
     }
     
     // upload images
-    const avatarURL = await uploadFile(avatarLocalPath)
+    const avatarURL = await uploadFile(avatarFile)
     if (!avatarURL) {
         res.status(500).json(new ApiResponse(500, {}, "Something went wrong while uploading avatar"))
     }
@@ -409,14 +409,14 @@ const updateUserDetails = asyncHandler(async (req, res) => {
     }
     const user = await User.findById(req.user._id)
     const { fullName, bio, website} = req.body
-    const avatarLocalPath = req.files.avatar ? req.files.avatar[0].path : null
-    const coverImageLocalPath = req.files.coverImage ? req.files.coverImage[0].path : null
+    const avatarFile = req.files.avatar ? req.files.avatar[0] : null
+    const coverImageFile = req.files.coverImage ? req.files.coverImage[0] : null
 
     if (!user) {
         return res.status(404).json(new ApiResponse(404, {}, "User not found"))
     }
 
-    if (fullName === "" && bio === "" && website === "" && avatarLocalPath === null && coverImageLocalPath === null) {
+    if (fullName === "" && bio === "" && website === "" && avatarFile === null && coverImageFile === null) {
         return res.status(400).json(new ApiResponse(400, {}, "Nothing to update"))
     }
 
@@ -444,30 +444,28 @@ const updateUserDetails = asyncHandler(async (req, res) => {
         }
     }
 
-    if (avatarLocalPath) {
-        const avatarUrl = await uploadFile(avatarLocalPath)
+    if (avatarFile) {
+        const avatarUrl = await uploadFile(avatarFile)
 
         if (!avatarUrl) {
             return res.status(500).json(new ApiResponse(500, {}, "Something went wrong while uploading avatar"))
         }
-
-        const publicId = user.avatar.split('/').pop().split('.')[0];
-
-        await deleteFile(publicId, res)
-
+        if (user.avatar) {
+            const publicId = user.avatar.split('/').pop().split('.')[0];
+            await deleteFile(publicId, res)
+        }
         user.avatar = avatarUrl
     }
 
-    if (coverImageLocalPath) {
-        if (user.coverImage) {
-            const publicId = user.coverImage.split('/').pop().split('.')[0];
-            await deleteFile(publicId, res)
-        }
-        
-        const coverImageUrl = await uploadFile(coverImageLocalPath)
+    if (coverImageFile) {
+        const coverImageUrl = await uploadFile(coverImageFile)
         
         if (!coverImageUrl) {
             return res.status(500).json(new ApiResponse(500, {}, "Something went wrong while uploading cover image"))
+        }
+        if (user.coverImage) {
+            const publicId = user.coverImage.split('/').pop().split('.')[0];
+            await deleteFile(publicId, res)
         }
         user.coverImage = coverImageUrl
     }

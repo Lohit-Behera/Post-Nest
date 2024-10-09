@@ -125,7 +125,7 @@ function UpdateProfilePage() {
     if (file.type.startsWith("image/")) {
       setCoverImage(file);
     } else {
-      alert("Please select an image file");
+      toast.warning("Please select an image file");
     }
   };
 

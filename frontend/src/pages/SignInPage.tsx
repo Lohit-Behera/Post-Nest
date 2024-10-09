@@ -19,6 +19,7 @@ import waterFall from "@/assets/waterfalls.jpg";
 import CustomPassword from "@/components/CustomPassword";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import GlobalLoader from "@/components/Loader/GlobalLoader/GlobalLoader";
 
 const FormSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
@@ -33,6 +34,9 @@ function SignInPage() {
 
   const userInfo = useSelector((state: any) => state.user.userInfo);
   const userInfoStatus = useSelector((state: any) => state.user.userInfoStatus);
+  const googleAuthStatus = useSelector(
+    (state: any) => state.user.googleAuthStatus
+  );
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -86,86 +90,99 @@ function SignInPage() {
     flow: "auth-code",
   });
   return (
-    <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px] ">
-      <div className="flex items-center justify-center py-12 ">
-        <div className="mx-auto grid w-[380px] gap-6 p-2 md:p-4 border-2 rounded-lg">
-          <div className="grid gap-2 text-center">
-            <h1 className="text-3xl font-bold">Sign In</h1>
-            <p className="text-balance text-muted-foreground">
-              Enter your credentials below to Sign Up to your account
-            </p>
-          </div>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Email" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="flex justify-between">
-                      <FormLabel>Password</FormLabel>
-                      <Link
-                        to="/forgot-password"
-                        className="text-sm hover:underline"
-                      >
-                        Forget Password
-                      </Link>
-                    </div>
-                    <FormControl>
-                      <CustomPassword
-                        placeholder="Password"
-                        {...field}
-                        ref={field.ref}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full">
-                Submit
+    <>
+      {googleAuthStatus === "loading" || userInfoStatus === "loading" ? (
+        <GlobalLoader fullHight />
+      ) : (
+        <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px] ">
+          <div className="flex items-center justify-center py-12 ">
+            <div className="mx-auto grid w-[380px] gap-6 p-2 md:p-4 border-2 rounded-lg">
+              <div className="grid gap-2 text-center">
+                <h1 className="text-3xl font-bold">Sign In</h1>
+                <p className="text-balance text-muted-foreground">
+                  Enter your credentials below to Sign Up to your account
+                </p>
+              </div>
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-6"
+                >
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Email" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="flex justify-between">
+                          <FormLabel>Password</FormLabel>
+                          <Link
+                            to="/forgot-password"
+                            className="text-sm hover:underline"
+                          >
+                            Forget Password
+                          </Link>
+                        </div>
+                        <FormControl>
+                          <CustomPassword
+                            placeholder="Password"
+                            {...field}
+                            ref={field.ref}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit" className="w-full">
+                    Submit
+                  </Button>
+                </form>
+              </Form>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={googleLogin}
+              >
+                Sign in with Google
               </Button>
-            </form>
-          </Form>
-          <Button variant="outline" className="w-full" onClick={googleLogin}>
-            Sign in with Google
-          </Button>
-          <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{" "}
-            <Link to="/sign-up" className="underline">
-              Sign up
-            </Link>
+              <div className="mt-4 text-center text-sm">
+                Don&apos;t have an account?{" "}
+                <Link to="/sign-up" className="underline">
+                  Sign up
+                </Link>
+              </div>
+            </div>
+          </div>
+          <div className="hidden bg-muted lg:block max-h-[110vh]">
+            <a
+              href="https://www.pexels.com/photo/waterfalls-surrounded-by-trees-2743287/"
+              target="_blank"
+            >
+              <img
+                src={waterFall}
+                alt="Image"
+                width="1920"
+                height="1080"
+                className="h-full w-full object-cover grayscale hover:filter-none duration-300 ease-in-out"
+              />
+            </a>
           </div>
         </div>
-      </div>
-      <div className="hidden bg-muted lg:block max-h-[110vh]">
-        <a
-          href="https://www.pexels.com/photo/waterfalls-surrounded-by-trees-2743287/"
-          target="_blank"
-        >
-          <img
-            src={waterFall}
-            alt="Image"
-            width="1920"
-            height="1080"
-            className="h-full w-full object-cover grayscale hover:filter-none duration-300 ease-in-out"
-          />
-        </a>
-      </div>
-    </div>
+      )}
+    </>
   );
 }
 

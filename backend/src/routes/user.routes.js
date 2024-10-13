@@ -13,7 +13,7 @@ import {
     userSearch,
     sendForgotPasswordMail,
     forgotPassword,
-    changeUsername
+    changeUsername,
  } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";

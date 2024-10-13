@@ -6,6 +6,7 @@ import PostSlice from "@/features/PostSlice";
 import FollowSlice from "@/features/FollowSlice";
 import CommentSlice from "@/features/CommentSlice";
 import LikeSlice from "@/features/LikeSlice";
+import AdminSlice from "@/features/AdminSlice";
 
 const store = configureStore({
   reducer: {
@@ -15,6 +16,7 @@ const store = configureStore({
     follow: FollowSlice,
     comment: CommentSlice,
     like: LikeSlice,
+    admin: AdminSlice,
   },
 });
 

@@ -743,5 +743,5 @@ export {
     userSearch,
     sendForgotPasswordMail,
     forgotPassword,
-    changeUsername
+    changeUsername,
 }

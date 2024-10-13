@@ -1,5 +1,5 @@
 import { ModeToggle } from "./mode-toggle";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -11,14 +11,31 @@ import {
   SheetTrigger,
   SheetClose,
 } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "./ui/button";
 import Logo from "../assets/Logo.svg";
-import { Home, LogIn, LogOut, PanelLeft, Rss, SquarePlus } from "lucide-react";
+import {
+  Home,
+  LogIn,
+  LogOut,
+  PanelLeft,
+  Rss,
+  SquarePlus,
+  UserCog2,
+} from "lucide-react";
 import { fetchLogout } from "@/features/UserSlice";
 import SearchUserAndPosts from "@/components/SearchUserAndPosts";
 
 function Header() {
   const dispatch = useDispatch<any>();
+  const navigate = useNavigate();
   const userInfo = useSelector((state: any) => state.user.userInfo);
   const userDetails = useSelector((state: any) => state.user.userDetails);
   const userDetailsData = userDetails.data || {};
@@ -72,27 +89,53 @@ function Header() {
                     </Button>
                   )}
                 </NavLink>
-                <Button
-                  variant="ghost"
-                  className="font-semibold"
-                  onClick={handleLogout}
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Logout
-                </Button>
-                <Link to={`/profile/${userDetailsData._id}`}>
-                  <Avatar>
-                    <AvatarImage
-                      src={userDetailsData.avatar}
-                      className="object-cover"
-                    />
-                    <AvatarFallback>
-                      {userDetailsData.username
-                        ? userDetailsData.username[0]
-                        : "A"}
-                    </AvatarFallback>
-                  </Avatar>
-                </Link>
+                {userDetails?.data?.isAdmin && (
+                  <NavLink to="/admin">
+                    {({ isActive }) => (
+                      <Button
+                        variant={isActive ? "default" : "ghost"}
+                        className="font-semibold"
+                      >
+                        <UserCog2 className="mr-2 h-4 w-4" />
+                        Admin
+                      </Button>
+                    )}
+                  </NavLink>
+                )}
+                <DropdownMenu>
+                  <DropdownMenuTrigger>
+                    <Avatar>
+                      <AvatarImage
+                        src={userDetailsData.avatar}
+                        className="object-cover"
+                      />
+                      <AvatarFallback>L</AvatarFallback>
+                    </Avatar>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() =>
+                        navigate(`/profile/${userDetailsData._id}`)
+                      }
+                    >
+                      Profile
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        navigate(`/update-profile/${userDetailsData._id}`)
+                      }
+                    >
+                      Settings
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>Support</DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout}>
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </>
             )}
             {!userInfo && (
@@ -208,13 +251,31 @@ function Header() {
         <div className="flex my-auto space-x-2">
           {userInfo && (
             <>
-              <Avatar>
-                <AvatarImage
-                  src={userDetailsData.avatar}
-                  className="object-cover"
-                />
-                <AvatarFallback>L</AvatarFallback>
-              </Avatar>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className="rounded-full"
+                  >
+                    <Avatar>
+                      <AvatarImage
+                        src={userDetailsData.avatar}
+                        className="object-cover"
+                      />
+                      <AvatarFallback>L</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>Settings</DropdownMenuItem>
+                  <DropdownMenuItem>Support</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>Logout</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </>
           )}
           <ModeToggle />

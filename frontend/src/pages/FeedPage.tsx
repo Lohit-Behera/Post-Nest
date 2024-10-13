@@ -3,9 +3,8 @@ import { useNavigate } from "react-router-dom";
 import {
   fetchAllPosts,
   resetAllPosts,
-  addPosts,
-  addMorePosts,
-  resetPosts,
+  addFeedPosts,
+  resetFeedPosts,
 } from "@/features/PostSlice";
 import { useCallback, useEffect, useState } from "react";
 import Post from "@/components/Post";
@@ -24,7 +23,7 @@ function FeedPage() {
   const allPostsStatus = useSelector((state: any) => state.post.allPostsStatus);
   const allPostsError = useSelector((state: any) => state.post.allPostsError);
 
-  const posts = useSelector((state: any) => state.post.posts);
+  const feedPosts = useSelector((state: any) => state.post.feedPosts);
 
   const [once, setOnce] = useState(false);
   const [page, setPage] = useState(1);
@@ -42,22 +41,21 @@ function FeedPage() {
     if (!useInfo) {
       navigate("/sign-in");
     } else {
-      dispatch(resetPosts());
-      setPage(1);
-      setHasMore(false);
-      dispatch(fetchAllPosts(page));
+      if (feedPosts.length === 0) {
+        dispatch(resetFeedPosts());
+        setPage(1);
+        setHasMore(false);
+        setOnce(true);
+        dispatch(fetchAllPosts(page));
+      }
     }
   }, [useInfo, dispatch, navigate]);
 
   useEffect(() => {
     if (allPostsStatus === "succeeded") {
-      if (allPosts.data.page === 1) {
-        dispatch(addPosts(allPosts.data.docs));
-      } else {
-        if (once) {
-          dispatch(addMorePosts(allPosts.data.docs));
-          setOnce(false);
-        }
+      if (once) {
+        dispatch(addFeedPosts(allPosts.data.docs));
+        setOnce(false);
       }
       setHasMore(allPosts.data.hasNextPage);
       setPage(allPosts.data.nextPage);
@@ -78,8 +76,6 @@ function FeedPage() {
         dispatch(fetchAllPosts(page));
       }
     }
-
-    // Show scroll to top button when scrolled down
     if (window.scrollY > 300) {
       setShowScrollToTop(true);
     } else {
@@ -96,7 +92,7 @@ function FeedPage() {
 
   return (
     <>
-      {allPostsStatus === "loading" && posts.length === 0 ? (
+      {allPostsStatus === "loading" && feedPosts.length === 0 ? (
         <PostLoader />
       ) : allPostsStatus === "failed" ? (
         <ServerErrorPage />
@@ -112,7 +108,7 @@ function FeedPage() {
               <ArrowUp />
             </Button>
           )}
-          <Post posts={posts} followButton />
+          <Post posts={feedPosts} followButton />
           {allPostsStatus === "loading" && (
             <div className="flex justify-center mt-6">
               <Loader2 className="animate-spin w-14 h-14" />

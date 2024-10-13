@@ -239,7 +239,9 @@ const postSlice = createSlice({
     searchPostsStatus: "idle",
     searchPostsError: {},
 
-    posts: [],
+    homePosts: [],
+    feedPosts: [],
+    profilePosts: [],
   },
   reducers: {
     resetCreatePost: (state) => {
@@ -277,14 +279,23 @@ const postSlice = createSlice({
       state.searchPostsStatus = "idle";
       state.searchPostsError = {};
     },
-    addPosts: (state, action) => {
-      state.posts = action.payload;
+    addHomePosts: (state: any, action) => {
+      state.homePosts = [...state.homePosts, ...action.payload];
     },
-    addMorePosts: (state: any, action) => {
-      state.posts = [...state.posts, ...action.payload];
+    resetHomePosts: (state) => {
+      state.homePosts = [];
     },
-    resetPosts: (state) => {
-      state.posts = [];
+    addFeedPosts: (state: any, action) => {
+      state.feedPosts = [...state.feedPosts, ...action.payload];
+    },
+    resetFeedPosts: (state) => {
+      state.feedPosts = [];
+    },
+    addProfilePosts: (state: any, action) => {
+      state.profilePosts = [...state.profilePosts, ...action.payload];
+    },
+    resetProfilePosts: (state) => {
+      state.profilePosts = [];
     },
   },
   extraReducers: (builder) => {
@@ -394,10 +405,13 @@ export const {
   resetAllPosts,
   resetUserPosts,
   resetFollowingPosts,
-  addPosts,
-  addMorePosts,
-  resetPosts,
   resetSearchPosts,
+  addHomePosts,
+  resetHomePosts,
+  addFeedPosts,
+  resetFeedPosts,
+  addProfilePosts,
+  resetProfilePosts,
 } = postSlice.actions;
 
 export default postSlice.reducer;

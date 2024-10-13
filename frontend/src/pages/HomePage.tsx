@@ -3,9 +3,8 @@ import { useNavigate } from "react-router-dom";
 import {
   fetchFollowingPosts,
   resetFollowingPosts,
-  addPosts,
-  addMorePosts,
-  resetPosts,
+  addHomePosts,
+  resetHomePosts,
 } from "@/features/PostSlice";
 import { useCallback, useEffect, useState } from "react";
 import Post from "@/components/Post";
@@ -29,8 +28,7 @@ function HomePage() {
     (state: any) => state.post.followingPostsError
   );
 
-  const posts = useSelector((state: any) => state.post.posts);
-
+  const homePosts = useSelector((state: any) => state.post.homePosts);
   const [once, setOnce] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
@@ -47,22 +45,21 @@ function HomePage() {
     if (!useInfo) {
       navigate("/sign-in");
     } else {
-      dispatch(resetPosts());
-      setPage(1);
-      setHasMore(false);
-      dispatch(fetchFollowingPosts(page));
+      if (homePosts.length === 0) {
+        dispatch(resetHomePosts());
+        setPage(1);
+        setHasMore(false);
+        setOnce(true);
+        dispatch(fetchFollowingPosts(page));
+      }
     }
   }, []);
 
   useEffect(() => {
     if (followingPostsStatus === "succeeded") {
-      if (followingPosts.data.page === 1) {
-        dispatch(addPosts(followingPosts.data.docs));
-      } else {
-        if (once) {
-          dispatch(addMorePosts(followingPosts.data.docs));
-          setOnce(false);
-        }
+      if (once) {
+        dispatch(addHomePosts(followingPosts.data.docs || []));
+        setOnce(false);
       }
       setHasMore(followingPosts.data.hasNextPage);
       setPage(followingPosts.data.nextPage);
@@ -99,14 +96,14 @@ function HomePage() {
   }, [handleScroll]);
   return (
     <>
-      {followingPostsStatus === "loading" && posts.length === 0 ? (
+      {followingPostsStatus === "loading" && homePosts.length === 0 ? (
         <PostLoader />
       ) : followingPostsStatus === "failed" ? (
         <ServerErrorPage />
       ) : (
         <>
           <div className="w-[98%] md:w-[95%] mx-auto my-6">
-            {posts.length === 0 ? (
+            {homePosts.length === 0 ? (
               <p className="text-center text-lg md:text-xl font-semibold mt-6">
                 You didn't follow anyone yet to see their posts.
               </p>
@@ -122,7 +119,7 @@ function HomePage() {
                     <ArrowUp />
                   </Button>
                 )}
-                <Post posts={posts} followButton />
+                <Post posts={homePosts} followButton />
                 {followingPostsStatus === "loading" && (
                   <div className="flex justify-center mt-6">
                     <Loader2 className="animate-spin w-14 h-14" />

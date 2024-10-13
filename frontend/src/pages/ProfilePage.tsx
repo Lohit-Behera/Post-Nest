@@ -1,6 +1,5 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -24,9 +23,8 @@ import { fetchGetUserInfo, fetchSendVerifyEmail } from "@/features/UserSlice";
 import {
   fetchUserAllPosts,
   resetUserPosts,
-  addPosts,
-  addMorePosts,
-  resetPosts,
+  addProfilePosts,
+  resetProfilePosts,
 } from "@/features/PostSlice";
 import {
   fetchFollow,
@@ -68,7 +66,7 @@ function ProfilePage() {
   const followingListStatus = useSelector(
     (state: any) => state.follow.followingListStatus
   );
-  const posts = useSelector((state: any) => state.post.posts);
+  const profilePosts = useSelector((state: any) => state.post.profilePosts);
 
   const [once, setOnce] = useState(false);
   const [page, setPage] = useState(1);
@@ -83,25 +81,26 @@ function ProfilePage() {
   };
 
   useEffect(() => {
-    dispatch(resetPosts());
-    setPage(1);
-    setHasMore(false);
-    dispatch(fetchGetUserInfo(userId as string));
-    dispatch(fetchUserAllPosts({ id: userId as string, page }));
-    if (userInfo) {
-      dispatch(fetchFollowingList(userInfo._id as string));
+    if (profilePosts.length === 0 || profilePosts[0].author !== userId) {
+      dispatch(resetProfilePosts());
+      setPage(1);
+      setHasMore(false);
+      setOnce(true);
+      dispatch(fetchUserAllPosts({ id: userId as string, page }));
+    }
+    if (userData._id !== userId) {
+      dispatch(fetchGetUserInfo(userId as string));
+      if (userInfo) {
+        dispatch(fetchFollowingList(userInfo._id as string));
+      }
     }
   }, [userId, dispatch]);
 
   useEffect(() => {
     if (userAllPostsStatus === "succeeded") {
-      if (userAllPosts.data.page === 1) {
-        dispatch(addPosts(userAllPosts.data.docs));
-      } else {
-        if (once) {
-          dispatch(addMorePosts(userAllPosts.data.docs));
-          setOnce(false);
-        }
+      if (once) {
+        dispatch(addProfilePosts(userAllPosts.data.docs));
+        setOnce(false);
       }
       setHasMore(userAllPosts.data.hasNextPage);
       setPage(userAllPosts.data.nextPage);
@@ -308,13 +307,13 @@ function ProfilePage() {
               </Card>
             </div>
             <div className="w-full md:w-[68%]">
-              {userAllPostsStatus === "loading" && posts.length === 0 ? (
+              {userAllPostsStatus === "loading" && profilePosts.length === 0 ? (
                 <PostLoader />
               ) : userAllPostsStatus === "failed" ? (
                 <p>Error</p>
               ) : (
                 <div className="w-[98%] md:w-[95%] mx-auto">
-                  {posts.length === 0 ? (
+                  {profilePosts.length === 0 ? (
                     <p className="text-center text-lg md:text-xl font-semibold mt-6">
                       {!userInfo || userDetailsData._id !== userData._id
                         ? "This user didn't create any posts yet"
@@ -332,7 +331,7 @@ function ProfilePage() {
                           <ArrowUp />
                         </Button>
                       )}
-                      <Post posts={posts} followButton />
+                      <Post posts={profilePosts} followButton />
                       {userAllPostsStatus === "loading" && (
                         <div className="flex justify-center mt-6">
                           <Loader2 className="animate-spin w-14 h-14" />

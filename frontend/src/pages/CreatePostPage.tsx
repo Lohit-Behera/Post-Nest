@@ -47,7 +47,6 @@ function CreatePostPage() {
   const dispatch = useDispatch<any>();
   const navigate = useNavigate();
 
-  const userInfo = useSelector((state: any) => state.user.userInfo);
   const userDetails = useSelector((state: any) => state.user.userDetails);
   const userDetailsData = userDetails.data || {};
   const createPost = useSelector((state: any) => state.post.createPost);
@@ -59,13 +58,11 @@ function CreatePostPage() {
   );
 
   useEffect(() => {
-    if (!userInfo) {
-      navigate("/sign-in");
-    } else if (!userDetailsData.isVerified) {
+    if (!userDetailsData.isVerified) {
       navigate(`/profile/${userDetailsData._id}`);
       toast.warning("Please verify your account first");
     }
-  }, [userInfo, dispatch]);
+  }, [dispatch]);
 
   useEffect(() => {
     if (createPostStatus === "succeeded") {

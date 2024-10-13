@@ -24,6 +24,8 @@ import ForgotPassword from "./pages/ForgotPassword";
 import TokenExpired from "./pages/TokenExpired";
 import AdminDashboard from "./pages/AdminDashboard";
 import SupportPage from "./pages/SupportPage";
+import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
 
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -46,24 +48,78 @@ const GoogleAuthWrapperSignIn = () => {
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<Layout />}>
+      {/* Public Routes */}
       <Route path="*" element={<PageNotFound />} />
-      <Route index element={<HomePage />} />
       <Route path="/sign-up" element={<GoogleAuthWrapperSignUp />} />
       <Route path="/sign-in" element={<GoogleAuthWrapperSignIn />} />
       <Route path="/profile/:userId" element={<ProfilePage />} />
-      <Route path="/update-profile/:userId" element={<UpdateProfilePage />} />
-      <Route path="/create-post" element={<CreatePostPage />} />
       <Route path="/post/:id" element={<PostDetailsPage />} />
-      <Route path="/post/update/:id" element={<UpdatePostPage />} />
-      <Route path="/feed" element={<FeedPage />} />
-      <Route path="/change-password" element={<ChangePasswordPage />} />
+      <Route path="/token-expired" element={<TokenExpired />} />
+      <Route path="/support" element={<SupportPage />} />
       <Route
         path="/forgot-password/:userId?/:token?"
         element={<ForgotPassword />}
       />
-      <Route path="/token-expired" element={<TokenExpired />} />
-      <Route path="/admin" element={<AdminDashboard />} />
-      <Route path="/support" element={<SupportPage />} />
+
+      {/* Protected Routes */}
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <HomePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/update-profile/:userId"
+        element={
+          <ProtectedRoute>
+            <UpdateProfilePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/create-post"
+        element={
+          <ProtectedRoute>
+            <CreatePostPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/post/update/:id"
+        element={
+          <ProtectedRoute>
+            <UpdatePostPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/feed"
+        element={
+          <ProtectedRoute>
+            <FeedPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/change-password"
+        element={
+          <ProtectedRoute>
+            <ChangePasswordPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Admin Routes */}
+      <Route
+        path="/admin"
+        element={
+          <AdminRoute>
+            <AdminDashboard />
+          </AdminRoute>
+        }
+      />
     </Route>
   )
 );

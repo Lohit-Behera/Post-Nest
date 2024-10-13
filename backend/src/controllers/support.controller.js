@@ -35,8 +35,6 @@ const sendSupportEmail = asyncHandler(async (req, res) => {
     if (!support) {
         return res.status(500).json(new ApiResponse(500, {}, "Something went wrong while generating support ticket"))
     }
-    console.log(support.email);
-    
 
     // send email
     await sendEmail(

@@ -1,5 +1,4 @@
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import {
   fetchFollowingPosts,
   resetFollowingPosts,
@@ -16,9 +15,6 @@ import ServerErrorPage from "./Error/ServerErrorPage";
 
 function HomePage() {
   const dispatch = useDispatch<any>();
-  const navigate = useNavigate();
-
-  const useInfo = useSelector((state: any) => state.user.userInfo);
   const followingPosts =
     useSelector((state: any) => state.post.followingPosts) || [];
   const followingPostsStatus = useSelector(
@@ -42,16 +38,12 @@ function HomePage() {
   };
 
   useEffect(() => {
-    if (!useInfo) {
-      navigate("/sign-in");
-    } else {
-      if (homePosts.length === 0) {
-        dispatch(resetHomePosts());
-        setPage(1);
-        setHasMore(false);
-        setOnce(true);
-        dispatch(fetchFollowingPosts(page));
-      }
+    if (homePosts.length === 0) {
+      dispatch(resetHomePosts());
+      setPage(1);
+      setHasMore(false);
+      setOnce(true);
+      dispatch(fetchFollowingPosts(page));
     }
   }, []);
 

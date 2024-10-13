@@ -40,6 +40,7 @@ function AdminDashboard() {
   useEffect(() => {
     dispatch(fetchAdminDashboard());
   }, [dispatch]);
+
   return (
     <>
       {adminDashboardStatus === "loading" ? (

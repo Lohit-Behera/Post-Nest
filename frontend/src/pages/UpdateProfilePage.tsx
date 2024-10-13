@@ -36,7 +36,6 @@ function UpdateProfilePage() {
   const dispatch = useDispatch<any>();
   const navigate = useNavigate();
 
-  const userInfo = useSelector((state: any) => state.user.userInfo);
   const getUserInfo = useSelector((state: any) => state.user.getUserInfo);
   const userDetails = getUserInfo.data || {};
   const getUserInfoStatus = useSelector(
@@ -68,9 +67,7 @@ function UpdateProfilePage() {
   const [username, setUsername] = useState(userDetails.username || "");
 
   useEffect(() => {
-    if (!userInfo) {
-      navigate(`/sign-in`);
-    } else if (userId) {
+    if (userId) {
       dispatch(fetchGetUserInfo(userId as string));
     }
   }, [userId, dispatch]);

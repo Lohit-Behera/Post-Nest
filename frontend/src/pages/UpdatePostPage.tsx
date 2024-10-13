@@ -21,7 +21,6 @@ function UpdatePostPage() {
   const dispatch = useDispatch<any>();
   const navigate = useNavigate();
 
-  const userInfo = useSelector((state: any) => state.user.userInfo);
   const postDetails = useSelector((state: any) => state.post.postDetails);
   const post = postDetails.data || {};
   const postDetailsStatus = useSelector(
@@ -43,12 +42,8 @@ function UpdatePostPage() {
   const [isPublic, setIsPublic] = useState(true);
 
   useEffect(() => {
-    if (!userInfo) {
-      navigate("/sign-in");
-    } else {
-      dispatch(fetchPostDetails(id as string));
-    }
-  }, [userInfo, dispatch]);
+    dispatch(fetchPostDetails(id as string));
+  }, [dispatch]);
 
   useEffect(() => {
     if (updatePostStatus === "succeeded") {

@@ -37,15 +37,10 @@ const FormSchema = z
 function ChangePasswordPage() {
   const dispatch = useDispatch<any>();
   const navigate = useNavigate();
-  const userInfo = useSelector((state: any) => state.user.userInfo);
+
   const changePasswordStatus = useSelector(
     (state: any) => state.user.changePasswordStatus
   );
-  useEffect(() => {
-    if (!userInfo) {
-      navigate("/sign-in");
-    }
-  }, [userInfo, navigate]);
 
   useEffect(() => {
     if (changePasswordStatus === "succeeded") {

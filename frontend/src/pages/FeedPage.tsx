@@ -18,7 +18,6 @@ function FeedPage() {
   const dispatch = useDispatch<any>();
   const navigate = useNavigate();
 
-  const useInfo = useSelector((state: any) => state.user.userInfo);
   const allPosts = useSelector((state: any) => state.post.allPosts);
   const allPostsStatus = useSelector((state: any) => state.post.allPostsStatus);
   const allPostsError = useSelector((state: any) => state.post.allPostsError);
@@ -38,18 +37,14 @@ function FeedPage() {
   };
 
   useEffect(() => {
-    if (!useInfo) {
-      navigate("/sign-in");
-    } else {
-      if (feedPosts.length === 0) {
-        dispatch(resetFeedPosts());
-        setPage(1);
-        setHasMore(false);
-        setOnce(true);
-        dispatch(fetchAllPosts(page));
-      }
+    if (feedPosts.length === 0) {
+      dispatch(resetFeedPosts());
+      setPage(1);
+      setHasMore(false);
+      setOnce(true);
+      dispatch(fetchAllPosts(page));
     }
-  }, [useInfo, dispatch, navigate]);
+  }, [dispatch, navigate]);
 
   useEffect(() => {
     if (allPostsStatus === "succeeded") {

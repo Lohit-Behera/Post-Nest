@@ -129,7 +129,9 @@ function Header() {
                     >
                       Settings
                     </DropdownMenuItem>
-                    <DropdownMenuItem>Support</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate("/support")}>
+                      Support
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout}>
                       Logout

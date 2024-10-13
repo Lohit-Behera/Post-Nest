@@ -23,6 +23,7 @@ import PageNotFound from "./pages/Error/PageNotFound";
 import ForgotPassword from "./pages/ForgotPassword";
 import TokenExpired from "./pages/TokenExpired";
 import AdminDashboard from "./pages/AdminDashboard";
+import SupportPage from "./pages/SupportPage";
 
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -62,6 +63,7 @@ const router = createBrowserRouter(
       />
       <Route path="/token-expired" element={<TokenExpired />} />
       <Route path="/admin" element={<AdminDashboard />} />
+      <Route path="/support" element={<SupportPage />} />
     </Route>
   )
 );

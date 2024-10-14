@@ -17,14 +17,16 @@ const makeUserAdmin = asyncHandler(async (req, res) => {
     }
     // check if user is admin
     if (user.isAdmin) {
-        return res.status(400).json(new ApiResponse(400, {}, "User is already admin"))
+        user.isAdmin = false
+        await user.save({ validateBeforeSave: false })
+        return res.status(200).json(new ApiResponse(200, {}, `${user.fullName} removed from admin successfully`))
     }
     // make user admin
     user.isAdmin = true
     await user.save({ validateBeforeSave: false })
 
     // send response
-    return res.status(200).json(new ApiResponse(200, {}, "User made admin successfully"))
+    return res.status(200).json(new ApiResponse(200, {}, `${user.fullName} made admin successfully`))
 })
 
 const adminDashboard = asyncHandler(async (req, res) => {
@@ -75,7 +77,119 @@ const adminDashboard = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, { usersCount, postsCount, commentsCount, likesCount, posts, users }, "Admin dashboard"))
 })
 
+const getAllUsers = asyncHandler(async (req, res) => {
+    const options = {
+        page: parseInt(req.query.page) || 1,
+        limit: parseInt(req.query.limit) || 12,
+    };
+    const aggregate = User.aggregate([
+      {
+        $lookup: {
+          from: "follows",
+          localField: "_id",
+          foreignField: "following",
+          as: "followers"
+        }
+      },
+      {
+        $addFields: {
+          totalFollowers: {
+            $size: "$followers"
+          }
+        }
+      },
+       {
+        $lookup: {
+          from: "follows",
+          localField: "_id",
+          foreignField: "follower",
+          as: "following"
+        }
+      },
+      {
+        $addFields: {
+          totalFollowing: {
+            $size: "$following"
+          }
+        }
+      },
+      {
+        $lookup: {
+          from: "posts",
+          localField: "_id",
+          foreignField: "author",
+          as: "posts"
+        }
+      },
+      {
+        $addFields: {
+          totalPosts: {
+            $size: "$posts"
+          }
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          email: 1,
+          fullName: 1,
+          username: 1,
+          totalFollowing: 1,
+          totalFollowers: 1,
+          isAdmin: 1,
+          totalPosts: 1
+        }
+      },
+      {
+        $sort: {
+          fullName: 1
+        }
+      }
+    ])
+    const users = await User.aggregatePaginate(aggregate, options)
+    // send response
+    return res.status(200).json(new ApiResponse(200, users, "All users"))
+})
+
+const getAllPosts = asyncHandler(async (req, res) => {
+    const options = {
+      page: parseInt(req.query.page) || 1,
+      limit: parseInt(req.query.limit) || 12,
+    };
+
+    const aggregate = await Post.aggregate([
+      {
+        $lookup: {
+          from: "users",
+          localField: "author",
+          foreignField: "_id",
+          as: "user"
+        }
+      },
+      {
+        $unwind: {
+          path: "$user",
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          author: 1,
+          title: 1,
+          "username": "$user.username",
+          "fullName": "$user.fullName",
+          
+        }
+      }
+    ])
+    const posts = await Post.aggregatePaginate(aggregate, options)
+    // send response
+    return res.status(200).json(new ApiResponse(200, posts, "All posts"))
+})
+
 export {
     makeUserAdmin,
-    adminDashboard
+    adminDashboard,
+    getAllUsers,
+    getAllPosts
 }

@@ -16,8 +16,8 @@ const AdminRoute = ({ children }: AdminRouteProps) => {
   const userDetailsData = userDetails.data || {};
 
   useEffect(() => {
-    if (userDetailsStatus === "succeeded") {
-      if (!userInfo || !userDetailsData.isAdmin) {
+    if (!userInfo || userDetailsStatus === "succeeded") {
+      if (!userDetailsData.isAdmin) {
         navigate("/sign-in");
       }
     }

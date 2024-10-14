@@ -25,7 +25,7 @@ export const authMiddleware = asyncHandler(async (req, res, next) => {
             const refreshToken = req.cookies.refreshToken;
 
             if (!refreshToken) {
-                return res.status(401).json(new ApiResponse(401, {}, "Unauthorized"));
+                return res.status(401).json(new ApiResponse(401, {}, "You are not Unauthorized"));
             }
             const isRefreshTokenExpired = isTokenExpired(refreshToken, res);
             if (isRefreshTokenExpired) {
@@ -57,7 +57,7 @@ export const authMiddleware = asyncHandler(async (req, res, next) => {
         }
 
         if (!token) {
-            return res.status(401).json(new ApiResponse(401, {}, "Unauthorized"));
+            return res.status(401).json(new ApiResponse(401, {}, "You are not Unauthorized"));
         }
 
         const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);

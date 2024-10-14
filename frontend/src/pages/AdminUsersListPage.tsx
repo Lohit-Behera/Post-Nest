@@ -1,7 +1,11 @@
 import { useSelector, useDispatch } from "react-redux";
-import { fetchAdmin, fetchAllUsers, resetAdmin } from "@/features/AdminSlice";
+import {
+  fetchAdmin,
+  fetchAllUsers,
+  fetchDeleteUser,
+  resetAdmin,
+} from "@/features/AdminSlice";
 import { useEffect } from "react";
-
 import {
   Table,
   TableBody,
@@ -46,7 +50,9 @@ function AdminUsersListPage() {
   const userList = allUsersData.docs || [];
 
   const adminStatus = useSelector((state: any) => state.admin.adminStatus);
-
+  const deleteUserStatus = useSelector(
+    (state: any) => state.admin.deleteUserStatus
+  );
   useEffect(() => {
     if (userList.length === 0) {
       dispatch(fetchAllUsers());
@@ -55,9 +61,24 @@ function AdminUsersListPage() {
 
   const admin = (id: string, isAdmin: boolean) => {
     const adminPromise = dispatch(fetchAdmin(id)).unwrap();
-
     toast.promise(adminPromise, {
       loading: isAdmin ? "Removing admin..." : "Adding admin...",
+      success: (data: any) => {
+        dispatch(fetchAllUsers());
+        dispatch(resetAdmin());
+        return data.message;
+      },
+      error: (error: any) => {
+        dispatch(resetAdmin());
+        return error || error.message;
+      },
+    });
+  };
+
+  const handleDeleteUser = (id: string) => {
+    const deleteUserPromise = dispatch(fetchDeleteUser(id)).unwrap();
+    toast.promise(deleteUserPromise, {
+      loading: "Deleting user...",
       success: (data: any) => {
         dispatch(fetchAllUsers());
         dispatch(resetAdmin());
@@ -165,7 +186,11 @@ function AdminUsersListPage() {
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button size="icon" variant="destructive">
-                      <Trash2 />
+                      {deleteUserStatus === "loading" ? (
+                        <Loader2 className="animate-spin" />
+                      ) : (
+                        <Trash2 />
+                      )}
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
@@ -181,7 +206,11 @@ function AdminUsersListPage() {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction>Continue</AlertDialogAction>
+                      <AlertDialogAction
+                        onClick={() => handleDeleteUser(user._id)}
+                      >
+                        Continue
+                      </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>

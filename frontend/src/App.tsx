@@ -27,6 +27,7 @@ import SupportPage from "./pages/SupportPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
 import AdminUsersListPage from "./pages/AdminUsersListPage";
+import AdminPostListPage from "./pages/AdminPostListPage";
 
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -127,6 +128,15 @@ const router = createBrowserRouter(
         element={
           <AdminRoute>
             <AdminUsersListPage />
+          </AdminRoute>
+        }
+      />
+
+      <Route
+        path="/admin/posts"
+        element={
+          <AdminRoute>
+            <AdminPostListPage />
           </AdminRoute>
         }
       />

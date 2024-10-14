@@ -38,7 +38,9 @@ function AdminDashboard() {
   );
 
   useEffect(() => {
-    dispatch(fetchAdminDashboard());
+    if (adminDashboardStatus === "idle" || adminDashboardStatus === "failed") {
+      dispatch(fetchAdminDashboard());
+    }
   }, [dispatch]);
 
   return (
@@ -83,7 +85,7 @@ function AdminDashboard() {
                   size="sm"
                   variant="secondary"
                   className="text-sm"
-                  onClick={() => navigate("/admin/posts")}
+                  onClick={() => navigate("/admin/users")}
                 >
                   <ArrowUpRight className="mr-2 h-4 w-4" />
                   View all

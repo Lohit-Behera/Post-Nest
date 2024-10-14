@@ -75,6 +75,81 @@ export const fetchAdmin = createAsyncThunk(
   }
 );
 
+export const fetchDeleteUser = createAsyncThunk(
+  "delete/user",
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      };
+      const { data } = await axios.delete(
+        `${baseUrl}/api/v1/admin/delete/${id}`,
+        config
+      );
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const fetchAllPostsAdmin = createAsyncThunk(
+  "admin/posts",
+  async (page: string, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      };
+      const { data } = await axios.get(
+        `${baseUrl}/api/v1/admin/posts?page=${page}`,
+        config
+      );
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const fetchAdminDeletePost = createAsyncThunk(
+  "delete/post",
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      };
+      const { data } = await axios.delete(
+        `${baseUrl}/api/v1/admin/delete/post/${id}`,
+        config
+      );
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 const adminSlice = createSlice({
   name: "admin",
   initialState: {
@@ -89,6 +164,18 @@ const adminSlice = createSlice({
     admin: {},
     adminStatus: "idle",
     adminError: {},
+
+    deleteUser: {},
+    deleteUserStatus: "idle",
+    deleteUserError: {},
+
+    allPosts: {},
+    allPostsStatus: "idle",
+    allPostsError: {},
+
+    adminDeletePost: {},
+    adminDeletePostStatus: "idle",
+    adminDeletePostError: {},
   },
   reducers: {
     resetAdmin: (state) => {
@@ -96,9 +183,20 @@ const adminSlice = createSlice({
       state.adminStatus = "idle";
       state.adminError = {};
     },
+    resetDeleteUser: (state) => {
+      state.deleteUser = {};
+      state.deleteUserStatus = "idle";
+      state.deleteUserError = {};
+    },
+    resetAdminDeletePost: (state) => {
+      state.adminDeletePost = {};
+      state.adminDeletePostStatus = "idle";
+      state.adminDeletePostError = {};
+    },
   },
   extraReducers: (builder) => {
     builder
+      // Admin dashboard
       .addCase(fetchAdminDashboard.pending, (state) => {
         state.adminDashboardStatus = "loading";
       })
@@ -111,6 +209,7 @@ const adminSlice = createSlice({
         state.adminDashboardError = action.payload || "Admin dashboard failed";
       })
 
+      // All users
       .addCase(fetchAllUsers.pending, (state) => {
         state.allUsersStatus = "loading";
       })
@@ -123,6 +222,7 @@ const adminSlice = createSlice({
         state.allUsersError = action.payload || "All users failed";
       })
 
+      // Admin
       .addCase(fetchAdmin.pending, (state) => {
         state.adminStatus = "loading";
       })
@@ -133,9 +233,50 @@ const adminSlice = createSlice({
       .addCase(fetchAdmin.rejected, (state, action) => {
         state.adminStatus = "failed";
         state.adminError = action.payload || "Admin failed";
+      })
+
+      // Delete user
+      .addCase(fetchDeleteUser.pending, (state) => {
+        state.deleteUserStatus = "loading";
+      })
+      .addCase(fetchDeleteUser.fulfilled, (state, action) => {
+        state.deleteUserStatus = "succeeded";
+        state.deleteUser = action.payload;
+      })
+      .addCase(fetchDeleteUser.rejected, (state, action) => {
+        state.deleteUserStatus = "failed";
+        state.deleteUserError = action.payload || "Delete user failed";
+      })
+
+      // All posts
+      .addCase(fetchAllPostsAdmin.pending, (state) => {
+        state.allPostsStatus = "loading";
+      })
+      .addCase(fetchAllPostsAdmin.fulfilled, (state, action) => {
+        state.allPostsStatus = "succeeded";
+        state.allPosts = action.payload;
+      })
+      .addCase(fetchAllPostsAdmin.rejected, (state, action) => {
+        state.allPostsStatus = "failed";
+        state.allPostsError = action.payload || "All posts failed";
+      })
+
+      // Admin delete post
+      .addCase(fetchAdminDeletePost.pending, (state) => {
+        state.adminDeletePostStatus = "loading";
+      })
+      .addCase(fetchAdminDeletePost.fulfilled, (state, action) => {
+        state.adminDeletePostStatus = "succeeded";
+        state.adminDeletePost = action.payload;
+      })
+      .addCase(fetchAdminDeletePost.rejected, (state, action) => {
+        state.adminDeletePostStatus = "failed";
+        state.adminDeletePostError =
+          action.payload || "Admin delete post failed";
       });
   },
 });
 
-export const { resetAdmin } = adminSlice.actions;
+export const { resetAdmin, resetDeleteUser, resetAdminDeletePost } =
+  adminSlice.actions;
 export default adminSlice.reducer;

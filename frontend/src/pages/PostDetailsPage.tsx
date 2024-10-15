@@ -15,7 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Heart, MessageCircle, Pencil, Trash } from "lucide-react";
+import { CircleAlert, Heart, MessageCircle, Pencil, Trash } from "lucide-react";
 import Comments from "@/components/Comments";
 import {
   fetchLikeUnlike,
@@ -108,6 +108,10 @@ function PostDetailsPage() {
     }
   };
 
+  const handleReportPost = (id: string) => {
+    navigate(`/support?postId=${id}`);
+  };
+
   return (
     <>
       {PostDetailsStatus === "loading" || PostDetailsStatus === "idle" ? (
@@ -142,26 +146,36 @@ function PostDetailsPage() {
                       </Link>
                     </div>
                   </div>
-                  {userInfo && userInfo._id === post.author && (
-                    <div className="flex space-x-3">
-                      <Button
-                        variant="secondary"
-                        size="icon"
-                        onClick={() => {
-                          navigate(`/post/update/${id}`);
-                        }}
-                      >
-                        <Pencil />
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="icon"
-                        onClick={() => handleDeletePost()}
-                      >
-                        <Trash />
-                      </Button>
-                    </div>
-                  )}
+                  <div className="flex space-x-3">
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      onClick={() => handleReportPost(post._id)}
+                    >
+                      <CircleAlert />
+                    </Button>
+
+                    {userInfo && userInfo._id === post.author && (
+                      <div className="flex space-x-3">
+                        <Button
+                          variant="secondary"
+                          size="icon"
+                          onClick={() => {
+                            navigate(`/post/update/${id}`);
+                          }}
+                        >
+                          <Pencil />
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          onClick={() => handleDeletePost()}
+                        >
+                          <Trash />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col space-y-4">

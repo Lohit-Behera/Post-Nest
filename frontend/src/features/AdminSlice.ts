@@ -150,6 +150,31 @@ export const fetchAdminDeletePost = createAsyncThunk(
   }
 );
 
+export const fetchGetAllSupportTickets = createAsyncThunk(
+  "admin/support",
+  async (page: string, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      };
+      const { data } = await axios.get(
+        `${baseUrl}/api/v1/admin/supports?page=${page}`,
+        config
+      );
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 const adminSlice = createSlice({
   name: "admin",
   initialState: {
@@ -176,6 +201,10 @@ const adminSlice = createSlice({
     adminDeletePost: {},
     adminDeletePostStatus: "idle",
     adminDeletePostError: {},
+
+    getAllSupportTickets: {},
+    getAllSupportTicketsStatus: "idle",
+    getAllSupportTicketsError: {},
   },
   reducers: {
     resetAdmin: (state) => {
@@ -273,6 +302,20 @@ const adminSlice = createSlice({
         state.adminDeletePostStatus = "failed";
         state.adminDeletePostError =
           action.payload || "Admin delete post failed";
+      })
+
+      // Get all support tickets
+      .addCase(fetchGetAllSupportTickets.pending, (state) => {
+        state.getAllSupportTicketsStatus = "loading";
+      })
+      .addCase(fetchGetAllSupportTickets.fulfilled, (state, action) => {
+        state.getAllSupportTicketsStatus = "succeeded";
+        state.getAllSupportTickets = action.payload;
+      })
+      .addCase(fetchGetAllSupportTickets.rejected, (state, action) => {
+        state.getAllSupportTicketsStatus = "failed";
+        state.getAllSupportTicketsError =
+          action.payload || "Get all support tickets failed";
       });
   },
 });

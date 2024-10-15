@@ -5,6 +5,7 @@ import { Post } from "../models/post.model.js";
 import { Comment } from "../models/comment.model.js";
 import { Like } from "../models/like.model.js";
 import { deleteFile } from "../utils/cloudinary.js";
+import { Support } from "../models/support.model.js";
 import { sendEmail } from "../utils/sendMail.js";
 
 const makeUserAdmin = asyncHandler(async (req, res) => {
@@ -265,6 +266,33 @@ const deletePost = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, {}, `${post.title} deleted successfully`))
 })
 
+const getAllSupports = asyncHandler(async (req, res) => {
+    const options = {
+      page: parseInt(req.query.page) || 1,
+      limit: parseInt(req.query.limit) || 10,
+    };
+    // get all supports
+    const aggregate = Support.aggregate([
+      {
+        $sort: {
+          createdAt: -1
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          email: 1,
+          subject: 1,
+          status: 1
+        }
+      }
+    ])
+    // paginate supports
+    const supports = await Support.aggregatePaginate(aggregate, options)
+    // send response
+    return res.status(200).json(new ApiResponse(200, supports, "All supports"))
+})
 
 export {
     makeUserAdmin,
@@ -272,5 +300,6 @@ export {
     getAllUsers,
     getAllPosts,
     deleteUser,
-    deletePost
+    deletePost,
+    getAllSupports
 }

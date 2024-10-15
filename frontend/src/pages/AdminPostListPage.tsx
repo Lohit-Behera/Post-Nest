@@ -96,7 +96,7 @@ function AdminPostListPage() {
             <div className="flex flex-col justify-center items-center gap-4 p-4 rounded-lg">
               <h1 className="text-xl font-bold">Incorrect Page</h1>
               <p className="text-lg">
-                Please select a valid page click below to go back page 1
+                Please select a valid page or click below to go back page 1
               </p>
               <Button variant="outline" onClick={() => navigate("?page=1")}>
                 1

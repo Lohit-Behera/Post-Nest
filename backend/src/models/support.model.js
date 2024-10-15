@@ -21,7 +21,7 @@ const supportSchema = new mongoose.Schema(
         },
         status: {
             type: String,
-            enum: ["Pending", "Resolved"],
+            enum: ["Pending", "In Progress", "Resolved"],
             default: "Pending"
         },
         user: {

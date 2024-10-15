@@ -8,7 +8,6 @@ import {
   MessageCircle,
   Users,
 } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -22,6 +21,7 @@ import {
 import { fetchAdminDashboard } from "@/features/AdminSlice";
 import ServerErrorPage from "./Error/ServerErrorPage";
 import AdminDashboardLoader from "@/components/Loader/AdminDashboardLoader";
+import { Badge } from "@/components/ui/badge";
 
 function AdminDashboard() {
   const dispatch = useDispatch<any>();
@@ -32,7 +32,7 @@ function AdminDashboard() {
   );
   const adminData = adminDashboard.data || {};
   const posts = adminData.posts || [];
-  const users = adminData.users || [];
+  const support = adminData.support || [];
   const adminDashboardStatus = useSelector(
     (state: any) => state.admin.adminDashboardStatus
   );
@@ -60,7 +60,7 @@ function AdminDashboard() {
                 <FileText className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent className="flex flex-col space-y-2">
-                <div className="text-2xl font-bold">{adminData.usersCount}</div>
+                <div className="text-2xl font-bold">{adminData.postsCount}</div>
                 <Button
                   size="sm"
                   variant="secondary"
@@ -120,14 +120,14 @@ function AdminDashboard() {
           <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
             <Card className="xl:col-span-2" x-chunk="dashboard-01-chunk-4">
               <CardHeader className="flex flex-row items-center">
-                <div className="grid gap-2">
-                  <CardTitle>Recent Posts</CardTitle>
-                </div>
-                <Button asChild size="sm" className="ml-auto gap-1">
-                  <Link to="#">
-                    View All
-                    <ArrowUpRight className="h-4 w-4" />
-                  </Link>
+                <CardTitle>Recent Posts</CardTitle>
+                <Button
+                  size="sm"
+                  className="ml-auto gap-1"
+                  onClick={() => navigate("/admin/posts")}
+                >
+                  View All
+                  <ArrowUpRight className="h-4 w-4" />
                 </Button>
               </CardHeader>
               <CardContent>
@@ -150,7 +150,7 @@ function AdminDashboard() {
                           <TableCell>
                             <Link
                               to={`/profile/${post.author}`}
-                              className="hover:underline"
+                              className="hover:underline text-xs md:text-sm"
                             >
                               {post.username}
                             </Link>
@@ -158,7 +158,7 @@ function AdminDashboard() {
                           <TableCell className="text-right">
                             <Link
                               to={`/post/${post._id}`}
-                              className="hover:underline"
+                              className="hover:underline text-xs md:text-sm"
                             >
                               {post.title}
                             </Link>
@@ -172,40 +172,73 @@ function AdminDashboard() {
             </Card>
             <Card x-chunk="dashboard-01-chunk-5">
               <CardHeader>
-                <CardTitle>Recent Created Users</CardTitle>
+                <CardTitle className="flex justify-between space-x-4">
+                  <p>Recent Support Requests</p>
+                  <Button
+                    size="sm"
+                    className="ml-auto gap-1"
+                    onClick={() => navigate("/admin/supports")}
+                  >
+                    View All
+                    <ArrowUpRight className="h-4 w-4" />
+                  </Button>
+                </CardTitle>
               </CardHeader>
               <CardContent className="grid gap-8">
-                {users.map(
-                  (user: {
-                    _id: string;
-                    username: string;
-                    fullName: string;
-                    avatar: string;
-                  }) => (
-                    <div className="flex items-center gap-4" key={user._id}>
-                      <Link to={`/profile/${user._id}`}>
-                        <Avatar className="hidden h-9 w-9 sm:flex outline-primary hover:outline outline-2  outline-offset-2">
-                          <AvatarImage src={user.avatar} alt="Avatar" />
-                          <AvatarFallback>
-                            {user.username ? user.username[0] : "A"}
-                          </AvatarFallback>
-                        </Avatar>
-                      </Link>
-                      <div className="grid gap-1">
-                        <Link to={`/profile/${user._id}`}>
-                          <p className="text-sm font-medium leading-none hover:underline">
-                            {user.fullName}
-                          </p>
-                        </Link>
-                        <Link to={`/profile/${user._id}`}>
-                          <p className="text-sm text-muted-foreground hover:underline">
-                            {user.username}
-                          </p>
-                        </Link>
-                      </div>
-                    </div>
-                  )
-                )}
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-left">Name</TableHead>
+                      <TableHead className="text-center hidden sm:table-cell">
+                        subject
+                      </TableHead>
+                      <TableHead className="text-right">Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {support.map(
+                      (support: {
+                        _id: string;
+                        name: string;
+                        email: string;
+                        subject: string;
+                        status: string;
+                      }) => (
+                        <TableRow>
+                          <TableCell className="text-left text-xs md:text-sm">
+                            <Link
+                              to={`/admin/support/${support._id}`}
+                              className="hover:underline"
+                            >
+                              {support.name}
+                            </Link>
+                          </TableCell>
+                          <TableCell className="text-center hidden sm:table-cell ">
+                            <Link
+                              to={`/admin/support/${support._id}`}
+                              className="hover:underline"
+                            >
+                              {support.subject}
+                            </Link>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Badge
+                              className={`hover:cursor-default text-black  ${
+                                support.status === "Pending"
+                                  ? "bg-muted-foreground hover:bg-muted-foreground/70"
+                                  : support.status === "In Progress"
+                                  ? "bg-blue-500 hover:bg-blue-500/70"
+                                  : "bg-green-500 hover:bg-green-500/70"
+                              }`}
+                            >
+                              {support.status}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    )}
+                  </TableBody>
+                </Table>
               </CardContent>
             </Card>
           </div>

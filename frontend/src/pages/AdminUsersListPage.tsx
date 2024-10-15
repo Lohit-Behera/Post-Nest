@@ -207,9 +207,10 @@ function AdminUsersListPage() {
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
                       <AlertDialogAction
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         onClick={() => handleDeleteUser(user._id)}
                       >
-                        Continue
+                        Delete
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>

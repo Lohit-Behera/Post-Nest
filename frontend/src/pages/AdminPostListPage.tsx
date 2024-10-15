@@ -175,9 +175,10 @@ function AdminPostListPage() {
                             <AlertDialogFooter>
                               <AlertDialogCancel>Cancel</AlertDialogCancel>
                               <AlertDialogAction
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                 onClick={() => handleDeletePost(post._id)}
                               >
-                                Continue
+                                Delete
                               </AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>

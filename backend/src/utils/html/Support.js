@@ -209,52 +209,53 @@ xmlns:o="urn:schemas-microsoft-com:office:office" lang="en">
                                                                               </p>
                                                                               </td>
                                                                         </tr>
+                                                                        <tr>
+                                                                          <td>
+                                                                            <div class="t22" style="mso-line-height-rule:exactly;mso-line-height-alt:30px;line-height:30px;font-size:1px;display:block;">
+                                                                              &nbsp;&nbsp;
+                                                                            </div>
+                                                                          </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                          <td align="left">
+                                                                            <table class="t24" role="presentation" cellpadding="0" cellspacing="0"
+                                                                            style="Margin-right:auto;">
+                                                                              <tr>
+                                                                                    <td class="t23" style="width:480px;">
+                                                                                    <p class="t21" style="margin:0;Margin:0;font-family:Inter,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:27px;font-weight:400;font-style:normal;font-size:16px;text-decoration:none;text-transform:none;direction:ltr;color:#000000;text-align:left;mso-line-height-rule:exactly;mso-text-raise:3px;">
+                                                                                      We appreciate your patience and will strive to resolve your issue quickly.
+                                                                                    </p>
+                                                                                    </td>
+                                                                              </tr>
+                                                                            </table>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <td>
+                                                                          <div class="t22" style="mso-line-height-rule:exactly;mso-line-height-alt:30px;line-height:30px;font-size:1px;display:block;">
+                                                                            &nbsp;&nbsp;
+                                                                          </div>
+                                                                        </td>
+                                                                        <tr>
+                                                                          <td align="left">
+                                                                            <table class="t24" role="presentation" cellpadding="0" cellspacing="0"
+                                                                            style="Margin-right:auto;">
+                                                                              <tr>
+                                                                                    <td class="t23" style="width:480px;">
+                                                                                    <p class="t21" style="margin:0;Margin:0;font-family:Inter,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:27px;font-weight:400;font-style:normal;font-size:16px;text-decoration:none;text-transform:none;direction:ltr;color:#000000;text-align:left;mso-line-height-rule:exactly;mso-text-raise:3px;">
+                                                                                      Best regards,<br/>
+                                                                                      The Support Team
+                                                                                    </p>
+                                                                                    </td>
+                                                                              </tr>
+                                                                            </table>
+                                                                            </td>
+                                                                        </tr>
                                                                       </table>
                                                                       </td>
                                                                   </tr>
                                                                    
                                                                   </tr>
-                                                                  <tr>
-                                                                    <td>
-                                                                      <div class="t22" style="mso-line-height-rule:exactly;mso-line-height-alt:30px;line-height:30px;font-size:1px;display:block;">
-                                                                        &nbsp;&nbsp;
-                                                                      </div>
-                                                                    </td>
-                                                                  </tr>
-                                                                  <tr>
-                                                                    <td align="left">
-                                                                      <table class="t24" role="presentation" cellpadding="0" cellspacing="0"
-                                                                      style="Margin-right:auto;">
-                                                                        <tr>
-                                                                              <td class="t23" style="width:480px;">
-                                                                              <p class="t21" style="margin:0;Margin:0;font-family:Inter,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:27px;font-weight:400;font-style:normal;font-size:16px;text-decoration:none;text-transform:none;direction:ltr;color:#000000;text-align:left;mso-line-height-rule:exactly;mso-text-raise:3px;">
-                                                                                We appreciate your patience and will strive to resolve your issue quickly.
-                                                                              </p>
-                                                                              </td>
-                                                                        </tr>
-                                                                      </table>
-                                                                      </td>
-                                                                  </tr>
-                                                                  <td>
-                                                                    <div class="t22" style="mso-line-height-rule:exactly;mso-line-height-alt:30px;line-height:30px;font-size:1px;display:block;">
-                                                                      &nbsp;&nbsp;
-                                                                    </div>
-                                                                  </td>
-                                                                  <tr>
-                                                                    <td align="left">
-                                                                      <table class="t24" role="presentation" cellpadding="0" cellspacing="0"
-                                                                      style="Margin-right:auto;">
-                                                                        <tr>
-                                                                              <td class="t23" style="width:480px;">
-                                                                              <p class="t21" style="margin:0;Margin:0;font-family:Inter,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:27px;font-weight:400;font-style:normal;font-size:16px;text-decoration:none;text-transform:none;direction:ltr;color:#000000;text-align:left;mso-line-height-rule:exactly;mso-text-raise:3px;">
-                                                                                Best regards,<br/>
-                                                                                The Support Team
-                                                                              </p>
-                                                                              </td>
-                                                                        </tr>
-                                                                      </table>
-                                                                      </td>
-                                                                  </tr>
+                                                                  
                                                                 </table>
                                                                 </td>
                                                             </tr>

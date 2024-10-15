@@ -73,10 +73,10 @@ const adminDashboard = asyncHandler(async (req, res) => {
         }
     ])
     // get last 10 users
-    const users = await User.find().sort({ createdAt: -1 }).limit(10).select({ _id: 1, username: 1, fullName: 1, avatar: 1 })
+    const support = await Support.find().sort({ createdAt: -1 }).select("name email subject status").limit(5)
 
     // send response
-    return res.status(200).json(new ApiResponse(200, { usersCount, postsCount, commentsCount, likesCount, posts, users }, "Admin dashboard"))
+    return res.status(200).json(new ApiResponse(200, { usersCount, postsCount, commentsCount, likesCount, posts, support }, "Admin dashboard"))
 })
 
 const getAllUsers = asyncHandler(async (req, res) => {
@@ -294,6 +294,43 @@ const getAllSupports = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, supports, "All supports"))
 })
 
+const supportDetails = asyncHandler(async (req, res) => {
+    // get support id from params
+    const { supportId } = req.params
+    // check if support ticket exists
+    const support = await Support.findById(supportId)
+    let post;
+    let user;
+    
+    if (!support) {
+        return res.status(404).json(new ApiResponse(404, {}, "Support ticket not found"))
+    }
+    if (support.post) {
+        post = await Post.findById(support.post).select("title thumbnail author createdAt")
+    }
+    if (support.user) {
+        user = await User.findById(support.user).select("avatar username fullName email isAdmin isVerified createdAt") 
+    }
+
+    // send response
+    return res.status(200).json(new ApiResponse(200, { support, post, user }, "Fetched Support ticket"))
+})
+
+const changeSupportStatus = asyncHandler(async (req, res) => {
+    // get support id from params
+    const { supportId, status } = req.body
+    // check if support ticket exists
+    const support = await Support.findById(supportId)
+    if (!support) {
+        return res.status(404).json(new ApiResponse(404, {}, "Support ticket not found"))
+    }
+    // change support status
+    support.status = status
+    await support.save({ validateBeforeSave: false })
+    // send response
+    return res.status(200).json(new ApiResponse(200, {}, "Support ticket status changed successfully"))
+})
+
 export {
     makeUserAdmin,
     adminDashboard,
@@ -301,5 +338,7 @@ export {
     getAllPosts,
     deleteUser,
     deletePost,
-    getAllSupports
+    getAllSupports,
+    supportDetails,
+    changeSupportStatus
 }

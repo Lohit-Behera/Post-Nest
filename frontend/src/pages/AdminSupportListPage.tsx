@@ -119,7 +119,7 @@ function AdminSupportListPage() {
                       </TableCell>
                       <TableCell className="text-center hidden md:table-cell">
                         <Badge
-                          className={`hover:cursor-default ${
+                          className={`hover:cursor-default text-black  ${
                             supportTicket.status === "Pending"
                               ? "bg-muted-foreground hover:bg-muted-foreground/70"
                               : supportTicket.status === "In Progress"
@@ -143,7 +143,7 @@ function AdminSupportListPage() {
                       </TableCell>
                       <TableCell className="text-center hidden md:table-cell">
                         <AlertDialog>
-                          <AlertDialogTrigger>
+                          <AlertDialogTrigger asChild>
                             <Button variant="destructive" size="icon">
                               <Trash2 />
                             </Button>

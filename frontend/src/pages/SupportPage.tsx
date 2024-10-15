@@ -21,7 +21,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchSupport } from "@/features/SupportSlice";
 import { toast } from "sonner";
 
@@ -55,15 +55,14 @@ const formSchema = z.object({
 
 function SupportPage() {
   const [searchParams] = useSearchParams();
-  console.log(searchParams);
-
   const dispatch = useDispatch<any>();
+  const userInfo = useSelector((state: any) => state.user.userInfo);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
-      name: "",
+      email: userInfo.email || "",
+      name: userInfo.username || "",
       message: "",
       subject: "",
     },
@@ -75,7 +74,7 @@ function SupportPage() {
         name: values.name,
         message: values.message,
         subject: values.subject,
-        userId: searchParams.get("userId"),
+        userId: userInfo._id || null,
         postId: searchParams.get("postId"),
       })
     ).unwrap();

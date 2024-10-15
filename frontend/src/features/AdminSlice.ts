@@ -151,7 +151,7 @@ export const fetchAdminDeletePost = createAsyncThunk(
 );
 
 export const fetchGetAllSupportTickets = createAsyncThunk(
-  "admin/support",
+  "admin/supports/list",
   async (page: string, { rejectWithValue }) => {
     try {
       const config = {
@@ -162,6 +162,60 @@ export const fetchGetAllSupportTickets = createAsyncThunk(
       };
       const { data } = await axios.get(
         `${baseUrl}/api/v1/admin/supports?page=${page}`,
+        config
+      );
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const fetchSupportDetails = createAsyncThunk(
+  "admin/support/details",
+  async (supportId: string, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      };
+      const { data } = await axios.get(
+        `${baseUrl}/api/v1/admin/support/details/${supportId}`,
+        config
+      );
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const fetchChangeSupportStatus = createAsyncThunk(
+  "admin/support/status",
+  async (
+    statusData: { supportId: string; status: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      };
+      const { data } = await axios.patch(
+        `${baseUrl}/api/v1/admin/support/change/status`,
+        statusData,
         config
       );
       return data;
@@ -205,6 +259,14 @@ const adminSlice = createSlice({
     getAllSupportTickets: {},
     getAllSupportTicketsStatus: "idle",
     getAllSupportTicketsError: {},
+
+    supportDetails: {},
+    supportDetailsStatus: "idle",
+    supportDetailsError: {},
+
+    changeSupportStatus: {},
+    changeSupportStatusStatus: "idle",
+    changeSupportStatusError: {},
   },
   reducers: {
     resetAdmin: (state) => {
@@ -221,6 +283,11 @@ const adminSlice = createSlice({
       state.adminDeletePost = {};
       state.adminDeletePostStatus = "idle";
       state.adminDeletePostError = {};
+    },
+    resetChangeSupportStatus: (state) => {
+      state.changeSupportStatus = {};
+      state.changeSupportStatusStatus = "idle";
+      state.changeSupportStatusError = {};
     },
   },
   extraReducers: (builder) => {
@@ -316,10 +383,42 @@ const adminSlice = createSlice({
         state.getAllSupportTicketsStatus = "failed";
         state.getAllSupportTicketsError =
           action.payload || "Get all support tickets failed";
+      })
+
+      // Get support details
+      .addCase(fetchSupportDetails.pending, (state) => {
+        state.supportDetailsStatus = "loading";
+      })
+      .addCase(fetchSupportDetails.fulfilled, (state, action) => {
+        state.supportDetailsStatus = "succeeded";
+        state.supportDetails = action.payload;
+      })
+      .addCase(fetchSupportDetails.rejected, (state, action) => {
+        state.supportDetailsStatus = "failed";
+        state.supportDetailsError =
+          action.payload || "Get support details failed";
+      })
+
+      // change support status
+      .addCase(fetchChangeSupportStatus.pending, (state) => {
+        state.changeSupportStatusStatus = "loading";
+      })
+      .addCase(fetchChangeSupportStatus.fulfilled, (state, action) => {
+        state.changeSupportStatusStatus = "succeeded";
+        state.changeSupportStatus = action.payload;
+      })
+      .addCase(fetchChangeSupportStatus.rejected, (state, action) => {
+        state.changeSupportStatusStatus = "failed";
+        state.changeSupportStatusError =
+          action.payload || "Change support status failed";
       });
   },
 });
 
-export const { resetAdmin, resetDeleteUser, resetAdminDeletePost } =
-  adminSlice.actions;
+export const {
+  resetAdmin,
+  resetDeleteUser,
+  resetAdminDeletePost,
+  resetChangeSupportStatus,
+} = adminSlice.actions;
 export default adminSlice.reducer;

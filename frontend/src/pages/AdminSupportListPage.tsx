@@ -27,6 +27,8 @@ import {
 import { Pencil2Icon } from "@radix-ui/react-icons";
 import { Trash2 } from "lucide-react";
 import Paginator from "@/components/paginator";
+import GlobalLoader from "@/components/Loader/GlobalLoader/GlobalLoader";
+import ServerErrorPage from "./Error/ServerErrorPage";
 
 type SupportTicket = {
   _id: string;
@@ -68,9 +70,9 @@ function AdminSupportListPage() {
   return (
     <>
       {getAllSupportTicketsStatus === "loading" ? (
-        <p>Loading...</p>
+        <GlobalLoader fullHight />
       ) : getAllSupportTicketsStatus === "failed" ? (
-        <p>Error</p>
+        <ServerErrorPage />
       ) : getAllSupportTicketsStatus === "succeeded" ? (
         <div className="min-h-[85vh] w-[98%] md:w-[95%] mx-auto flex justify-center items-center my-6">
           {incorrectPage ? (

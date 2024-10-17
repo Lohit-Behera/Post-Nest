@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { ErrorBoundary } from "react-error-boundary";
 import Header from "./components/Header";
 import { useEffect } from "react";
-import { fetchUserDetails, resetUserDetails } from "./features/UserSlice";
+import { fetchUserDetails } from "./features/UserSlice";
 import { fetchFollowingList } from "./features/FollowSlice";
 import GlobalLoader from "./components/Loader/GlobalLoader/GlobalLoader";
 import ServerErrorPage from "./pages/Error/ServerErrorPage";

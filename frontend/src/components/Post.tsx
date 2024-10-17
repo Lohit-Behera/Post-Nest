@@ -105,11 +105,11 @@ function Post({
                             followingListStatus === "loading"
                           }
                         >
-                          {followingListData.includes(post.author) ? (
-                            <UserMinus />
-                          ) : followStatus === "loading" ||
-                            followingListStatus === "loading" ? (
+                          {followStatus === "loading" ||
+                          followingListStatus === "loading" ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : followingListData.includes(post.author) ? (
+                            <UserMinus />
                           ) : (
                             <UserPlus />
                           )}

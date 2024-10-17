@@ -8,19 +8,17 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { reSignIn } from "@/features/UserSlice";
+import { resetUserDetails, reSignIn } from "@/features/UserSlice";
 import { useEffect } from "react";
 
 function TokenExpired() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const userInfo = useSelector((state: any) => state.user.userInfo);
 
   useEffect(() => {
-    if (!userInfo) {
-      navigate("/sign-in");
-    }
-  }, [userInfo, navigate]);
+    dispatch(reSignIn());
+    dispatch(resetUserDetails());
+  }, []);
   return (
     <div className="w-full min-h-[80vh] flex justify-center items-center">
       <Card className="w-[98%] md:w-[350px] mx-auto h-full">
@@ -32,7 +30,9 @@ function TokenExpired() {
           <Button
             className="w-full"
             size="sm"
-            onClick={() => dispatch(reSignIn())}
+            onClick={() => {
+              navigate("/sign-in");
+            }}
           >
             Re-Sign In
           </Button>

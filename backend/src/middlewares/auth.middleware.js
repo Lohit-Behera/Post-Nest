@@ -27,7 +27,7 @@ export const authMiddleware = asyncHandler(async (req, res, next) => {
             if (!refreshToken) {
                 return res.status(401).json(new ApiResponse(401, {}, "You are not Unauthorized"));
             }
-            const isRefreshTokenExpired = isTokenExpired(refreshToken, res);
+            const isRefreshTokenExpired = isTokenExpired(refreshToken);
             if (isRefreshTokenExpired) {
                 return res.status(401).json(new ApiResponse(401, {}, "Refresh token expired"));
             }

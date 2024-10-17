@@ -50,13 +50,7 @@ function SignInPage() {
     if (userInfo) {
       navigate("/");
     }
-  }, [userInfo, navigate]);
-
-  useEffect(() => {
-    if (userInfoStatus === "succeeded") {
-      navigate("/");
-    }
-  }, [userInfoStatus]);
+  }, []);
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     const signInPromise = dispatch(
@@ -67,11 +61,12 @@ function SignInPage() {
     ).unwrap();
     toast.promise(signInPromise, {
       loading: "Logging in...",
-      success: (data: any) => {
-        return data.message;
+      success: () => {
+        navigate("/");
+        return "Logged in successfully";
       },
       error: (error: any) => {
-        return error;
+        return error || error.message;
       },
     });
   }

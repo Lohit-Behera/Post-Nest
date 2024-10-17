@@ -215,14 +215,14 @@ function ProfilePage() {
                 }
                 onClick={() => handleFollow(userData._id)}
               >
-                {followingListData.includes(userData._id) ? (
-                  <>
-                    <UserMinus className="mr-2 h-4 w-4" /> Unfollow
-                  </>
-                ) : followStatus === "loading" ||
-                  followingListStatus === "loading" ? (
+                {followStatus === "loading" ||
+                followingListStatus === "loading" ? (
                   <>
                     <Loader2 className="mr-2 w-4 h-4 animate-spin" /> Loading...
+                  </>
+                ) : followingListData.includes(userData._id) ? (
+                  <>
+                    <UserMinus className="mr-2 h-4 w-4" /> Unfollow
                   </>
                 ) : (
                   <>

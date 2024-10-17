@@ -204,7 +204,7 @@ function AdminDashboard() {
                         subject: string;
                         status: string;
                       }) => (
-                        <TableRow>
+                        <TableRow key={support._id}>
                           <TableCell className="text-left text-xs md:text-sm">
                             <Link
                               to={`/admin/support/${support._id}`}

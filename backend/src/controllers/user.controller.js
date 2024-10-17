@@ -9,21 +9,18 @@ import axios from "axios";
 import { ForgotPasswordEmailTemplate } from "../utils/html/ForgotPassword.js";
 
 const accessTokenOptions = {
-    httpOnly: true,
+    httpOnly: process.env.NODE_ENV === 'production' ? true : false,
     secure: true,
     sameSite: 'None',
     maxAge: 24 * 60 * 60 * 1000, 
 };
 
 const refreshTokenOptions = {
-    httpOnly: true,
+    httpOnly: process.env.NODE_ENV === 'production' ? true : false,
     secure: true,
     sameSite: 'None',
     maxAge: 30 * 24 * 60 * 60 * 1000,
 };
-
-
-
 
 // generate access token and refresh token
 const generateTokens = async (userId, res) => {

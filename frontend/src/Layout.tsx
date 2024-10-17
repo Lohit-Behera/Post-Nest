@@ -9,6 +9,7 @@ import GlobalLoader from "./components/Loader/GlobalLoader/GlobalLoader";
 import ServerErrorPage from "./pages/Error/ServerErrorPage";
 import SomethingWentWrong from "./pages/Error/SomethingWentWrong";
 import { toast } from "sonner";
+import { getCookie } from "./lib/getCookie";
 
 function Layout() {
   const dispatch = useDispatch<any>();
@@ -28,18 +29,22 @@ function Layout() {
     }
   }, [userInfo, dispatch]);
 
+  const refresh = getCookie("refreshToken");
+
   useEffect(() => {
     if (userDetailsError === "Refresh token expired") {
       toast.error("Your session has expired. Please sign in again.");
       navigate("/token-expired");
-      dispatch(resetUserDetails());
+    } else if (!refresh) {
+      navigate("/token-expired");
     }
-  });
+  }, [userDetailsError, refresh]);
   return (
     <>
       {userDetailsStatus === "loading" || logoutStatus === "loading" ? (
         <GlobalLoader fullHight />
-      ) : userDetailsStatus === "failed" ? (
+      ) : userDetailsStatus === "failed" &&
+        userDetailsError !== "Refresh token expired" ? (
         <ServerErrorPage />
       ) : (
         <div className="min-h-[100vh]">

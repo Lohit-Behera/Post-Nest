@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { baseUrl } from "./Proxy";
+import { getCookie } from "@/lib/getCookie";
 
 export const fetchRegister = createAsyncThunk(
   "user/register",
@@ -354,17 +355,6 @@ export const fetchChangeUsername = createAsyncThunk(
     }
   }
 );
-
-function getCookie(name: string) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-
-  if (parts.length > 1) {
-    const cookieValue = parts.pop()?.split(";").shift();
-    return cookieValue ? decodeURIComponent(cookieValue) : null;
-  }
-  return null;
-}
 
 const userInfoCookie = getCookie("userInfoPostNest");
 

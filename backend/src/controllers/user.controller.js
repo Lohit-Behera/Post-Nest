@@ -11,14 +11,14 @@ import { ForgotPasswordEmailTemplate } from "../utils/html/ForgotPassword.js";
 const accessTokenOptions = {
     httpOnly: false,
     secure: true,
-    sameSite: 'None',
+    same_site: 'none',
     maxAge: 24 * 60 * 60 * 1000, 
 };
 
 const refreshTokenOptions = {
     httpOnly: false,
     secure: true,
-    sameSite: 'None',
+    same_site: 'none',
     maxAge: 60 * 24 * 60 * 60 * 1000,
 };
 
@@ -150,12 +150,12 @@ const logoutUser = asyncHandler(async (req, res) => {
     .clearCookie("accessToken", {
         httpOnly: true,
         secure: true,
-        sameSite: 'None',
+        same_site: 'none',
     })
     .clearCookie("refreshToken", {
         httpOnly: true,
         secure: true,
-        sameSite: 'None',
+        same_site: 'none',
     })
     .json(
         new ApiResponse(200, {}, "Logout successful")

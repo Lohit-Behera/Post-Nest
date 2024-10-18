@@ -14,8 +14,6 @@ app.use(express.urlencoded({ extended: true, limit: '16kb' }));
 app.use(express.static("public"));
 app.use(cookieParser());
 
-app.set('trust proxy', true)
-
 // routes import
 import userRouter from "./routes/user.routes.js";
 import postRouter from "./routes/post.routes.js";

@@ -9,16 +9,16 @@ import axios from "axios";
 import { ForgotPasswordEmailTemplate } from "../utils/html/ForgotPassword.js";
 
 const accessTokenOptions = {
-    httpOnly: false,
+    httpOnly: true,
     secure: true,
-    same_site: 'none',
+    sameSite: 'none',
     maxAge: 24 * 60 * 60 * 1000, 
 };
 
 const refreshTokenOptions = {
-    httpOnly: false,
+    httpOnly: true,
     secure: true,
-    same_site: 'none',
+    sameSite: 'none',
     maxAge: 60 * 24 * 60 * 60 * 1000,
 };
 
@@ -150,12 +150,12 @@ const logoutUser = asyncHandler(async (req, res) => {
     .clearCookie("accessToken", {
         httpOnly: true,
         secure: true,
-        same_site: 'none',
+        sameSite: 'none',
     })
     .clearCookie("refreshToken", {
         httpOnly: true,
         secure: true,
-        same_site: 'none',
+        sameSite: 'none',
     })
     .json(
         new ApiResponse(200, {}, "Logout successful")

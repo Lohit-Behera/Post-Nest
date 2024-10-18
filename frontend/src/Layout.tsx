@@ -9,7 +9,6 @@ import GlobalLoader from "./components/Loader/GlobalLoader/GlobalLoader";
 import ServerErrorPage from "./pages/Error/ServerErrorPage";
 import SomethingWentWrong from "./pages/Error/SomethingWentWrong";
 import { toast } from "sonner";
-import { getCookie } from "./lib/getCookie";
 
 function Layout() {
   const dispatch = useDispatch<any>();

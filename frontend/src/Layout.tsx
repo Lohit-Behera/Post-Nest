@@ -30,16 +30,12 @@ function Layout() {
     }
   }, [userInfo, dispatch]);
 
-  const refresh = getCookie("refreshToken");
-
   useEffect(() => {
     if (userDetailsError === "Refresh token expired") {
       toast.error("Your session has expired. Please sign in again.");
       navigate("/token-expired");
-    } else if (!refresh) {
-      navigate("/token-expired");
     }
-  }, [userDetailsError, refresh]);
+  }, [userDetailsError]);
   return (
     <>
       {userDetailsStatus === "loading" || logoutStatus === "loading" ? (

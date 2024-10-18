@@ -41,14 +41,12 @@ export const authMiddleware = asyncHandler(async (req, res, next) => {
 
             const newAccessToken = user.generateAccessToken();
             res.cookie("accessToken", newAccessToken, {
-                httpOnly: true,
                 secure: true,
                 sameSite: 'None',
                 maxAge: 24 * 60 * 60 * 1000,
             });
             const newRefreshToken = user.generateRefreshToken();
             res.cookie("refreshToken", newRefreshToken, {
-                httpOnly: true,
                 secure: true,
                 sameSite: 'None',
                 maxAge: 30 * 24 * 60 * 60 * 1000,

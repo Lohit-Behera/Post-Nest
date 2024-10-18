@@ -9,14 +9,14 @@ import axios from "axios";
 import { ForgotPasswordEmailTemplate } from "../utils/html/ForgotPassword.js";
 
 const accessTokenOptions = {
-    httpOnly: true,
+    
     secure: true,
     sameSite: 'none',
     maxAge: 24 * 60 * 60 * 1000, 
 };
 
 const refreshTokenOptions = {
-    httpOnly: true,
+    
     secure: true,
     sameSite: 'none',
     maxAge: 60 * 24 * 60 * 60 * 1000,
@@ -148,12 +148,12 @@ const logoutUser = asyncHandler(async (req, res) => {
 
     return res.status(200)
     .clearCookie("accessToken", {
-        httpOnly: true,
+        
         secure: true,
         sameSite: 'none',
     })
     .clearCookie("refreshToken", {
-        httpOnly: true,
+        
         secure: true,
         sameSite: 'none',
     })

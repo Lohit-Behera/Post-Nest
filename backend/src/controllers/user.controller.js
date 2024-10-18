@@ -9,14 +9,14 @@ import axios from "axios";
 import { ForgotPasswordEmailTemplate } from "../utils/html/ForgotPassword.js";
 
 const accessTokenOptions = {
-    httpOnly: true,
+    httpOnly: false,
     secure: true,
     sameSite: 'None',
     maxAge: 24 * 60 * 60 * 1000, 
 };
 
 const refreshTokenOptions = {
-    httpOnly: true,
+    httpOnly: false,
     secure: true,
     sameSite: 'None',
     maxAge: 60 * 24 * 60 * 60 * 1000,

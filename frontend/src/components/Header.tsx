@@ -30,7 +30,7 @@ import {
   SquarePlus,
   UserCog2,
 } from "lucide-react";
-import { fetchLogout } from "@/features/UserSlice";
+import { fetchLogout, resetUserDetails } from "@/features/UserSlice";
 import SearchUserAndPosts from "@/components/SearchUserAndPosts";
 
 function Header() {
@@ -42,7 +42,8 @@ function Header() {
 
   const handleLogout = async () => {
     await dispatch(fetchLogout());
-    window.location.reload();
+    await dispatch(resetUserDetails());
+    navigate("/sign-in");
   };
   return (
     <header className="z-20 w-full sticky top-0 p-2 backdrop-blur bg-background/50 shadow  ">

@@ -21,6 +21,8 @@ function Layout() {
   const userDetailsError = useSelector(
     (state: any) => state.user.userDetailsError
   );
+  console.log(document.cookie);
+
   const logoutStatus = useSelector((state: any) => state.user.logoutStatus);
   useEffect(() => {
     if (userInfo) {
